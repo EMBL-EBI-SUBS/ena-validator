@@ -18,7 +18,7 @@ import uk.ac.ebi.subs.data.component.AssayRef;
 import uk.ac.ebi.subs.data.component.Attribute;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.submittable.*;
-import uk.ac.ebi.subs.ena.EnaAgentApplication;
+import uk.ac.ebi.subs.EnaAgentApplication;
 
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBException;

@@ -41,6 +41,10 @@ dependencies {
 	//compile('org.springframework.boot:spring-boot-starter-web') {
 	//	exclude module : 'spring-boot-starter-logging'
 	//}
+	compile ('uk.ac.ebi.ena.sra:sra-core:1.14.39-SUBS-343-usidev') {
+		exclude group : 'org.slf4j'
+	}
+
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile("org.springframework.boot:spring-boot-starter-actuator")
 	compile 'de.codecentric:spring-boot-admin-starter-client:1.3.7'
