@@ -134,15 +134,6 @@ public abstract class ENAAgentProcessor<T extends Submittable> extends AgentProc
         return document;
     }
 
-    abstract Transformer getTransformer () throws URISyntaxException, TransformerConfigurationException;
-
-    Transformer getTransformer(String transformerResource) throws URISyntaxException, TransformerConfigurationException {
-        final URL resource = getClass().getResource(transformerResource);
-        java.io.File xsltFile = new File(resource.toURI());
-        StreamSource stylesource = new StreamSource(xsltFile);
-        return transformerFactory.newTransformer(stylesource);
-    }
-
     private Document transformDocument(Transformer transformer, Document inputDocument) throws TransformerException, ParserConfigurationException {
         Document documentResult = documentBuilderFactory.newDocumentBuilder().newDocument();
         DOMSource domSource = new DOMSource(inputDocument);
