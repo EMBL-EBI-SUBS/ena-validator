@@ -45,11 +45,6 @@ public class ENAStudyProcessor extends ENAAgentProcessor<ENAStudy> {
     }
 
     @Override
-    Transformer getTransformer() throws URISyntaxException, TransformerConfigurationException {
-        return getTransformer(STUDY_TRANSFORMER);
-    }
-
-    @Override
     protected void addActions(SubmissionType submissionType, ENAStudy submittable) {
         super.addActions(submissionType, submittable);
         final SubmissionType.ACTIONS.ACTION.HOLD hold = submissionType.getACTIONS().addNewACTION().addNewHOLD();
@@ -63,7 +58,7 @@ public class ENAStudyProcessor extends ENAAgentProcessor<ENAStudy> {
 
     @Override
     protected ProcessingStatus loadData(ENAStudy submittable, SubmissionEnvelope submissionEnvelope) throws Exception {
-        //if (submittable.getReleaseDate() == null) throw new Exception("release date has not been set for study " + submittable.getId());
+        if (submittable.getBaseObject().getReleaseDate() == null) throw new Exception("release date has not been set for study " + submittable.getId());
         return super.loadData(submittable, submissionEnvelope);
     }
 
