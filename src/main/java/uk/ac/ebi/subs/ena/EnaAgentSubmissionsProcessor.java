@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import uk.ac.ebi.ena.sra.SRALoader;
 import uk.ac.ebi.subs.data.FullSubmission;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
-import uk.ac.ebi.subs.ena.processor.AssayProcessor;
+import uk.ac.ebi.subs.ena.processor.ENAExperimentProcessor;
 import uk.ac.ebi.subs.ena.processor.ENAStudyProcessor;
 import uk.ac.ebi.subs.processing.*;
 import uk.ac.ebi.subs.data.component.Archive;
@@ -97,8 +97,8 @@ public class EnaAgentSubmissionsProcessor {
         List<ProcessingCertificate> certs = new ArrayList<>();
         ENAStudyProcessor ENAStudyProcessor = new ENAStudyProcessor(submissionEnvelope,Archive.Ena,studyMarshaller,connection,submissionAccountId,transactionMode);
         certs.addAll(ENAStudyProcessor.processSubmittables());
-        AssayProcessor assayProcessor = new AssayProcessor(submissionEnvelope,Archive.Ena);
-        certs.addAll(assayProcessor.processSubmittables());
+        ENAExperimentProcessor ENAExperimentProcessor = new ENAExperimentProcessor(submissionEnvelope,Archive.Ena,experimentMarshaller,connection,submissionAccountId,transactionMode);
+        certs.addAll(ENAExperimentProcessor.processSubmittables());
 
         return certs;
     }
