@@ -61,16 +61,7 @@ public abstract class AgentProcessor<T extends Submittable> {
         getSubmittables(submissionEnvelope.getSubmission()).stream().
                 filter(s -> s.getArchive() == archive)
                 .forEach(s -> certs.add(processData(s, submissionEnvelope)));
-
-        //getSubmittables(submissionEnvelope.getSubmission()).stream()
-        //        .filter(s -> s.getArchive() == archive);
         return certs;
-    }
-
-    private List<T> prepareSubmittables () {
-        final List<T> list = getSubmittables(submissionEnvelope.getSubmission()).stream().
-                filter(s -> s.getArchive() == archive).collect(Collectors.toList());
-        return list;
     }
 
 
