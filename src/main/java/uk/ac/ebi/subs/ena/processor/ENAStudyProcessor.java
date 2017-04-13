@@ -1,47 +1,33 @@
 package uk.ac.ebi.subs.ena.processor;
 
-import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlObject;
-import org.eclipse.persistence.annotations.TimeOfDay;
 import org.springframework.oxm.Marshaller;
-import org.w3c.dom.Document;
-
 import uk.ac.ebi.ena.sra.SRALoader;
 import uk.ac.ebi.ena.sra.StudyInfo;
-import uk.ac.ebi.ena.sra.xml.SUBMISSIONSETDocument;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 import uk.ac.ebi.ena.sra.xml.SubmissionType;
 import uk.ac.ebi.subs.data.FullSubmission;
-import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.status.ProcessingStatus;
-import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
+import uk.ac.ebi.subs.data.submittable.BaseSubmittable;
+import uk.ac.ebi.subs.data.submittable.BaseSubmittableFactory;
 import uk.ac.ebi.subs.data.submittable.ENAStudy;
-import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 
-import java.net.URISyntaxException;
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 
 //import uk.ac.ebi.ena.sra.SRALoader;
 //import uk.ac.ebi.ena.sra.SRALoader;
 
-public class ENAStudyProcessor extends ENAAgentProcessor<ENAStudy> {
+public class ENAStudyProcessor extends ENAAgentSubmittableProcessor<ENAStudy> {
     static String STUDY_SCHEMA = "study";
     String STUDY_TRANSFORMER = "/uk/ac/ebi/subs/xml/study_mapper.xslt";
     public static final String STUDY_SET_XSD = "https://github.com/enasequence/schema/blob/master/src/main/resources/uk/ac/ebi/ena/sra/schema/SRA.study.xsd";
 
 
-    public ENAStudyProcessor(SubmissionEnvelope submissionEnvelope, Archive archive, Marshaller marshaller, Connection connection, String submissionAccountId, SRALoader.TransactionMode transactionMode) {
-        super(submissionEnvelope, archive, marshaller, connection, submissionAccountId, transactionMode);
+    public ENAStudyProcessor(SubmissionEnvelope submissionEnvelope, Marshaller marshaller, Connection connection, String submissionAccountId, SRALoader.TransactionMode transactionMode) {
+        super(submissionEnvelope, marshaller, connection, submissionAccountId, transactionMode);
     }
 
     @Override
@@ -85,6 +71,17 @@ public class ENAStudyProcessor extends ENAAgentProcessor<ENAStudy> {
     }
 
     @Override
+    protected Class<? extends BaseSubmittableFactory> getBaseSubmittableClass() {
+        return ENAStudy.class;
+    }
+
+    @Override
+    protected List<? extends BaseSubmittable> getBaseSubmittables(FullSubmission fullSubmission) {
+        return fullSubmission.getStudies();
+    }
+
+    /*
+    @Override
     List<ENAStudy> getSubmittables(FullSubmission fullSubmission) {
         List <ENAStudy> enaStudies = new ArrayList<>();
         for (Study study : fullSubmission.getStudies()) {
@@ -96,12 +93,11 @@ public class ENAStudyProcessor extends ENAAgentProcessor<ENAStudy> {
         }
         return enaStudies;
     }
+    */
 
     @Override
     String getSchemaName() {
         return STUDY_SCHEMA;
     }
-
-
 
 }

@@ -21,6 +21,8 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import uk.ac.ebi.subs.data.submittable.ENAExperiment;
 import uk.ac.ebi.subs.data.submittable.ENARun;
 import uk.ac.ebi.subs.data.submittable.ENAStudy;
+import uk.ac.ebi.subs.ena.processor.SRALoaderService;
+import uk.ac.ebi.subs.ena.processor.StudySRALoaderImpl;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +49,9 @@ public class EnaAgentConfiguration {
 
     @Autowired
     private ApplicationContext appContext;
+
+    @Value("${ena.submission_account_id}")
+    String submissionAccountId;
 
     @Value("classpath:uk/ac/ebi/subs/data/component/attribute_mapping.xml")
     Resource componentMappingResource;
@@ -96,6 +101,12 @@ public class EnaAgentConfiguration {
     DataSource dataSource() {
         DataSource dataSource = DataSourceBuilder.create().build();
         return dataSource;
+    }
+
+    @Bean(name = "studySRALoader")
+    SRALoaderService studySRALoaderService () throws IOException {
+        StudySRALoaderImpl studySRALoader = new StudySRALoaderImpl(submissionAccountId,submissionAccountId,jaxb2StudyMarshaller());
+        return studySRALoader;
     }
 
 }

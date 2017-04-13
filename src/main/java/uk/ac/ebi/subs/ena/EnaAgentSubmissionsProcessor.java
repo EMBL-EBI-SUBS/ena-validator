@@ -1,4 +1,4 @@
-package uk.ac.ebi.subs.enaagent;
+package uk.ac.ebi.subs.ena;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,10 +95,10 @@ public class EnaAgentSubmissionsProcessor {
 
     public List<ProcessingCertificate> processSubmission(SubmissionEnvelope submissionEnvelope, Connection connection) {
         List<ProcessingCertificate> certs = new ArrayList<>();
-        ENAStudyProcessor ENAStudyProcessor = new ENAStudyProcessor(submissionEnvelope,Archive.Ena,studyMarshaller,connection,submissionAccountId,transactionMode);
-        certs.addAll(ENAStudyProcessor.processSubmittables());
-        ENAExperimentProcessor ENAExperimentProcessor = new ENAExperimentProcessor(submissionEnvelope,Archive.Ena,experimentMarshaller,connection,submissionAccountId,transactionMode);
-        certs.addAll(ENAExperimentProcessor.processSubmittables());
+        ENAStudyProcessor ENAStudyProcessor = new ENAStudyProcessor(submissionEnvelope,studyMarshaller,connection,submissionAccountId,transactionMode);
+        //certs.addAll(ENAStudyProcessor.processSubmittables());
+        ENAExperimentProcessor ENAExperimentProcessor = new ENAExperimentProcessor(submissionEnvelope,experimentMarshaller,connection,submissionAccountId,transactionMode);
+        //certs.addAll(ENAExperimentProcessor.processSubmittables());
 
         return certs;
     }

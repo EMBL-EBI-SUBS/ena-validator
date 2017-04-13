@@ -1,43 +1,28 @@
 package uk.ac.ebi.subs.ena.processor;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.repository.MongoRepository;
-
 import org.springframework.oxm.Marshaller;
 import uk.ac.ebi.ena.sra.ExperimentInfo;
 import uk.ac.ebi.ena.sra.SRALoader;
-import uk.ac.ebi.ena.sra.StudyInfo;
 import uk.ac.ebi.ena.sra.xml.ExperimentType;
-import uk.ac.ebi.ena.sra.xml.StudyType;
 import uk.ac.ebi.subs.data.FullSubmission;
-import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.component.SampleRef;
 import uk.ac.ebi.subs.data.component.SampleUse;
-import uk.ac.ebi.subs.data.status.ProcessingStatus;
-import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
-import uk.ac.ebi.subs.data.submittable.Assay;
-import uk.ac.ebi.subs.data.submittable.ENAExperiment;
-import uk.ac.ebi.subs.data.submittable.Sample;
+import uk.ac.ebi.subs.data.submittable.*;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import java.net.URISyntaxException;
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-public class ENAExperimentProcessor extends ENAAgentProcessor<ENAExperiment> {
+public class ENAExperimentProcessor extends ENAAgentSubmittableProcessor<ENAExperiment> {
 
     static String EXPERIMENT_SCHEMA = "experiment";
     public static final String EXPERIMENT_SET_XSD = "https://github.com/enasequence/schema/blob/master/src/main/resources/uk/ac/ebi/ena/sra/schema/SRA.experiment.xsd";
 
 
-    public ENAExperimentProcessor(SubmissionEnvelope submissionEnvelope, Archive archive, Marshaller marshaller, Connection connection, String submissionAccountId, SRALoader.TransactionMode transactionMode) {
-        super(submissionEnvelope, archive, marshaller, connection, submissionAccountId, transactionMode);
+    public ENAExperimentProcessor(SubmissionEnvelope submissionEnvelope, Marshaller marshaller, Connection connection, String submissionAccountId, SRALoader.TransactionMode transactionMode) {
+        super(submissionEnvelope, marshaller, connection, submissionAccountId, transactionMode);
     }
 
     ProcessingCertificate processData(ENAExperiment submittable, SubmissionEnvelope submissionEnvelope) {
@@ -84,6 +69,17 @@ public class ENAExperimentProcessor extends ENAAgentProcessor<ENAExperiment> {
     }
 
     @Override
+    protected Class<? extends BaseSubmittableFactory> getBaseSubmittableClass() {
+        return ENAExperiment.class;
+    }
+
+    @Override
+    protected List<? extends BaseSubmittable> getBaseSubmittables(FullSubmission fullSubmission) {
+        return fullSubmission.getAssays();
+    }
+
+    /*
+    @Override
     List<ENAExperiment> getSubmittables(FullSubmission fullSubmission) {
         List <ENAExperiment> enaExperimentList = new ArrayList<>();
         for (Assay assay : fullSubmission.getAssays()) {
@@ -95,4 +91,6 @@ public class ENAExperimentProcessor extends ENAAgentProcessor<ENAExperiment> {
         }
         return enaExperimentList;
     }
+    */
+
 }
