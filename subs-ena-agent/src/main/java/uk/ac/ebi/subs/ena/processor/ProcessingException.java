@@ -1,4 +1,4 @@
-package uk.ac.ebi.subs.enaagent.processor;
+package uk.ac.ebi.subs.ena.processor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

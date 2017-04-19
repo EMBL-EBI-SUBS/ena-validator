@@ -11,118 +11,109 @@ buildscript {
 	}
 }
 
-apply plugin: 'java'
-apply plugin: 'maven-publish'
-apply plugin: 'maven'
-apply plugin: 'org.hidetake.ssh'
-apply plugin: 'org.springframework.boot'
-
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 1.8
-
-repositories {
-	mavenLocal()
-	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-	mavenCentral()
-	maven { url "http://ena-dev:8081/artifactory/all" }
+allprojects {
+	ext.version_base = '1.0.0-SNAPSHOT'
+	version = version_base
+	group = 'uk.ac.ebi.subs.ena'
 }
 
-dependencyManagement {
-	resolutionStrategy {
-		cacheChangingModulesFor 0, 'seconds'
-	}
-}
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'maven-publish'
+	apply plugin: 'maven'
+	apply plugin: 'org.hidetake.ssh'
+	apply plugin: 'org.springframework.boot'
 
-dependencies {
-	compile(group: 'uk.ac.ebi.subs', name: 'subs-messaging', version: '1.0.0-SNAPSHOT', changing: true)
-	compile(group: 'uk.ac.ebi.subs', name: 'subs-processing-model', version: '1.0.0-SNAPSHOT', changing: true)
-	compile(group: 'uk.ac.ebi.subs', name: 'subs-ena-data-model', version: '1.0.0-SNAPSHOT', changing: true)
-	compile ("org.springframework:spring-oxm")
-	compile ('uk.ac.ebi.ena.sra:sra-core:1.14.39-SUBS-343-usidev') {
-		exclude group : 'org.slf4j'
-	}
-	compile('org.springframework.boot:spring-boot-starter-web')
-	compile("org.springframework.boot:spring-boot-starter-actuator")
-	compile 'de.codecentric:spring-boot-admin-starter-client:1.3.7'
-	compile 'org.apache.tomcat:tomcat-jdbc:8.0.32'
-	compile 'org.springframework:spring-jdbc'
-	runtime(group: 'com.oracle', name: 'ojdbc6', version: '11.2.0.3')
-	runtime(group: 'com.oracle', name: 'xdb', version: '11.2.0.3')
-	runtime(group: 'com.oracle', name: 'xmlparserv2', version: '11.2.0.3.1')
-	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile("junit:junit")
-}
-
-task wrapper(type: Wrapper) {
-	gradleVersion = '3.3'
-}
-
-processResources {
-	filesMatching('application.properties') {
-		expand(project.properties)
-	}
-}
-
-
-ssh.settings {
-	user = 'sub_adm'
-}
-
-if (project.hasProperty('sshKeyFile')) {
-	ssh.settings.identity = new File(sshKeyFile)
-}
-
-if (project.hasProperty('sshPassphrase')) {
-	ssh.settings.passphrase = sshPassphrase
-}
-
-remotes {
-	dev {
-		host = 'mac-subs-001.ebi.ac.uk'
-	}
-}
-
-task printJarName {
-	doLast {
-		println "$jar.archivePath.name"
+	repositories {
+		mavenLocal()
+		maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+		mavenCentral()
+		maven { url "http://ena-dev:8081/artifactory/all" }
 	}
 
-}
-
-task printJarFullPath {
-	doLast {
-		println "$jar.archivePath.absolutePath"
-	}
-}
-
-remotes {
-	staging {
-		role('staging')
-		host = 'mac-subs-001'
-	}
-}
-
-task deployJar(type: SshTask, dependsOn: 'build') {
-	doLast {
-		def deployHome = "/data/" + project.name;
-		File jarDeployDir = new File(deployHome,"jar")
-
-		ssh.run {
-			session(remotes.staging) {
-				println "Uploading jar $jar.archivePath.name to $jarDeployDir area on $remote"
-				put(jar.archivePath.absolutePath, jarDeployDir.absolutePath)
-				println "creating symbolic link to $jar.archiveName"
-				def result = execute "ln -s -f $jarDeployDir/$jar.archiveName $jarDeployDir/$jar.baseName" + ".jar", ignoreError: true
-				println result
-
-			}
+	dependencyManagement {
+		resolutionStrategy {
+			cacheChangingModulesFor 0, 'seconds'
 		}
 	}
-	ssh.settings {
-		knownHosts = allowAnyHosts
+
+	task wrapper(type: Wrapper) {
+		gradleVersion = '3.3'
 	}
+
+	processResources {
+		filesMatching('application.properties') {
+			expand(project.properties)
+		}
+	}
+
+
+	ssh.settings {
+		user = 'sub_adm'
+	}
+
+	if (project.hasProperty('sshKeyFile')) {
+		ssh.settings.identity = new File(sshKeyFile)
+	}
+
+	if (project.hasProperty('sshPassphrase')) {
+		ssh.settings.passphrase = sshPassphrase
+	}
+
+	remotes {
+		dev {
+			host = 'mac-subs-001.ebi.ac.uk'
+		}
+	}
+
+	task printJarName {
+		doLast {
+			println "$jar.archivePath.name"
+		}
+
+	}
+
+	task printJarFullPath {
+		doLast {
+			println "$jar.archivePath.absolutePath"
+		}
+	}
+
+	remotes {
+		staging {
+			role('staging')
+			host = 'mac-subs-001'
+		}
+	}
+
+	task deployJar(type: SshTask, dependsOn: 'build') {
+		doLast {
+			def deployHome = "/data/" + project.name;
+			File jarDeployDir = new File(deployHome,"jar")
+
+			ssh.run {
+				session(remotes.staging) {
+					println "Uploading jar $jar.archivePath.name to $jarDeployDir area on $remote"
+					put(jar.archivePath.absolutePath, jarDeployDir.absolutePath)
+					println "creating symbolic link to $jar.archiveName"
+					def result = execute "ln -s -f $jarDeployDir/$jar.archiveName $jarDeployDir/$jar.baseName" + ".jar", ignoreError: true
+					println result
+
+				}
+			}
+		}
+		ssh.settings {
+			knownHosts = allowAnyHosts
+		}
+	}
+
+	springBoot {
+		executable = true
+	}
+
 }
 
-springBoot {
-	executable = true
-}
+
+
+
+
