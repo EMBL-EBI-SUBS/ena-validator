@@ -1,4 +1,5 @@
 rootProject.name = 'subs-ena'
 
 include "subs-ena-agent"
+include "subs-ena-repository"
 

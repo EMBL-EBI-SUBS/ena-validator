@@ -1,0 +1,7 @@
+apply plugin: 'java'
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile files('lib/ojdbc6-11.2.0.3.jar')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
