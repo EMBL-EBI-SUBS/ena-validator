@@ -38,4 +38,3 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 ## License
 
 This project is licensed under the Oracle Technology License - see the [LICENSE.md](http://www.oracle.com/technetwork/licenses/distribution-license-152002.html) file for details
-
