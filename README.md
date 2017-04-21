@@ -5,6 +5,7 @@ Contains all the USI Subs SRA agent and the associated integration tests.
 ### Prerequisites
 
 * [Java 1.8](https://www.java.com/) 
+* [RabbitMQ]()
 
 ## Running the tests
 
@@ -24,7 +25,7 @@ Contains all the USI Subs SRA agent and the associated integration tests.
 
 ## Built With
 
-* [Gradle](https://gradle.org/) - Dependency Management
+* [Gradle](https://gradle.org/) 
 
 ## Versioning
 
