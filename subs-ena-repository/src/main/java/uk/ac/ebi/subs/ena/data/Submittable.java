@@ -10,6 +10,8 @@ public interface Submittable {
 
     public void setId(String id);
 
+    public String getAlias();
+
     public Document getDocument();
 
     public void setDocument(Document document);
@@ -25,4 +27,6 @@ public interface Submittable {
     public String getSubmissionAccountId();
 
     public void setSubmissionAccountId(String submissionAccountId);
+
+
 }
