@@ -60,7 +60,6 @@ public class XMLType implements UserType{
                 Document document1 = (Document)x;
                 document1.normalizeDocument();
                 Document document2 = (Document)y;
-                Serializable sra = document2;
                 document2.normalizeDocument();
                 return (document1.isEqualNode(document2));
             }
@@ -89,7 +88,7 @@ public class XMLType implements UserType{
         } finally {
             xmlType.free();
         }
-        return null;
+        return document;
     }
 
     @Override
