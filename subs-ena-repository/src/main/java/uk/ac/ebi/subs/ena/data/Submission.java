@@ -1,6 +1,7 @@
 package uk.ac.ebi.subs.ena.data;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 import org.w3c.dom.Document;
 
 import javax.persistence.*;
@@ -13,20 +14,25 @@ import javax.persistence.*;
 @Table(name="SUBMISSION")
 public class Submission extends AbstractSubmittable<Study>{
 
-    @Column(name = "SUBMISSION_ID")
-    protected String submissionId = null;
-
     @Id
     @GenericGenerator(name = "sraSubmissionGen", strategy = "uk.ac.ebi.subs.ena.id.SubmissionIDGenerator")
     @GeneratedValue(generator = "sraSubmissionGen")
     String id;
-    @Column(name="STUDY_XML")
-    Document document;
 
+    @Column(name = "SUBMISSION_ALIAS")
+    String alias;
+
+    @Column(name="STUDY_XML")
+    @Type(type="uk.ac.ebi.subs.ena.type.XMLType")
+    Document document;
 
     public Submission(String submissionId, Document document, int statusId) {
         super(submissionId, statusId);
         this.document = document;
+    }
+
+    public Submission () {
+        super();
     }
 
     @Override
@@ -47,6 +53,11 @@ public class Submission extends AbstractSubmittable<Study>{
     @Override
     public void setId(String id) {
         this.submissionId = submissionId;
+    }
+
+    @Override
+    public String getAlias() {
+        return alias;
     }
 }
 
