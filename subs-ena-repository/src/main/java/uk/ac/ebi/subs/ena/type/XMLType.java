@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import javax.sql.rowset.serial.SerialArray;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -52,14 +53,24 @@ public class XMLType implements UserType{
 
     @Override
     public boolean equals(Object x, Object y) throws HibernateException {
-        Document document1 = (Document)x;
-        Document document2 = (Document)y;
-        return (document1.isEqualNode(document2));
+        if (x == y) {
+            return true;
+        } else {
+            if (x != null && y != null) {
+                Document document1 = (Document)x;
+                document1.normalizeDocument();
+                Document document2 = (Document)y;
+                Serializable sra = document2;
+                document2.normalizeDocument();
+                return (document1.isEqualNode(document2));
+            }
+        }
+        return false;
     }
 
     @Override
     public int hashCode(Object x) throws HibernateException {
-        return 0;
+        return x.hashCode();
     }
 
     @Override
@@ -70,7 +81,7 @@ public class XMLType implements UserType{
             if (xmlType != null) {
                 document = documentBuilder.parse(new InputSource(xmlType.getCharacterStream()));
             } else {
-//                document = documentBuilder.newDocument();
+                document = documentBuilder.newDocument();
             }
         } catch (Exception e) {
             log.error("Exception in nullSafeGet",e);
