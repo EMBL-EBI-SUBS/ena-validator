@@ -26,6 +26,21 @@ public class Sample extends AbstractSubmittable<Sample> {
     @Type(type="uk.ac.ebi.subs.ena.type.XMLType")
     Document document;
 
+    public Sample(String alias, Document document) {
+        this.alias = alias;
+        this.document = document;
+    }
+
+    public Sample(String submissionId, int statusId, String alias, Document document) {
+        super(submissionId, statusId);
+        this.alias = alias;
+        this.document = document;
+    }
+
+    public Sample () {
+        super();
+    }
+
     @Override
     public String getId() {
         return null;
