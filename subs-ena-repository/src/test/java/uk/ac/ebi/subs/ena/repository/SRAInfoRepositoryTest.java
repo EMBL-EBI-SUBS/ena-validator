@@ -5,15 +5,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.subs.ena.ENATestRepositoryApplication;
 import uk.ac.ebi.subs.ena.data.AbstractSRAInfo;
 import uk.ac.ebi.subs.ena.data.SRAInfo;
+import uk.ac.ebi.subs.ena.data.SubmissionStatus;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -22,6 +26,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ENATestRepositoryApplication.class)
+@Transactional
 public abstract class SRAInfoRepositoryTest<E extends SRAInfo, T extends SRARepository<E>>
         implements SubmittableTestObjectFactory<E> {
 
@@ -30,7 +35,6 @@ public abstract class SRAInfoRepositoryTest<E extends SRAInfo, T extends SRARepo
 
     static String SUBMISSION_ACCOUNT_ID = "Webin-2";
 
-    //@Autowired
     T repository;
 
     public SRAInfoRepositoryTest() {
@@ -52,14 +56,6 @@ public abstract class SRAInfoRepositoryTest<E extends SRAInfo, T extends SRARepo
         assertNotNull(sraInfo);
     }
 
-    /*
-    @Test
-    public void findBySubmissionId() throws Exception {
-        String id = getSubmissionId();
-        final List<? extends AbstractSRAInfo> submittableList = repository.findBySubmissionId(id);
-        assertFalse(submittableList.isEmpty());
-    }
-    */
 
     @Test
     public void findByAliasAndSubmissionAccountId() throws Exception {
@@ -67,6 +63,15 @@ public abstract class SRAInfoRepositoryTest<E extends SRAInfo, T extends SRARepo
         assertNotNull(sraInfo);
     }
 
-    abstract T setSubmissionRepository (T repository);
+    @Test
+    public void save() throws Exception {
+        final E submittable = createSubmittable(UUID.randomUUID().toString(), "Webin-2", SubmissionStatus.PRIVATE);
+        if (submittable != null) {
+            final E save = repository.save(submittable);
+            assertNotNull(save.getId());
+        }
+    }
+
+    abstract void setSubmissionRepository (T repository);
 
 }

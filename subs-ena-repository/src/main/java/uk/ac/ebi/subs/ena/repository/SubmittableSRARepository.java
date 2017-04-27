@@ -2,8 +2,6 @@ package uk.ac.ebi.subs.ena.repository;
 
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import uk.ac.ebi.subs.ena.data.SRAInfo;
-import uk.ac.ebi.subs.ena.data.Submittable;
 import uk.ac.ebi.subs.ena.data.SubmittableSRAInfo;
 
 import java.util.List;

@@ -5,9 +5,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.w3c.dom.Document;
+import uk.ac.ebi.ena.sra.xml.SAMPLESETDocument;
+import uk.ac.ebi.ena.sra.xml.SampleSetType;
+import uk.ac.ebi.ena.sra.xml.SampleType;
 import uk.ac.ebi.subs.ena.ENATestRepositoryApplication;
 import uk.ac.ebi.subs.ena.data.Sample;
 import uk.ac.ebi.subs.ena.data.Study;
+import uk.ac.ebi.subs.ena.data.SubmissionStatus;
 
 import java.util.List;
 
@@ -18,31 +23,36 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ENATestRepositoryApplication.class)
-public class SampleRepositoryTest {
+public class SampleRepositoryTest extends SubmittableSRARepositoryTest<Sample,SampleRepository> {
+
+
+    @Override
+    public String getId() {
+        return "ERS452493";
+    }
+
+    @Override
+    public String getAlias() {
+        return "Salmonella_Typhi_E00-7866";
+    }
+
+    @Override
+    public Sample createSubmittable(String alias, String submissionAccountId, SubmissionStatus submissionStatus) {
+        final SAMPLESETDocument samplesetDocument = SAMPLESETDocument.Factory.newInstance();
+        final SampleSetType sampleSetType = samplesetDocument.addNewSAMPLESET();
+        final SampleType sampleType = sampleSetType.addNewSAMPLE();
+        sampleType.setAlias(alias);
+        Document sampleDocument = (Document) samplesetDocument.getDomNode();
+        Sample sample = new Sample();
+        sample.setDocument(sampleDocument);
+        sample.setSubmissionStatus(submissionStatus);
+        sample.setSubmissionAccountId(submissionAccountId);
+        sample.updateMD5();
+        return sample;
+    }
 
     @Autowired
-    SampleRepository sampleRepository;
-
-    @Test
-    public void find() throws Exception {
-        final Sample sample = sampleRepository.findOne("ERS000007");
-        assertNotNull(sample);
+    void setSubmissionRepository(SampleRepository repository) {
+        this.repository = repository;
     }
-
-    /*
-    @Test
-    public void findBySubmissionId() throws Exception {
-        final List<Sample> sampleList = sampleRepository.findBySubmissionId("ERA000001");
-        assertFalse(sampleList.isEmpty());
-    }
-    */
-
-    @Test
-    public void findByAliasAndSubmissionAccountId() throws Exception {
-        final Sample sample = sampleRepository.findByAliasAndSubmissionAccountId("Solexa sequencing of Saccharomyces paradoxus strain Y55 random 200 bp library","Webin-2");
-        assertNotNull(sample);
-    }
-
-
-
 }

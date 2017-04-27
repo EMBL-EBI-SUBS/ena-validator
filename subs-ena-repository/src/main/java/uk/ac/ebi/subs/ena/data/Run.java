@@ -55,4 +55,9 @@ public class Run extends AbstractSubmittableSRAInfo<Run> {
     public String getAlias() {
         return alias;
     }
+
+    @Override
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
 }

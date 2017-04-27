@@ -12,7 +12,6 @@ import java.util.List;
  */
 @NoRepositoryBean
 public interface SRARepository<T extends SRAInfo> extends PagingAndSortingRepository<T, String> {
-    //List<T> findBySubmissionId(String submissionId);
     T findByAliasAndSubmissionAccountId(String alias, String submissionAccountId);
 
 }

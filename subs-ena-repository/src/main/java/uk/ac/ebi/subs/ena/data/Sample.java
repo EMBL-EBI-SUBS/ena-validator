@@ -37,26 +37,31 @@ public class Sample extends AbstractSubmittableSRAInfo<Sample> {
 
     @Override
     public String getId() {
-        return null;
+        return id;
     }
 
     @Override
     public void setId(String id) {
-
+        this.id = id;
     }
 
     @Override
     public String getAlias() {
-        return null;
+        return alias;
+    }
+
+    @Override
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     @Override
     public Document getDocument() {
-        return null;
+        return document;
     }
 
     @Override
     public void setDocument(Document document) {
-
+        this.document = document;
     }
 }

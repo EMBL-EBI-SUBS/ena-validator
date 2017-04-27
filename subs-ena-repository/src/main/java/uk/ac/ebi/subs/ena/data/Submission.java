@@ -46,7 +46,7 @@ public class Submission extends AbstractSRAInfo<Submission> implements SRAInfo {
 
     @Override
     public String getId() {
-        return submissionId;
+        return id;
     }
 
     @Override
@@ -59,5 +59,9 @@ public class Submission extends AbstractSRAInfo<Submission> implements SRAInfo {
         return alias;
     }
 
+    @Override
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
 }
 

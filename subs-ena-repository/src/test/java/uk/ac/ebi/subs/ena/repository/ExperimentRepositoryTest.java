@@ -41,20 +41,20 @@ public class ExperimentRepositoryTest extends SubmittableSRARepositoryTest<Exper
         final EXPERIMENTSETDocument experimentsetDocument = EXPERIMENTSETDocument.Factory.newInstance();
         final ExperimentType experimentType = experimentsetDocument.addNewEXPERIMENTSET().addNewEXPERIMENT();
         experimentType.setAlias(alias);
-
+        experimentType.setCenterName("SC");
         Document experimentDocument = (Document)experimentsetDocument.getDomNode();
         Experiment experiment = new Experiment();
         experiment.setDocument(experimentDocument);
         experiment.setSubmissionStatus(submissionStatus);
         experiment.setSubmissionAccountId(submissionAccountId);
-
+        experiment.updateMD5();
         return experiment;
     }
 
 
     @Autowired
-    ExperimentRepository setSubmissionRepository(ExperimentRepository repository) {
-        return this.repository = repository;
+    void setSubmissionRepository(ExperimentRepository repository) {
+        this.repository = repository;
     }
 
 }
