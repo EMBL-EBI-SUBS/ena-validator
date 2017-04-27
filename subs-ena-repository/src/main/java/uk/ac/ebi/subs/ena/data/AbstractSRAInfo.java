@@ -1,7 +1,5 @@
 package uk.ac.ebi.subs.ena.data;
 
-import org.w3c.dom.Document;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
 
@@ -9,11 +7,7 @@ import java.sql.Timestamp;
  * Created by neilg on 01/04/2017.
  */
 @MappedSuperclass
-public abstract class AbstractSubmittable<T extends AbstractSubmittable> implements Submittable {
-    @Column(name = "SUBMISSION_ID")
-    String submissionId = null;
-    @Column(name = "STATUS_ID")
-    int statusId;
+public abstract class AbstractSRAInfo<T extends AbstractSRAInfo> implements SRAInfo {
 
     @Column(name = "SUBMISSION_ACCOUNT_ID")
     String submissionAccountId;
@@ -27,28 +21,7 @@ public abstract class AbstractSubmittable<T extends AbstractSubmittable> impleme
     @Column(name = "FIRST_CREATED")
     Timestamp firstCreated;
 
-    public AbstractSubmittable() {
-    }
-
-    public AbstractSubmittable(String submissionId, int statusId) {
-        this.submissionId = submissionId;
-        this.statusId = statusId;
-    }
-
-    public String getSubmissionId() {
-        return submissionId;
-    }
-
-    public void setSubmissionId(String submissionId) {
-        this.submissionId = submissionId;
-    }
-
-    public int getStatusId() {
-        return statusId;
-    }
-
-    public void setStatusId(int statusId) {
-        this.statusId = statusId;
+    public AbstractSRAInfo() {
     }
 
     @Override
@@ -83,13 +56,5 @@ public abstract class AbstractSubmittable<T extends AbstractSubmittable> impleme
 
     public void setFirstCreated(Timestamp firstCreated) {
         this.firstCreated = firstCreated;
-    }
-
-    public SubmissionStatus getSubmissionStatus() {
-        return SubmissionStatus.getSubmissionStatus(statusId);
-    }
-
-    public void setSubmissionStatus(SubmissionStatus submissionStatus) {
-        setStatusId(submissionStatus.getStatusId());
     }
 }
