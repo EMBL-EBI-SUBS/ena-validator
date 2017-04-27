@@ -28,11 +28,13 @@ public class StudyRepositoryTest {
         assertNotNull(study);
     }
 
+    /*
     @Test
     public void findBySubmissionId() throws Exception {
         final List<Study> studyList = studyRepository.findBySubmissionId("ERA000001");
         assertFalse(studyList.isEmpty());
     }
+    */
 
     @Test
     public void findByAliasAndSubmissionAccountId() throws Exception {

@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name="STUDY")
-public class Study extends AbstractSubmittable<Study>{
+public class Study extends AbstractSubmittableSRAInfo<Study> {
 
     @Id
     @GenericGenerator(name = "sraStudyGen", strategy = "uk.ac.ebi.subs.ena.id.StudyIDGenerator")
@@ -30,12 +30,6 @@ public class Study extends AbstractSubmittable<Study>{
 
     @Column(name = "HOLD_DATE")
     Timestamp holdDate;
-
-    public Study(String id, Document document, String submissionId, int statusId) {
-        super(submissionId, statusId);
-        this.id = id;
-        this.document = document;
-    }
 
     public Study () {
         super();
