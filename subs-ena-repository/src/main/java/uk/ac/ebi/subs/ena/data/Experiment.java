@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="EXPERIMENT")
-public class Experiment extends AbstractSubmittable<Experiment> {
+public class Experiment extends AbstractSubmittableSRAInfo<Experiment>  {
 
     @Id
     @GenericGenerator(name = "sraExperimentGen", strategy = "uk.ac.ebi.subs.ena.id.ExperimentIDGenerator")
@@ -23,6 +23,10 @@ public class Experiment extends AbstractSubmittable<Experiment> {
     @Type(type="uk.ac.ebi.subs.ena.type.XMLType")
     Document document;
 
+    public Experiment () {
+        super();
+    }
+
     @Override
     public String getId() {
         return null;
@@ -32,6 +36,8 @@ public class Experiment extends AbstractSubmittable<Experiment> {
     public void setId(String id) {
 
     }
+
+
 
     @Override
     public String getAlias() {
