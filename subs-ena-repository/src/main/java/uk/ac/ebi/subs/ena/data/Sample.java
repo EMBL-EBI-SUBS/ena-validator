@@ -11,7 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="SAMPLE")
-public class Sample extends AbstractSubmittable<Sample> {
+public class Sample extends AbstractSubmittableSRAInfo<Sample> {
 
     @Id
     @GenericGenerator(name = "sraSampleGen", strategy = "uk.ac.ebi.subs.ena.id.SampleIDGenerator")
@@ -27,12 +27,6 @@ public class Sample extends AbstractSubmittable<Sample> {
     Document document;
 
     public Sample(String alias, Document document) {
-        this.alias = alias;
-        this.document = document;
-    }
-
-    public Sample(String submissionId, int statusId, String alias, Document document) {
-        super(submissionId, statusId);
         this.alias = alias;
         this.document = document;
     }

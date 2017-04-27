@@ -29,11 +29,13 @@ public class SampleRepositoryTest {
         assertNotNull(sample);
     }
 
+    /*
     @Test
     public void findBySubmissionId() throws Exception {
         final List<Sample> sampleList = sampleRepository.findBySubmissionId("ERA000001");
         assertFalse(sampleList.isEmpty());
     }
+    */
 
     @Test
     public void findByAliasAndSubmissionAccountId() throws Exception {
