@@ -5,6 +5,7 @@ dependencies {
 	compile files('lib/ojdbc6-11.2.0.3.jar')
 	compile files('lib/xdb-11.2.0.3.jar')
 	compile files('lib/xmlparserv2-11.2.0.3.1.jar')
+	compile 'uk.ac.ebi.ena.sra:sra-xml:1.5.32'
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
