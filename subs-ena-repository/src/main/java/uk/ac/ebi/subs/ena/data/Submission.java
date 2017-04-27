@@ -12,24 +12,23 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="SUBMISSION")
-public class Submission extends AbstractSubmittable<Study>{
+public class Submission extends AbstractSRAInfo<Submission> implements SRAInfo {
 
     @Id
     @GenericGenerator(name = "sraSubmissionGen", strategy = "uk.ac.ebi.subs.ena.id.SubmissionIDGenerator")
     @GeneratedValue(generator = "sraSubmissionGen")
+    @Column(name = "SUBMISSION_ID")
     String id;
 
     @Column(name = "SUBMISSION_ALIAS")
     String alias;
 
-    @Column(name="STUDY_XML")
+    @Column(name="SUBMISSION_XML")
     @Type(type="uk.ac.ebi.subs.ena.type.XMLType")
     Document document;
 
-    public Submission(String submissionId, Document document, int statusId) {
-        super(submissionId, statusId);
-        this.document = document;
-    }
+    @Column(name = "SUBMISSION_ID", insertable = false, updatable = false)
+    String submissionId;
 
     public Submission () {
         super();
@@ -59,5 +58,6 @@ public class Submission extends AbstractSubmittable<Study>{
     public String getAlias() {
         return alias;
     }
+
 }
 
