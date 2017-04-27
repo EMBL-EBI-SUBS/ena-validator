@@ -5,7 +5,6 @@ import org.hibernate.annotations.Type;
 import org.w3c.dom.Document;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 
 /**
  * Created by neilg on 02/04/2017.
@@ -13,7 +12,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name="RUN")
-public class Run extends AbstractSubmittable<Run>{
+public class Run extends AbstractSubmittableSRAInfo<Run> {
 
     @Id
     @GenericGenerator(name = "sraRunGen", strategy = "uk.ac.ebi.subs.ena.id.RunIDGenerator")
@@ -27,12 +26,6 @@ public class Run extends AbstractSubmittable<Run>{
     @Column(name="RUN_XML")
     @Type(type="uk.ac.ebi.subs.ena.type.XMLType")
     Document document;
-
-    public Run(String id, Document document, String submissionId, int statusId) {
-        super(submissionId, statusId);
-        this.id = id;
-        this.document = document;
-    }
 
     public Run () {
         super();
