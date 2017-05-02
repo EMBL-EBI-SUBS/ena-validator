@@ -12,7 +12,7 @@ import org.springframework.oxm.Marshaller;
 import org.springframework.stereotype.Service;
 
 import uk.ac.ebi.ena.sra.SRALoader;
-import uk.ac.ebi.subs.data.FullSubmission;
+import uk.ac.ebi.subs.data.Submission;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
 import uk.ac.ebi.subs.ena.processor.ENAExperimentProcessor;
 import uk.ac.ebi.subs.ena.processor.ENAStudyProcessor;
@@ -71,6 +71,7 @@ public class EnaAgentSubmissionsProcessor {
 
     @RabbitListener(queues = Queues.ENA_SAMPLES_UPDATED)
     public void handleSampleUpdate(UpdatedSamplesEnvelope updatedSamplesEnvelope){
+
         logger.info("received updated samples for submission {}",updatedSamplesEnvelope.getSubmissionId());
 
         updatedSamplesEnvelope.getUpdatedSamples().forEach( s ->{
@@ -145,18 +146,18 @@ public class EnaAgentSubmissionsProcessor {
 
 
     private ProcessingCertificate processAssay(Assay assay, SubmissionEnvelope submissionEnvelope) {
-        FullSubmission submission = submissionEnvelope.getSubmission();
+        final Submission submission = submissionEnvelope.getSubmission();
 
         for (SampleUse su : assay.getSampleUses()){
             SampleRef sr = su.getSampleRef();
-            Sample sample = sr.fillIn(submission.getSamples(),submissionEnvelope.getSupportingSamples());
+            Sample sample = sr.fillIn(submissionEnvelope.getSupportingSamples());
 
             if (sample != null) {
 
             }
         }
 
-        assay.getStudyRef().fillIn(submission.getStudies());
+        assay.getStudyRef().fillIn(submissionEnvelope.getStudies());
         if (!assay.isAccessioned()) {
             assay.setAccession("ENA-EXP-" + UUID.randomUUID());
         }
@@ -166,7 +167,7 @@ public class EnaAgentSubmissionsProcessor {
     }
 
     private ProcessingCertificate processAssayData(AssayData assayData, SubmissionEnvelope submissionEnvelope) {
-        assayData.getAssayRef().fillIn(submissionEnvelope.getSubmission().getAssays());
+        assayData.getAssayRef().fillIn(submissionEnvelope.getAssays());
 
         if (!assayData.isAccessioned()) {
             assayData.setAccession("ENA-RUN-" + UUID.randomUUID());

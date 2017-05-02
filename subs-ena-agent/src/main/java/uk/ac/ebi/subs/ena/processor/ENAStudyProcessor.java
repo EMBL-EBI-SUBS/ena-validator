@@ -5,7 +5,6 @@ import uk.ac.ebi.ena.sra.SRALoader;
 import uk.ac.ebi.ena.sra.StudyInfo;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 import uk.ac.ebi.ena.sra.xml.SubmissionType;
-import uk.ac.ebi.subs.data.FullSubmission;
 import uk.ac.ebi.subs.data.status.ProcessingStatus;
 import uk.ac.ebi.subs.data.submittable.BaseSubmittable;
 import uk.ac.ebi.subs.data.submittable.BaseSubmittableFactory;
@@ -76,8 +75,8 @@ public class ENAStudyProcessor extends ENAAgentSubmittableProcessor<ENAStudy> {
     }
 
     @Override
-    protected List<? extends BaseSubmittable> getBaseSubmittables(FullSubmission fullSubmission) {
-        return fullSubmission.getStudies();
+    protected List<? extends BaseSubmittable> getBaseSubmittables(SubmissionEnvelope submissionEnvelope) {
+        return submissionEnvelope.getStudies();
     }
 
     /*

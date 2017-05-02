@@ -4,7 +4,6 @@ import org.springframework.oxm.Marshaller;
 import uk.ac.ebi.ena.sra.ExperimentInfo;
 import uk.ac.ebi.ena.sra.SRALoader;
 import uk.ac.ebi.ena.sra.xml.ExperimentType;
-import uk.ac.ebi.subs.data.FullSubmission;
 import uk.ac.ebi.subs.data.component.SampleRef;
 import uk.ac.ebi.subs.data.component.SampleUse;
 import uk.ac.ebi.subs.data.submittable.*;
@@ -26,18 +25,17 @@ public class ENAExperimentProcessor extends ENAAgentSubmittableProcessor<ENAExpe
     }
 
     ProcessingCertificate processData(ENAExperiment submittable, SubmissionEnvelope submissionEnvelope) {
-        FullSubmission submission = submissionEnvelope.getSubmission();
 
         for (SampleUse su : submittable.getBaseObject().getSampleUses()){
             SampleRef sr = su.getSampleRef();
-            Sample sample = sr.fillIn(submission.getSamples(),submissionEnvelope.getSupportingSamples());
+            Sample sample = sr.fillIn(submissionEnvelope.getSamples(),submissionEnvelope.getSupportingSamples());
 
             if (sample != null) {
 //                enaSampleRepository.save(sample);
             }
         }
 
-        submittable.getStudyRef().fillIn(submission.getStudies());
+        submittable.getStudyRef().fillIn(submissionEnvelope.getStudies());
         return super.processData(submittable, submissionEnvelope);
     }
 
@@ -74,8 +72,8 @@ public class ENAExperimentProcessor extends ENAAgentSubmittableProcessor<ENAExpe
     }
 
     @Override
-    protected List<? extends BaseSubmittable> getBaseSubmittables(FullSubmission fullSubmission) {
-        return fullSubmission.getAssays();
+    protected List<? extends BaseSubmittable> getBaseSubmittables(SubmissionEnvelope submissionEnvelope) {
+        return submissionEnvelope.getAssays();
     }
 
     /*

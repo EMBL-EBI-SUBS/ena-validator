@@ -3,7 +3,6 @@ package uk.ac.ebi.subs.ena.processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.ebi.subs.data.FullSubmission;
 import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.status.ProcessingStatus;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
@@ -55,11 +54,11 @@ public abstract class AbstractAgentProcessor<T extends Submittable> {
 
     protected abstract ProcessingStatus updateData(T submittable, SubmissionEnvelope submissionEnvelope) throws Exception;
 
-    abstract List<T> getSubmittables (FullSubmission fullSubmission) throws InstantiationException, IllegalAccessException;
+    abstract List<T> getSubmittables (SubmissionEnvelope fullSubmission) throws InstantiationException, IllegalAccessException;
 
     public List<ProcessingCertificate> processSubmittables () throws IllegalAccessException, InstantiationException {
         List<ProcessingCertificate> certs = new ArrayList<>();
-        getSubmittables(submissionEnvelope.getSubmission()).stream().
+        getSubmittables(submissionEnvelope).stream().
                 filter(s -> s.getArchive() == archive)
                 .forEach(s -> certs.add(processData(s, submissionEnvelope)));
         return certs;

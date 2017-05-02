@@ -14,7 +14,6 @@ import uk.ac.ebi.ena.authentication.model.AuthResult;
 import uk.ac.ebi.ena.sra.SRALoader;
 import uk.ac.ebi.ena.sra.xml.SUBMISSIONSETDocument;
 import uk.ac.ebi.ena.sra.xml.SubmissionType;
-import uk.ac.ebi.subs.data.FullSubmission;
 import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.status.ProcessingStatus;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
@@ -207,12 +206,12 @@ public abstract class ENAAgentSubmittableProcessor<T extends ENASubmittable> ext
         return (T) baseSubmittableFactory;
     }
 
-    protected abstract List<? extends BaseSubmittable> getBaseSubmittables(FullSubmission fullSubmission);
+    protected abstract List<? extends BaseSubmittable> getBaseSubmittables(SubmissionEnvelope submissionEnvelope);
 
     @Override
-    List<T> getSubmittables(FullSubmission fullSubmission) throws InstantiationException, IllegalAccessException {
+    List<T> getSubmittables(SubmissionEnvelope submissionEnvelope) throws InstantiationException, IllegalAccessException {
         List <T> enaExperimentList = new ArrayList<>();
-        final List<? extends BaseSubmittable> baseSubmittables = getBaseSubmittables(fullSubmission);
+        final List<? extends BaseSubmittable> baseSubmittables = getBaseSubmittables(submissionEnvelope);
         for (BaseSubmittable baseSubmittable : baseSubmittables) {
             enaExperimentList.add(wrapBaseSubmittable(baseSubmittable));
         }

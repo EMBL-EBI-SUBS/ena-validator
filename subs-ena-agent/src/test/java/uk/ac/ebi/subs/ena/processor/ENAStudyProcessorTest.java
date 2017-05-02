@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.ena.sra.SRALoader;
 import uk.ac.ebi.ena.sra.xml.SubmissionType;
 import uk.ac.ebi.subs.EnaAgentApplication;
-import uk.ac.ebi.subs.data.FullSubmission;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.status.ProcessingStatus;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
@@ -50,8 +49,6 @@ public class ENAStudyProcessorTest {
 
     Team team = null;
     Study study = null;
-
-    SubmissionEnvelope submissionEnvelope = null;
     String alias;
 
     @Autowired
@@ -61,7 +58,7 @@ public class ENAStudyProcessorTest {
 
     @Value("${ena.submission_account_id}")
     String submissionAccountId;
-    FullSubmission fullSubmission = null;
+    SubmissionEnvelope submissionEnvelope = null;
 
     @Before
     public void setUp() throws Exception {
@@ -83,7 +80,7 @@ public class ENAStudyProcessorTest {
     @Test
     public void addActions() throws Exception {
         SubmissionType submissionType = SubmissionType.Factory.newInstance();
-        ENAStudy enaStudy = new ENAStudy(submissionEnvelope.getSubmission().getStudies().get(0));
+        ENAStudy enaStudy = new ENAStudy(submissionEnvelope.getStudies().get(0));
         enaStudyProcessor.addActions(submissionType,enaStudy);
         String xmlText = submissionType.xmlText();
         // execute xpath query
@@ -92,7 +89,7 @@ public class ENAStudyProcessorTest {
 
     @Test
     public void loadData() throws Exception {
-        for (Study st : submissionEnvelope.getSubmission().getStudies()) {
+        for (Study st : submissionEnvelope.getStudies()) {
             ENAStudy enaStudy = new ENAStudy(st);
             final ProcessingStatus processingStatus = enaStudyProcessor.loadData(enaStudy, submissionEnvelope);
             assertThat("processing status", processingStatus.getStatus(), equalTo(ProcessingStatusEnum.Accepted.toString()));
@@ -105,25 +102,19 @@ public class ENAStudyProcessorTest {
 
     @Test
     public void getBaseSubmittables() throws Exception {
-        final FullSubmission fullSubmission = createFullSubmission(UUID.randomUUID().toString(), team);
-        final List<? extends BaseSubmittable> baseSubmittableList = enaStudyProcessor.getBaseSubmittables(fullSubmission);
+        final SubmissionEnvelope submissionEnvelope = createSubmissionEnvelope(UUID.randomUUID().toString(), team);
+        final List<? extends BaseSubmittable> baseSubmittableList = enaStudyProcessor.getBaseSubmittables(submissionEnvelope);
         for (BaseSubmittable baseSubmittable : baseSubmittableList) {
             logger.info(baseSubmittable.getId());
         }
     }
 
-    SubmissionEnvelope createSubmissionEnvelope (String alias, Team team) {
-        fullSubmission = createFullSubmission(alias,team);
-        SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope(fullSubmission);
-        return submissionEnvelope;
-    }
-
-    FullSubmission createFullSubmission (String alias, Team test) {
-        FullSubmission fullSubmission = new FullSubmission();
+    SubmissionEnvelope createSubmissionEnvelope (String alias, Team test) {
+        SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope();
         for (int i = 0; i < 100; i++) {
-            fullSubmission.getStudies().add(TestStudyFactory.createStudy(team));
+            submissionEnvelope.getStudies().add(TestStudyFactory.createStudy(team));
         }
-        return fullSubmission;
+        return submissionEnvelope;
     }
 
 }

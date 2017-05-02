@@ -1,7 +1,6 @@
 package uk.ac.ebi.subs.ena.processor;
 
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.subs.data.FullSubmission;
 import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
@@ -20,8 +19,7 @@ public class ENAAgentProcessor implements AgentProcessor {
 
     @Override
     public List<ProcessingCertificate> processSubmission(SubmissionEnvelope submissionEnvelope) {
-        final FullSubmission submission = submissionEnvelope.getSubmission();
-        final List<Study> studies = submission.getStudies();
+        final List<Study> studies = submissionEnvelope.getStudies();
         return new ArrayList<>();
     }
 
