@@ -2,6 +2,7 @@ apply plugin: 'java'
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile("org.springframework.boot:spring-boot-starter-data-rest")
 	compile files('lib/ojdbc6-11.2.0.3.jar')
 	compile files('lib/xdb-11.2.0.3.jar')
 	compile files('lib/xmlparserv2-11.2.0.3.1.jar')
