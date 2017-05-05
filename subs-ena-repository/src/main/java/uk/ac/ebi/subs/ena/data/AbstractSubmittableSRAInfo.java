@@ -42,6 +42,14 @@ public abstract class AbstractSubmittableSRAInfo<T extends AbstractSubmittableSR
         setStatusId(submissionStatus.getStatusId());
     }
 
+    @Override
+    public boolean isPublic() {
+        if (statusId == SubmissionStatus.PUBLIC.getStatusId())
+            return true;
+        else
+            return false;
+    }
+
     public AbstractSubmittableSRAInfo() {
         super();
     }

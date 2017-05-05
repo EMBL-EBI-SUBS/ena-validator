@@ -13,4 +13,5 @@ public interface Submittable {
     public void setStatusId(int statusId);
     public SubmissionStatus getSubmissionStatus();
     public void setSubmissionStatus(SubmissionStatus submissionStatus);
+    public boolean isPublic ();
 }
