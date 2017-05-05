@@ -1,0 +1,13 @@
+apply plugin: 'java'
+
+dependencies {
+    compile project(':subs-ena-agent')
+    compile project(':subs-ena-repository')
+    testCompile("junit:junit")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("com.google.code.gson:gson:2.7")
+    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc:1.1.2.RELEASE")
+    testCompile("com.mashape.unirest:unirest-java:1.4.9")
+}
+
+bootRepackage.enabled = false
