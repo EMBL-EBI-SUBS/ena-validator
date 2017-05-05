@@ -26,11 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 
-import static org.junit.Assert.*;
-
-/**
- * Created by neilg on 12/04/2017.
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
 public class StudySRALoaderImplTest {
