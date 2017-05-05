@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.ena.sra.SRALoader;
 import uk.ac.ebi.ena.sra.xml.SubmissionType;
 import uk.ac.ebi.subs.EnaAgentApplication;
+import uk.ac.ebi.subs.data.Submission;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.status.ProcessingStatus;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
@@ -22,6 +23,7 @@ import uk.ac.ebi.subs.data.submittable.BaseSubmittable;
 import uk.ac.ebi.subs.data.submittable.ENAStudy;
 import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.data.submittable.TestStudyFactory;
+import uk.ac.ebi.subs.ena.repository.StudyRepository;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 
 import javax.sql.DataSource;
@@ -44,6 +46,9 @@ public class ENAStudyProcessorTest {
     DataSource dataSource;
 
     Connection connection = null;
+
+    @Autowired
+    StudyRepository repository;
 
     static final String MY_TEAM_NAME = "my-team";
 
@@ -111,6 +116,10 @@ public class ENAStudyProcessorTest {
 
     SubmissionEnvelope createSubmissionEnvelope (String alias, Team test) {
         SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope();
+        Submission submission = new Submission();
+        //submission.setId(UUID.randomUUID().toString());
+        submission.setTeam(team);
+        submissionEnvelope.setSubmission(submission);
         for (int i = 0; i < 100; i++) {
             submissionEnvelope.getStudies().add(TestStudyFactory.createStudy(team));
         }
