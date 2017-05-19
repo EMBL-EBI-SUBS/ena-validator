@@ -1,9 +1,10 @@
-package uk.ac.ebi.subs.ena.processor;
+package uk.ac.ebi.subs.ena.loader;
 
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.oxm.Marshaller;
 import org.w3c.dom.Document;
 import uk.ac.ebi.embl.api.validation.Origin;
@@ -15,6 +16,7 @@ import uk.ac.ebi.ena.sra.xml.SUBMISSIONSETDocument;
 import uk.ac.ebi.ena.sra.xml.SubmissionType;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
 
+import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,7 +26,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.sql.Connection;
 import java.util.HashMap;
@@ -35,16 +36,23 @@ import java.util.Map;
  * Created by neilg on 12/04/2017.
  */
 public abstract class AbstractSRALoaderService<T extends ENASubmittable> implements SRALoaderService<T> {
-    final Logger logger = LoggerFactory.getLogger(this.getClass());
-    SRALoader sraLoader;
-    AuthResult authResult;
-    XmlOptions xmlOptions = new XmlOptions();
-    List<XmlError> validationErrorList;
-    String schema;
-    Marshaller marshaller;
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    protected SRALoader sraLoader;
+    protected AuthResult authResult;
+    protected XmlOptions xmlOptions = new XmlOptions();
+    protected List<XmlError> validationErrorList;
+    protected String schema;
+
+    protected Marshaller marshaller;
     static DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
     static DocumentBuilder documentBuilder;
     static TransformerFactory transformerFactory;
+
+    @Value("${ena.principal}")
+    String principal;
+
+    @Value("${ena.login_name}")
+    String loginName;
 
     static {
         try {
@@ -54,18 +62,14 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
         }
     }
 
-    public AbstractSRALoaderService(String principal,
-                                    String loginName,
-                                    String schema,
-                                    Marshaller marshaller) {
+    @PostConstruct
+    protected void init () {
         authResult = new AuthResult();
         authResult.setLoginName(loginName);
         authResult.setPrinciple(principal);
         authResult.setRoles(createAuthMap());
         sraLoader = new SRALoader();
         sraLoader.setTransactionMode(SRALoader.TransactionMode.NOT_TRANSACTIONAL);
-        this.schema = schema;
-        this.marshaller = marshaller;
     }
 
     private static Map<String, Boolean> createAuthMap() {
@@ -87,7 +91,7 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
     }
 
     @Override
-    public void executeSRALoader(ENASubmittable enaSubmittable, String submissionAlias, Connection connection) throws Exception {
+    public void executeSubmittableSRALoader(ENASubmittable enaSubmittable, String submissionAlias, Connection connection) throws Exception {
         final String submissionXML = createSubmissionXML(enaSubmittable, submissionAlias);
         Document document = documentBuilder.newDocument();
         marshaller.marshal(enaSubmittable,new DOMResult(document));
@@ -101,7 +105,7 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
         final SubmissionType submissionType = submissionsetDocument.addNewSUBMISSIONSET().addNewSUBMISSION();
         submissionType.setCenterName(enaSubmittable.getTeam().getName());
         submissionType.setAlias(submissionAlias);
-        createActions(submissionType,isUpdate(enaSubmittable),getSchema());
+        createActions(submissionType,enaSubmittable,getSchema());
         return submissionsetDocument.xmlText();
     }
 
@@ -109,14 +113,14 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
      * Creates the submission actions in the submissions XML
      *
      * @param submissionType
-     * @param isUpdate
+     * @param enaSubmittable
      * @param schema
      * @return
      */
-    SubmissionType.ACTIONS createActions(SubmissionType submissionType, boolean isUpdate, String schema) {
+    SubmissionType.ACTIONS createActions(SubmissionType submissionType, ENASubmittable enaSubmittable, String schema) {
         final SubmissionType.ACTIONS actions = submissionType.addNewACTIONS();
         final SubmissionType.ACTIONS.ACTION action = actions.addNewACTION();
-        if (isUpdate) {
+        if (enaSubmittable.isAccessioned()) {
             SubmissionType.ACTIONS.ACTION.MODIFY modify = action.addNewMODIFY();
             modify.setSchema(uk.ac.ebi.ena.sra.xml.SubmissionType.ACTIONS.ACTION.MODIFY.Schema.Enum.forString(schema));
         } else {
@@ -125,14 +129,6 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
             add.setSource(schema + "xml");
         }
         return actions;
-    }
-
-    private boolean isUpdate (ENASubmittable enaSubmittable) {
-        if (enaSubmittable.getAccession() != null && !enaSubmittable.getAccession().isEmpty()) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     abstract String getSchema ();
@@ -145,5 +141,29 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
         Transformer transformer = transformerFactory.newTransformer();
         transformer.transform(domSource, result);
         return writer.toString();
+    }
+
+    public String getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(String principal) {
+        this.principal = principal;
+    }
+
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
+    }
+
+    public Marshaller getMarshaller() {
+        return marshaller;
+    }
+
+    public void setMarshaller(Marshaller marshaller) {
+        this.marshaller = marshaller;
     }
 }

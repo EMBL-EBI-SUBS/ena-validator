@@ -1,5 +1,6 @@
 package uk.ac.ebi.subs.ena.security;
 
+/*
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import uk.ac.ebi.ena.authentication.provider.EnaSessionlessAuthenticationProvider;
+*/
 
 /**
  * Created by neilg on 05/05/2017.

@@ -1,12 +1,18 @@
-package uk.ac.ebi.subs.ena.processor;
+package uk.ac.ebi.subs.ena.loader;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.oxm.Marshaller;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import uk.ac.ebi.ena.sra.ExperimentInfo;
 import uk.ac.ebi.ena.sra.StudyInfo;
+import uk.ac.ebi.ena.sra.xml.ExperimentType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
+import uk.ac.ebi.subs.data.submittable.ENAExperiment;
 import uk.ac.ebi.subs.data.submittable.ENAStudy;
+import uk.ac.ebi.subs.ena.processor.SRALoaderAccessionException;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -15,25 +21,22 @@ import java.util.Map;
 /**
  * Created by neilg on 12/04/2017.
  */
-public class StudySRALoaderImpl extends AbstractSRALoaderService<ENAStudy> {
-    public static final String SCHEMA = "study";
-
-    public StudySRALoaderImpl(String principal, String loginName, Marshaller marshaller) {
-        super(principal, loginName, SCHEMA, marshaller);
-    }
+@Component
+public class ExperimentSRALoader extends AbstractSRALoaderService<ENAExperiment> {
+    public static final String SCHEMA = "experiment";
 
     @Override
     public String executeSRALoader(String submissionXML, String submittableXML, Connection connection) throws Exception {
         String accession = null;
         try {
             if (sraLoader.eraputRestWebin(submissionXML,
-                    submittableXML, null, null, null, null, null, null, null, null,
+                    null, null, submittableXML, null, null, null, null, null, null,
                     null, authResult, null, connection) == 0) {
-                final Map<StudyType, StudyInfo> studys = sraLoader.getStudys();
-                if (studys != null) {
-                    if (studys.values().iterator().hasNext()) {
-                        accession = studys.values().iterator().next().getStudyAccession();
-                        logger.info("Created ENA study with accession " + accession);
+                final Map<ExperimentType, ExperimentInfo> experiments = sraLoader.getExperiments();
+                if (experiments != null) {
+                    if (experiments.values().iterator().hasNext()) {
+                        accession = experiments.values().iterator().next().getExperimentAccession();
+                        logger.info("Created ENA experiment with accession " + accession);
                     }
                 }
             } else {
@@ -48,8 +51,14 @@ public class StudySRALoaderImpl extends AbstractSRALoaderService<ENAStudy> {
         return accession;
     }
 
-    @Override
     String getSchema() {
-        return "study";
+        return "experiment";
+    }
+
+    @Override
+    @Autowired
+    @Qualifier("experiment")
+    public void setMarshaller(Marshaller marshaller) {
+        super.setMarshaller(marshaller);
     }
 }

@@ -5,31 +5,33 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.converter.MessageConverter;
-import org.springframework.oxm.Marshaller;
 import org.springframework.stereotype.Service;
-
 import uk.ac.ebi.ena.sra.SRALoader;
 import uk.ac.ebi.subs.data.Submission;
-import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
-import uk.ac.ebi.subs.ena.processor.ENAExperimentProcessor;
-import uk.ac.ebi.subs.ena.processor.ENAStudyProcessor;
-import uk.ac.ebi.subs.processing.*;
 import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.component.SampleRef;
 import uk.ac.ebi.subs.data.component.SampleUse;
-import uk.ac.ebi.subs.data.submittable.*;
+import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
+import uk.ac.ebi.subs.data.submittable.Assay;
+import uk.ac.ebi.subs.data.submittable.AssayData;
+import uk.ac.ebi.subs.data.submittable.Sample;
+import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.messaging.Exchanges;
 import uk.ac.ebi.subs.messaging.Queues;
 import uk.ac.ebi.subs.messaging.Topics;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.*;
+import uk.ac.ebi.subs.processing.ProcessingCertificate;
+import uk.ac.ebi.subs.processing.ProcessingCertificateEnvelope;
+import uk.ac.ebi.subs.processing.SubmissionEnvelope;
+import uk.ac.ebi.subs.processing.UpdatedSamplesEnvelope;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -42,31 +44,13 @@ public class EnaAgentSubmissionsProcessor {
 
     RabbitMessagingTemplate rabbitMessagingTemplate;
 
-    @Autowired
-    @Qualifier("study")
-    Marshaller studyMarshaller;
-
-    @Autowired
-    @Qualifier("experiment")
-    Marshaller experimentMarshaller;
-
-    @Autowired
-    @Qualifier("run")
-    Marshaller runMarshaller;
-
-    @Autowired
     DataSource dataSource;
 
-    @Value("${ena.submission_account_id}")
-    String submissionAccountId;
-
-    SRALoader.TransactionMode transactionMode;
-
-
     @Autowired
-    public EnaAgentSubmissionsProcessor(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter) {
+    public EnaAgentSubmissionsProcessor(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter, DataSource dataSource) {
         this.rabbitMessagingTemplate = rabbitMessagingTemplate;
         this.rabbitMessagingTemplate.setMessageConverter(messageConverter);
+        this.dataSource = dataSource;
     }
 
     @RabbitListener(queues = Queues.ENA_SAMPLES_UPDATED)
@@ -97,10 +81,6 @@ public class EnaAgentSubmissionsProcessor {
 
     public List<ProcessingCertificate> processSubmission(SubmissionEnvelope submissionEnvelope, Connection connection) {
         List<ProcessingCertificate> certs = new ArrayList<>();
-        ENAStudyProcessor ENAStudyProcessor = new ENAStudyProcessor(submissionEnvelope,studyMarshaller,connection,submissionAccountId,transactionMode);
-        //certs.addAll(ENAStudyProcessor.processSubmittables());
-        ENAExperimentProcessor ENAExperimentProcessor = new ENAExperimentProcessor(submissionEnvelope,experimentMarshaller,connection,submissionAccountId,transactionMode);
-        //certs.addAll(ENAExperimentProcessor.processSubmittables());
 
         return certs;
     }
@@ -189,8 +169,4 @@ public class EnaAgentSubmissionsProcessor {
         throw (T) throwable; // rely on vacuous cast
     }
 
-    @Value("${ena.transaction_mode}")
-    public void setTransactionMode (String transactionMode) {
-        this.transactionMode = SRALoader.TransactionMode.valueOf(transactionMode.toUpperCase());
-    }
 }

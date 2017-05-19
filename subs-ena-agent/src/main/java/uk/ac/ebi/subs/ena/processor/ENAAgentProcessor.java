@@ -1,40 +1,20 @@
 package uk.ac.ebi.subs.ena.processor;
 
-import org.springframework.stereotype.Service;
-import uk.ac.ebi.subs.data.submittable.Study;
-import uk.ac.ebi.subs.data.submittable.Submittable;
+import uk.ac.ebi.subs.data.submittable.ENASubmittable;
+import uk.ac.ebi.subs.ena.loader.SRALoaderService;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
-import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by neilg on 12/04/2017.
+ * Created by neilg on 17/05/2017.
  */
-//@Service
-public class ENAAgentProcessor implements AgentProcessor {
-
+public interface ENAAgentProcessor<T extends ENASubmittable> extends AgentProcessor<T> {
     @Override
-    public List<ProcessingCertificate> processSubmission(SubmissionEnvelope submissionEnvelope) {
-        final List<Study> studies = submissionEnvelope.getStudies();
-        return new ArrayList<>();
-    }
-
-    Connection connection;
-    boolean commitSubmittable;
-
-    public ENAAgentProcessor(Connection connection, boolean commitSubmittable) {
-        this.connection = connection;
-        this.commitSubmittable = commitSubmittable;
-    }
-
-    static boolean isUpdate (Submittable submittable) {
-        if (submittable.getAccession() != null && !submittable.getAccession().isEmpty())
-            return true;
-        else
-            return false;
-    }
+    ProcessingCertificate process(T submittable);
+    SRALoaderService<T> getLoader ();
+    void setLoader (SRALoaderService<T> sraLoaderService);
+    DataSource getDataSource ();
+    void setDataSource (DataSource dataSource);
 }

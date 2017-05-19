@@ -1,94 +1,55 @@
 package uk.ac.ebi.subs.ena.processor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.oxm.Marshaller;
+import org.springframework.stereotype.Service;
 import uk.ac.ebi.ena.sra.ExperimentInfo;
 import uk.ac.ebi.ena.sra.SRALoader;
 import uk.ac.ebi.ena.sra.xml.ExperimentType;
+import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.component.SampleRef;
 import uk.ac.ebi.subs.data.component.SampleUse;
+import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
 import uk.ac.ebi.subs.data.submittable.*;
+import uk.ac.ebi.subs.ena.loader.SRALoaderService;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ENAExperimentProcessor extends ENAAgentSubmittableProcessor<ENAExperiment> {
+@Service
+public class ENAExperimentProcessor extends AbstractENAProcessor<ENAExperiment> {
 
-    static String EXPERIMENT_SCHEMA = "experiment";
-    public static final String EXPERIMENT_SET_XSD = "https://github.com/enasequence/schema/blob/master/src/main/resources/uk/ac/ebi/ena/sra/schema/SRA.experiment.xsd";
-
-
-    public ENAExperimentProcessor(SubmissionEnvelope submissionEnvelope, Marshaller marshaller, Connection connection, String submissionAccountId, SRALoader.TransactionMode transactionMode) {
-        super(submissionEnvelope, marshaller, connection, submissionAccountId, transactionMode);
+    @Autowired
+    public void setLoader(SRALoaderService<ENAExperiment> sraLoaderService) {
+        this.sraLoaderService = sraLoaderService;
     }
 
-    ProcessingCertificate processData(ENAExperiment submittable, SubmissionEnvelope submissionEnvelope) {
-
-        for (SampleUse su : submittable.getBaseObject().getSampleUses()){
-            SampleRef sr = su.getSampleRef();
-            Sample sample = sr.fillIn(submissionEnvelope.getSamples(),submissionEnvelope.getSupportingSamples());
-
-            if (sample != null) {
-//                enaSampleRepository.save(sample);
-            }
-        }
-
-        submittable.getStudyRef().fillIn(submissionEnvelope.getStudies());
-        return super.processData(submittable, submissionEnvelope);
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
-    String executeSRALoader(String submissionXML, String submittableXML) throws Exception {
-        String accession = null;
-        if (sraLoader.eraputRestWebin(submissionXML,
-                null, null, submittableXML, null, null, null, null, null, null,
-                null, authResult, null, connection) == 0) {
-            final Map<ExperimentType, ExperimentInfo> experiments = sraLoader.getExperiments();
-            if (experiments != null) {
-                if (experiments.values().iterator().hasNext()) {
-                    accession = experiments.values().iterator().next().getExperimentAccession();
-                    logger.info("Created ENA experiment with accession " + accession);
-                }
-            }
-        } else {
-            logValidationErrors();
-        }
-        if (accession == null ) {
-            throw new SRALoaderAccessionException(submissionXML,submittableXML);
-        }
-        return accession;
-    }
-
-    @Override
-    String getSchemaName() {
-        return EXPERIMENT_SCHEMA;
-    }
-
-    @Override
-    protected Class<? extends BaseSubmittableFactory> getBaseSubmittableClass() {
-        return ENAExperiment.class;
-    }
-
-    @Override
-    protected List<? extends BaseSubmittable> getBaseSubmittables(SubmissionEnvelope submissionEnvelope) {
-        return submissionEnvelope.getAssays();
-    }
-
-    /*
-    @Override
-    List<ENAExperiment> getSubmittables(FullSubmission fullSubmission) {
-        List <ENAExperiment> enaExperimentList = new ArrayList<>();
-        for (Assay assay : fullSubmission.getAssays()) {
+    public List<ProcessingCertificate> processSubmission(SubmissionEnvelope envelope) {
+        List<ProcessingCertificate> processingCertificateList = new ArrayList<>();
+        final List<Assay> assays = envelope.getAssays();
+        for (Assay assay : assays) {
+            ProcessingCertificate processingCertificate = new ProcessingCertificate(assay, Archive.Ena, ProcessingStatusEnum.Error);;
             try {
-                enaExperimentList.add(new ENAExperiment(assay));
+                final ENAExperiment enaSubmittable = (ENAExperiment) BaseSubmittableFactory.create(ENAExperiment.class, assay);
+                processingCertificate = process(enaSubmittable);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        return enaExperimentList;
-    }
-    */
 
+            } catch (InstantiationException e) {
+
+            }
+            processingCertificateList.add(processingCertificate);
+        }
+        return processingCertificateList;
+    }
 }

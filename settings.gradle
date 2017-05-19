@@ -3,4 +3,5 @@ rootProject.name = 'subs-ena'
 include "subs-ena-agent"
 include "subs-ena-repository"
 include "subs-ena-agent-test"
+include "subs-samples-agent-test"
 

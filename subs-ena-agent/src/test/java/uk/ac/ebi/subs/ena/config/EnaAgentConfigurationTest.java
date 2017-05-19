@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.oxm.Marshaller;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.w3c.dom.Document;
@@ -16,7 +17,7 @@ import uk.ac.ebi.subs.data.component.AssayRef;
 import uk.ac.ebi.subs.data.component.Attribute;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.submittable.*;
-import uk.ac.ebi.subs.EnaAgentApplication;
+import uk.ac.ebi.subs.ena.EnaAgentApplication;
 
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBException;
@@ -96,6 +97,7 @@ public class EnaAgentConfigurationTest {
         assertNotNull(documentElement.getLocalName());
     }
 
+
     @Test
     public void testDataSource() throws Exception {
         Connection connection = dataSource.getConnection();
@@ -103,6 +105,7 @@ public class EnaAgentConfigurationTest {
         connection.close();
         assertTrue(valid);
     }
+
 
 
     public Study createStudy (String name, String team) {

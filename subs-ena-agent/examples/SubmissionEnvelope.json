@@ -1,0 +1,161 @@
+{
+  "submission" : {
+    "id" : "919aeee4-8301-4536-b6e0-2ee08846ae37",
+    "submitter" : {
+      "email" : "subs-dev@ebi.ac.uk"
+    },
+    "team" : {
+      "name" : "test-team"
+    },
+    "submissionDate" : "2017-05-19T09:28:28.239+0000"
+  },
+  "supportingSamplesRequired" : [ ],
+  "supportingSamples" : [ ],
+  "analyses" : [ ],
+  "assays" : [ {
+    "id" : "536abfbb-452b-4a72-bcbf-9c6b2b970787",
+    "accession" : null,
+    "alias" : "3e027cb8-1487-4f41-9699-a1b24bf0ea06",
+    "archive" : "Ena",
+    "team" : null,
+    "title" : "Assay Title ",
+    "description" : "Test assay",
+    "attributes" : [ {
+      "name" : "platform_type",
+      "value" : "Illumina",
+      "units" : null,
+      "terms" : [ ]
+    }, {
+      "name" : "instrument_model",
+      "value" : "Illumina Genome Analyzer",
+      "units" : null,
+      "terms" : [ ]
+    }, {
+      "name" : "library_layout",
+      "value" : "SINGLE",
+      "units" : null,
+      "terms" : [ ]
+    }, {
+      "name" : "library_name",
+      "value" : "Example Library",
+      "units" : null,
+      "terms" : [ ]
+    }, {
+      "name" : "library_selection",
+      "value" : "Random",
+      "units" : null,
+      "terms" : [ ]
+    }, {
+      "name" : "library_source",
+      "value" : "GENOMIC",
+      "units" : null,
+      "terms" : [ ]
+    }, {
+      "name" : "library_strategy",
+      "value" : "WGS",
+      "units" : null,
+      "terms" : [ ]
+    } ],
+    "studyRef" : {
+      "alias" : "3e027cb8-1487-4f41-9699-a1b24bf0ea06",
+      "accession" : null,
+      "archive" : null,
+      "team" : null
+    },
+    "sampleUses" : [ {
+      "sampleRef" : {
+        "alias" : "3e027cb8-1487-4f41-9699-a1b24bf0ea06",
+        "accession" : null,
+        "archive" : null,
+        "team" : null
+      },
+      "attributes" : [ ]
+    } ],
+    "protocolUses" : [ ]
+  } ],
+  "assayData" : [ {
+    "id" : "12ae48b6-a611-417f-9731-2fa1f514e1bf",
+    "accession" : null,
+    "alias" : "3e027cb8-1487-4f41-9699-a1b24bf0ea06",
+    "archive" : "Ena",
+    "team" : {
+      "name" : "test-team"
+    },
+    "title" : "Test Title",
+    "description" : null,
+    "attributes" : [ ],
+    "assayRef" : {
+      "alias" : "3e027cb8-1487-4f41-9699-a1b24bf0ea06",
+      "accession" : null,
+      "archive" : null,
+      "team" : null
+    },
+    "sampleRef" : {
+      "alias" : null,
+      "accession" : null,
+      "archive" : null,
+      "team" : null
+    },
+    "files" : [ {
+      "name" : "Test.fastq",
+      "checksum" : "12345678abcdefgh12345678abcdefgh",
+      "checksumMethod" : "MD5",
+      "type" : "fastq",
+      "unencryptedChecksum" : null,
+      "label" : null
+    } ]
+  } ],
+  "egaDacs" : [ ],
+  "egaDacPolicies" : [ ],
+  "egaDatasets" : [ ],
+  "projects" : [ ],
+  "samples" : [ {
+    "id" : "5098ea2f-8b9b-4f6a-90d0-600446f1e819",
+    "accession" : null,
+    "alias" : "3e027cb8-1487-4f41-9699-a1b24bf0ea06",
+    "archive" : "BioSamples",
+    "team" : {
+      "name" : "test-team"
+    },
+    "title" : "Sample title",
+    "description" : "Sample description",
+    "attributes" : [ ],
+    "sampleRelationships" : [ ],
+    "taxonId" : 9606,
+    "taxon" : null
+  } ],
+  "sampleGroups" : [ ],
+  "studies" : [ {
+    "id" : "ae8c52e9-b66a-4e6a-80d2-523955199cb8",
+    "accession" : null,
+    "alias" : "3e027cb8-1487-4f41-9699-a1b24bf0ea06",
+    "archive" : "Ena",
+    "team" : {
+      "name" : "test-team"
+    },
+    "title" : "Study Title",
+    "description" : null,
+    "attributes" : [ {
+      "name" : "study_abstract",
+      "value" : "Study abstract",
+      "units" : null,
+      "terms" : [ ]
+    }, {
+      "name" : "existing_study_type",
+      "value" : "Whole Genome Sequencing",
+      "units" : null,
+      "terms" : [ ]
+    } ],
+    "publications" : [ ],
+    "contacts" : [ ],
+    "protocolRefs" : [ ],
+    "projectRef" : {
+      "alias" : null,
+      "accession" : null,
+      "archive" : null,
+      "team" : null
+    },
+    "releaseDate" : "2017-06-30T23:00:00.000+0000"
+  } ],
+  "protocols" : [ ]
+}
