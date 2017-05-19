@@ -1,0 +1,16 @@
+apply plugin: 'java'
+
+dependencies {
+    testCompile("junit:junit")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("com.google.code.gson:gson:2.7")
+    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc:1.1.2.RELEASE")
+    testCompile("com.mashape.unirest:unirest-java:1.4.9")
+    compile 'uk.ac.ebi.subs:subs-api:1.0.0-SNAPSHOT'
+    compile 'uk.ac.ebi.subs:subs-samples-agent:1.0.0-SNAPSHOT'
+    compile 'uk.ac.ebi.subs:subs-test-categories:1.0.0-SNAPSHOT'
+    compile 'uk.ac.ebi.subs:subs-dispatcher:1.0.0-SNAPSHOT'
+    compile 'uk.ac.ebi.subs:subs-progress-monitor:1.0.0-SNAPSHOT'
+}
+
+bootRepackage.enabled = false
