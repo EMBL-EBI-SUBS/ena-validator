@@ -46,14 +46,12 @@ public class ENAExperimentProcessorTest {
     public void process() throws Exception {
         String alias = UUID.randomUUID().toString();
         final Team team = TestHelper.getTeam("test-team");
-        final ENASample enaSample = TestHelper.getENASample(alias, team);
-        final ProcessingCertificate processingCertificate = enaSampleProcessor.process(enaSample);
-        assertThat("study accessioned", enaSample.getAccession(), startsWith("ERS"));
+        ENASampleProcessorTest.process(enaSampleProcessor,alias, team);
+        ENAStudyProcessorTest.process(enaStudyProcessor,alias,team);
+        final ENAExperiment enaExperiment = TestHelper.getENAExperiment(alias, team);
+        final ProcessingCertificate processingCertificate = enaExperimentProcessor.process(enaExperiment);
+        assertThat("experiment accessioned", enaExperiment.getAccession(), startsWith("ERX"));
         assertThat("correct certificate",processingCertificate.getProcessingStatus() , equalTo(ProcessingStatusEnum.Received));
-
-
-
-
     }
 
 }

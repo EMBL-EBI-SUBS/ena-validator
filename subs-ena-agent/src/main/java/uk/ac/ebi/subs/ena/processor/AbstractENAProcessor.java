@@ -41,6 +41,12 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
             processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Received,submittable.getAccession());
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return processingCertificate;
     }

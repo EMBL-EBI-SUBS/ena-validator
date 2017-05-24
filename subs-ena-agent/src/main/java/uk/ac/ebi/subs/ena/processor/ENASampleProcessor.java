@@ -52,4 +52,5 @@ public class ENASampleProcessor extends AbstractENAProcessor<ENASample> {
         }
         return processingCertificateList;
     }
+
 }

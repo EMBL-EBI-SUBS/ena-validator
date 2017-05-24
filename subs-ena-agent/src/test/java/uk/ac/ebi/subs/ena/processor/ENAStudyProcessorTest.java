@@ -36,12 +36,12 @@ public class ENAStudyProcessorTest {
 
     @Test
     public void process () throws Exception {
-        process(enaStudyProcessor);
-    }
-
-    static void process(ENAStudyProcessor enaStudyProcessor) throws Exception {
         String alias = UUID.randomUUID().toString();
         final Team team = TestHelper.getTeam("test-team");
+        process(enaStudyProcessor,alias,team);
+    }
+
+    static void process(ENAStudyProcessor enaStudyProcessor, String alias, Team team) throws Exception {
         final ENAStudy enaStudy = TestHelper.getENAStudy(alias, team);
         final ProcessingCertificate processingCertificate = enaStudyProcessor.process(enaStudy);
         assertThat("study accessioned", enaStudy.getAccession(), startsWith("ERP"));

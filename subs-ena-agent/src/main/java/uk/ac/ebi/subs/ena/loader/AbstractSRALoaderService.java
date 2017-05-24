@@ -92,7 +92,7 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
 
     @Override
     public void executeSubmittableSRALoader(ENASubmittable enaSubmittable, String submissionAlias, Connection connection) throws Exception {
-        final String submissionXML = createSubmissionXML(enaSubmittable, submissionAlias);
+        final String submissionXML = createSubmissionXML(enaSubmittable, enaSubmittable.getId().toString());
         Document document = documentBuilder.newDocument();
         marshaller.marshal(enaSubmittable,new DOMResult(document));
         String submittableXML = getDocumentString(document);

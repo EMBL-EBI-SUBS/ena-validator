@@ -37,12 +37,12 @@ public class ENASampleProcessorTest {
     ENASampleProcessor enaSampleProcessor;
 
     public void setEnaSampleProcessor () throws Exception {
-        process(enaSampleProcessor);
-    }
-
-    static void process(ENASampleProcessor enaSampleProcessor) throws Exception {
         String alias = UUID.randomUUID().toString();
         final Team team = TestHelper.getTeam("test-team");
+        process(enaSampleProcessor,alias,team);
+    }
+
+    static void process(ENASampleProcessor enaSampleProcessor, String alias, Team team) throws Exception {
         final ENASample enaSample = TestHelper.getENASample(alias, team);
         final ProcessingCertificate processingCertificate = enaSampleProcessor.process(enaSample);
         assertThat("study accessioned", enaSample.getAccession(), startsWith("ERS"));
