@@ -15,6 +15,7 @@ import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -69,8 +70,24 @@ public class TestHelper {
         return experimentsetDocument;
     }
 
+    public static RUNSETDocument getRunSetDocument(String alias, String experimentAlias, String centerName, String fileName, String fileType) {
+        RUNSETDocument runsetDocument = RUNSETDocument.Factory.newInstance();
+        final RunType runType = runsetDocument.addNewRUNSET().addNewRUN();
+        runType.setAlias(alias);
+        runType.setCenterName(centerName);
+        runType.addNewEXPERIMENTREF().addNewIDENTIFIERS().addNewSUBMITTERID().setStringValue(experimentAlias);
+        final RunType.DATABLOCK datablock = runType.addNewDATABLOCK();
+        final RunType.DATABLOCK.FILES.FILE file = datablock.addNewFILES().addNewFILE();
+        file.setChecksumMethod(RunType.DATABLOCK.FILES.FILE.ChecksumMethod.MD_5);
+        file.setChecksum("12345678123456781234567812345678");
+        file.setFilename(fileName);
+        file.setFiletype(RunType.DATABLOCK.FILES.FILE.Filetype.Enum.forString(fileType));
+        return runsetDocument;
+    }
+
     public static ENAStudy getENAStudy(String alias, Team team) throws Exception {
         ENAStudy enaStudy = new ENAStudy();
+        enaStudy.setId(UUID.randomUUID().toString());
         enaStudy.setAlias(alias);
         enaStudy.setTeam(team);
         enaStudy.setStudyType("Whole Genome Sequencing");
@@ -81,12 +98,37 @@ public class TestHelper {
 
     public static ENASample getENASample(String alias, Team team) throws Exception {
         ENASample enaSample = new ENASample();
+        enaSample.setId(UUID.randomUUID().toString());
         enaSample.setAlias(alias);
         enaSample.setTeam(team);
         enaSample.setTaxonId(9606l);
         enaSample.setTitle("Sample Title");
         enaSample.setDescription("Sample Description");
         return enaSample;
+    }
+
+    public static ENAExperiment getENAExperiment(String alias, Team team) throws Exception {
+        ENAExperiment enaExperiment = new ENAExperiment();
+        enaExperiment.setAlias(alias);
+        enaExperiment.setTeam(team);
+        enaExperiment.setId(UUID.randomUUID().toString());
+        StudyRef studyRef = new StudyRef();
+        studyRef.setAlias(alias);
+        studyRef.setTeam(team.getName());
+        enaExperiment.setStudyRef(studyRef);
+        SampleRef sampleRef = new SampleRef();
+        sampleRef.setAlias(alias);
+        sampleRef.setTeam(team.getName());
+        enaExperiment.setSampleRef(sampleRef);
+        enaExperiment.setIllumina("Illumina Genome Analyzer");
+        enaExperiment.setDesignDescription("Design Desc");
+        enaExperiment.setLibraryName("Library name");
+        enaExperiment.setLibraryLayout("SINGLE");
+        enaExperiment.serialiseLibraryLayout();
+        enaExperiment.setLibrarySelection("RANDOM");
+        enaExperiment.setLibrarySource("GENOMIC");
+        enaExperiment.setLibraryStrategy("WGS");
+        return enaExperiment;
     }
 
     public static Team getTeam (String centerName) {
