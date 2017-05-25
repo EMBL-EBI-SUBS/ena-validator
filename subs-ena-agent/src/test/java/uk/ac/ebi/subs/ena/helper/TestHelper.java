@@ -139,6 +139,7 @@ public class TestHelper {
 
     public static Study getStudy (String alias, Team team) {
         Study study = new Study();
+        study.setId(UUID.randomUUID().toString());
         study.setAlias(alias);
         study.setTeam(team);
         study.setTitle("Study Title");
@@ -155,6 +156,7 @@ public class TestHelper {
 
     public static Sample getSample(String alias, Team team) {
         Sample sample = new Sample();
+        sample.setId(UUID.randomUUID().toString());
         sample.setAlias(alias);
         sample.setTeam(team);
         sample.setTaxonId(9606l);
@@ -165,7 +167,9 @@ public class TestHelper {
 
     public static Assay getAssay(String alias, Team team, String sampleAlias, String studyAlias) {
         Assay a = new Assay();
+        a.setId(UUID.randomUUID().toString());
         a.setAlias(alias);
+        a.setTeam(team);
         a.setTitle("Assay Title ");
         a.setArchive(Archive.Ena);
         a.setDescription("Test assay");
@@ -181,13 +185,17 @@ public class TestHelper {
         libraryLayoutAttribute.setName(ENAExperiment.LIBRARY_LAYOUT);
         libraryLayoutAttribute.setValue(ENAExperiment.SINGLE);
         a.getAttributes().add(libraryLayoutAttribute);
+        Attribute designDescriptionAttribute = new Attribute();
+        designDescriptionAttribute.setName(ENAExperiment.DESIGN_DESCRIPTION);
+        designDescriptionAttribute.setValue("Design Description");
+        a.getAttributes().add(designDescriptionAttribute);
         Attribute libraryName = new Attribute();
         libraryName.setName(ENAExperiment.LIBRARY_NAME);
         libraryName.setValue("Example Library");
         a.getAttributes().add(libraryName);
         Attribute librarySelection = new Attribute();
         librarySelection.setName(ENAExperiment.LIBRARY_SELECTION);
-        librarySelection.setValue("Random");
+        librarySelection.setValue("RANDOM");
         a.getAttributes().add(librarySelection);
         Attribute librarySource = new Attribute();
         librarySource.setName(ENAExperiment.LIBRARY_SOURCE);
