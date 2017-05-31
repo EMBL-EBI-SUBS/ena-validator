@@ -103,7 +103,7 @@ public class EnaAgentConfiguration {
     }
 
     @Bean
-    public DataSourceTransactionManager txManager() {
+    public DataSourceTransactionManager transactionManager() {
         return new DataSourceTransactionManager(dataSource());
     }
 
