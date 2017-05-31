@@ -50,7 +50,7 @@ public class StudySRALoader extends AbstractSRALoaderService<ENAStudy> {
         if (accession == null ) {
             throw new SRALoaderAccessionException(submissionXML,submittableXML);
         }
-        connection.commit();
+
         return accession;
     }
 

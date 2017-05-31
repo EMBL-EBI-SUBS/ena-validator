@@ -48,8 +48,7 @@ public class SampleSRALoader extends AbstractSRALoaderService<ENASample> {
         if (accession == null ) {
             throw new SRALoaderAccessionException(submissionXML,submittableXML);
         }
-        // get rid of this
-        connection.commit();
+
         return accession;
     }
 
