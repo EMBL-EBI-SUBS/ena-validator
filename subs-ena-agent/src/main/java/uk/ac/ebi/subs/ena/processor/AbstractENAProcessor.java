@@ -2,6 +2,7 @@ package uk.ac.ebi.subs.ena.processor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
 import uk.ac.ebi.subs.data.submittable.ENAStudy;
@@ -34,7 +35,7 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
 
     @Override
     public ProcessingCertificate process(T submittable) {
-        Connection connection = getConnection(dataSource);
+        Connection connection = DataSourceUtils.getConnection(dataSource);
         ProcessingCertificate processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Error);
         try {
             sraLoaderService.executeSubmittableSRALoader(submittable,submittable.getAlias(),connection);
@@ -49,17 +50,6 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
             }
         }
         return processingCertificate;
-    }
-
-    protected Connection getConnection(DataSource dataSource) {
-        Connection connection = null;
-        try {
-            connection = dataSource.getConnection();
-        } catch (SQLException e) {
-            logger.error("Failed to get connection from datasource " + dataSource);
-            throw rethrow(e);
-        }
-        return connection;
     }
 
     /**
