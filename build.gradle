@@ -92,6 +92,9 @@ subprojects {
 		}
 	}
 
+	task sourceJar(type: Jar) { from sourceSets.main.allJava }
+
+
 	task deployJar(type: SshTask, dependsOn: 'build') {
 		doLast {
 			def deployHome = "/data/" + project.name;
@@ -119,6 +122,25 @@ subprojects {
 
 	task printClasspath doLast {
 		configurations.compile.each { println it }
+	}
+
+
+	publishing {
+		publications {
+			mavenJava(MavenPublication) {
+				from components.java
+				artifact sourceJar { classifier "sources" }
+			}
+		}
+		repositories {
+			maven {
+				credentials {
+					username artifactoryUsername
+					password artifactoryPassword
+				}
+				url "http://ena-dev:8081/artifactory/libs-release-local"
+			}
+		}
 	}
 
 }
