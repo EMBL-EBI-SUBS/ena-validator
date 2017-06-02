@@ -3,6 +3,7 @@ package uk.ac.ebi.subs.ena.processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
 import uk.ac.ebi.subs.data.submittable.ENAStudy;
@@ -34,6 +35,7 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
     }
 
     @Override
+    @Transactional
     public ProcessingCertificate process(T submittable) {
         Connection connection = DataSourceUtils.getConnection(dataSource);
         ProcessingCertificate processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Error);
@@ -44,7 +46,7 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
             e.printStackTrace();
         } finally {
             try {
-                connection.close();
+                DataSourceUtils.doReleaseConnection(connection,dataSource);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

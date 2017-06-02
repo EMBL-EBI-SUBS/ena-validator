@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import uk.ac.ebi.ena.authentication.model.AuthResult;
 import uk.ac.ebi.ena.sra.SRALoader;
@@ -102,9 +103,13 @@ public class EnaAgentConfiguration {
         return dataSource;
     }
 
-    @Bean
-    public DataSourceTransactionManager transactionManager() {
-        return new DataSourceTransactionManager(dataSource());
+    //@Bean
+    //public DataSourceTransactionManager transactionManager() {
+    //    return new DataSourceTransactionManager(dataSource());
+    //}
+
+    public JpaTransactionManager transactionManager() {
+        return new JpaTransactionManager();
     }
 
     @Bean
