@@ -32,11 +32,11 @@ before_script:
 build:
   stage: build
   script:
-    - ./gradlew -g /cache/.gradle clean assemble
+    - ./gradlew -g /cache/.gradle -PartifactoryUsername=$artifactoryUsername -PartifactoryPassword=$artifactoryPassword clean assemble
   allow_failure: false
 
 # Use the generated build output to run the tests.
 test:
   stage: test
   script:
-    - ./gradlew -g /cache/.gradle check
+    - ./gradlew -g /cache/.gradle -PartifactoryUsername=$artifactoryUsername -PartifactoryPassword=$artifactoryPassword check
