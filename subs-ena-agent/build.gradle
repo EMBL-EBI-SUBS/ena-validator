@@ -1,5 +1,9 @@
 apply plugin: 'java'
 
+repositories {
+	maven { url 'https://jitpack.io' }
+}
+
 dependencies {
 	compile(group: 'uk.ac.ebi.subs', name: 'subs-messaging', version: '1.0.0-SNAPSHOT', changing: true)
 	compile(group: 'uk.ac.ebi.subs', name: 'subs-processing-model', version: '1.0.0-SNAPSHOT', changing: true)
@@ -15,6 +19,9 @@ dependencies {
 	compile 'org.apache.tomcat:tomcat-jdbc:8.0.32'
 	compile 'org.springframework:spring-jdbc'
 	compile 'uk.ac.ebi.ena.sra:sra-xml:1.5.32'
+
+	compile 'com.github.EMBL-EBI-SUBS:validator-common:master-SNAPSHOT'
+
 	testCompile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
 	runtime(group: 'com.oracle', name: 'ojdbc6', version: '11.2.0.3')
 	runtime(group: 'com.oracle', name: 'xdb', version: '11.2.0.3')
