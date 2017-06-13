@@ -5,7 +5,6 @@ import uk.ac.ebi.subs.ena.loader.SRALoaderService;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 /**
  * Created by neilg on 17/05/2017.

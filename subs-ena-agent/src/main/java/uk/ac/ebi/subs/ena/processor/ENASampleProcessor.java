@@ -3,6 +3,7 @@ package uk.ac.ebi.subs.ena.processor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.oxm.Marshaller;
 import org.springframework.stereotype.Service;
+import uk.ac.ebi.embl.api.validation.ValidationResult;
 import uk.ac.ebi.ena.sra.ExperimentInfo;
 import uk.ac.ebi.ena.sra.SRALoader;
 import uk.ac.ebi.ena.sra.xml.ExperimentType;
@@ -39,18 +40,15 @@ public class ENASampleProcessor extends AbstractENAProcessor<ENASample> {
         List<ProcessingCertificate> processingCertificateList = new ArrayList<>();
         final List<Sample> samples = envelope.getSamples();
         for (Sample sample : samples) {
-            ProcessingCertificate processingCertificate = new ProcessingCertificate(sample, Archive.Ena, ProcessingStatusEnum.Error);;
             try {
                 final ENASample enaSubmittable = (ENASample) BaseSubmittableFactory.create(ENASample.class, sample);
-                processingCertificate = process(enaSubmittable);
+                processingCertificateList.add(process(enaSubmittable));
             } catch (IllegalAccessException e) {
 
             } catch (InstantiationException e) {
 
             }
-            processingCertificateList.add(processingCertificate);
         }
         return processingCertificateList;
     }
-
 }
