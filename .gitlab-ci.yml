@@ -44,5 +44,6 @@ test:
 install:
   stage: install
   only: master
+  script:
     - ./gradlew -g /cache/.gradle -PartifactoryUsername=$artifactoryUsername -PartifactoryPassword=$artifactoryPassword clean publish
 
