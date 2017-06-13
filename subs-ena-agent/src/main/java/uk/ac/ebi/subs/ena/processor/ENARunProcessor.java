@@ -53,4 +53,9 @@ public class ENARunProcessor extends AbstractENAProcessor<ENARun> {
         return processingCertificateList;
     }
 
+    @Override
+    public String getSubmittableObjectTypeAsAString() {
+        return Study.class.getSimpleName();
+    }
+
 }

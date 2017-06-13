@@ -12,9 +12,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import uk.ac.ebi.embl.api.validation.Origin;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.subs.data.component.Archive;
-import uk.ac.ebi.subs.data.submittable.BaseSubmittableFactory;
-import uk.ac.ebi.subs.data.submittable.ENASample;
-import uk.ac.ebi.subs.data.submittable.Sample;
+import uk.ac.ebi.subs.data.submittable.*;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENASampleProcessor;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
@@ -67,38 +65,40 @@ public class EnaAgentValidator {
 
         final Sample sample = validationEnvelope.getEntityToValidate();
 
-        Collection<ValidationMessage<Origin>> validationMessages = executeValidation(sample);
+        Collection<ValidationMessage<Origin>> validationMessages = executeSubmittableValidation(sample);
 
-        String validationMessage = assembleErrorMessage(validationMessages);
-
-        if (validationMessages.isEmpty()) {
-            rabbitMessagingTemplate.convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_SUCCESS,
-                    buildSingleValidationResult(sample, ValidationStatus.Pass, validationMessage));
-
-            logger.info("Validation successful for {} entity with id: {}", sample.getClass().getSimpleName(), sample.getId());
-        } else {
-            rabbitMessagingTemplate.convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_ERROR,
-                    buildSingleValidationResult(sample, ValidationStatus.Error, validationMessage));
-
-            logger.info("Validation erred for {} entity with id: {}", sample.getClass().getSimpleName(), sample.getId());
-        }
+        publishValidationMessage(sample, validationMessages);
     }
 
     /**
-     * Serialise the passed entity ({@link Sample}) to its ENA representative and validate it through SRA Validator.
-     * It will return a collection of {@link ValidationMessage}s or an empty collection.
-     * @param sample entity to validate
-     * @return a collection of {@link ValidationMessage}s or an empty collection in case of no validation error.
+     * Do a validation for the sample submitted in the {@link ValidationMessageEnvelope}.
+     * It produces a message according to the validation outcome.
+     *
+     * @param validationEnvelope {@link ValidationMessageEnvelope} that contains the sample to validate
+     * @throws InstantiationException
+     * @throws IllegalAccessException
      */
-    Collection<ValidationMessage<Origin>> executeValidation(Sample sample) {
+    @Transactional
+    @RabbitListener(queues = Queues.ENA_STUDY_VALIDATION)
+    public void validateStudy(ValidationMessageEnvelope<Study> validationEnvelope) {
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+        final Study study = validationEnvelope.getEntityToValidate();
+
+        Collection<ValidationMessage<Origin>> validationMessages = executeSubmittableValidation(study);
+
+        publishValidationMessage(study, validationMessages);
+    }
+
+    Collection<ValidationMessage<Origin>> executeSubmittableValidation(Submittable submittable) {
         Collection<ValidationMessage<Origin>> validationMessages = new ArrayList<>();
-        if (sample == null) {
-            validationMessages.add(ValidationMessage.error("ERAM.1.0.14", Sample.class.getSimpleName()));
+
+        if (submittable == null) {
+            enaSampleProcessor.addNullSubmittableValidationMessage(validationMessages,
+                    enaSampleProcessor.getSubmittableObjectTypeAsAString());
         } else {
-            ENASample enaSubmittable = null;
             try {
-                enaSubmittable = (ENASample) BaseSubmittableFactory.create(ENASample.class, sample);
-                validationMessages = enaSampleProcessor.validateEntity(enaSubmittable);
+                enaSampleProcessor.convertFromSubmittableToENASubmittable(submittable);
             } catch (InstantiationException | IllegalAccessException e) {
                 logger.error("An exception occured: {}", e.getMessage());
                 validationMessages.add(ValidationMessage.error("ERAM.1.0.3", e.getMessage()));
@@ -106,6 +106,22 @@ public class EnaAgentValidator {
         }
 
         return validationMessages;
+    }
+
+    private void publishValidationMessage(Submittable submittable, Collection<ValidationMessage<Origin>> validationMessages) {
+        String validationMessage = assembleErrorMessage(validationMessages);
+
+        if (validationMessages.isEmpty()) {
+            rabbitMessagingTemplate.convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_SUCCESS,
+                    buildSingleValidationResult(submittable, ValidationStatus.Pass, validationMessage));
+
+            logger.info("Validation successful for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
+        } else {
+            rabbitMessagingTemplate.convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_ERROR,
+                    buildSingleValidationResult(submittable, ValidationStatus.Error, validationMessage));
+
+            logger.info("Validation erred for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
+        }
     }
 
     /**
@@ -126,8 +142,8 @@ public class EnaAgentValidator {
         return assembledValidationMessage;
     }
 
-    private SingleValidationResult buildSingleValidationResult(Sample sample, ValidationStatus status, String validationMessages) {
-        SingleValidationResult singleValidationResult = new SingleValidationResult(Archive.Ena, sample.getId());
+    private SingleValidationResult buildSingleValidationResult(Submittable submittable, ValidationStatus status, String validationMessages) {
+        SingleValidationResult singleValidationResult = new SingleValidationResult(Archive.Ena, submittable.getId());
         singleValidationResult.setUuid(UUID.randomUUID().toString());
         singleValidationResult.setValidationStatus(status);
 

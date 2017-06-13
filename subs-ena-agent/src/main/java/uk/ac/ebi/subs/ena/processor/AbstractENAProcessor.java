@@ -10,6 +10,8 @@ import uk.ac.ebi.embl.api.validation.ValidationResult;
 import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
+import uk.ac.ebi.subs.data.submittable.Sample;
+import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.loader.SRALoaderService;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 
@@ -94,6 +96,16 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
         return validationMessages;
     }
 
+    /**
+     * Add a {@link ValidationMessage} when the submitted entity is null.
+     *
+     * @param validationMessages the collection of validation messages
+     * @param submittableTypeAsString the type of the entity in String
+     */
+    public void addNullSubmittableValidationMessage(Collection<ValidationMessage<Origin>> validationMessages,
+                                                    String submittableTypeAsString) {
+        validationMessages.add(ValidationMessage.error("ERAM.1.0.14", submittableTypeAsString));
+    }
 
     /**
      * Cast a CheckedException as an unchecked one.

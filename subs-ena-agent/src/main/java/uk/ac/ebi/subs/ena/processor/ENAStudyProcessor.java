@@ -53,4 +53,10 @@ public class ENAStudyProcessor extends AbstractENAProcessor<ENAStudy>  {
         return processingCertificateList;
     }
 
- }
+    @Override
+    public String getSubmittableObjectTypeAsAString() {
+        return Study.class.getSimpleName();
+    }
+
+
+}

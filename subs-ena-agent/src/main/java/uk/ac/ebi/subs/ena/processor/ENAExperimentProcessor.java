@@ -52,4 +52,10 @@ public class ENAExperimentProcessor extends AbstractENAProcessor<ENAExperiment> 
         }
         return processingCertificateList;
     }
+
+    @Override
+    public String getSubmittableObjectTypeAsAString() {
+        return Assay.class.getSimpleName();
+    }
+
 }
