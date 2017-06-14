@@ -1,4 +1,4 @@
-package uk.ac.ebi.subs.ena;
+package uk.ac.ebi.subs.ena.validator;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +10,9 @@ import uk.ac.ebi.embl.api.validation.Origin;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.submittable.*;
+import uk.ac.ebi.subs.ena.EnaAgentApplication;
 import uk.ac.ebi.subs.ena.helper.TestHelper;
+import uk.ac.ebi.subs.ena.validator.EnaAgentSampleValidator;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -26,19 +28,21 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
 @Transactional
-public class EnaAgentValidationProcessorTest {
+public class EnaAgentSampleValidationTest {
 
     @Autowired
-    EnaAgentValidator enaAgentValidator;
+    EnaAgentSampleValidator enaAgentSampleValidator;
 
     @Test
     public void returnsSuccessfullyWhenValidationEnvelopeContainsAValidSample() throws Exception {
         final Sample sample = createSample();
-        final String expectedValidationErrorMessage = EnaAgentValidator.SUCCESS_MESSAGE;
+        final String submittableType = sample.getClass().getSimpleName();
+        final String expectedValidationErrorMessage = String.format(EnaAgentSampleValidator.SUCCESS_MESSAGE, submittableType);
 
-        Collection<ValidationMessage<Origin>> validationMessages = enaAgentValidator.executeSubmittableValidation(sample);
+        Collection<ValidationMessage<Origin>> validationMessages =
+                enaAgentSampleValidator.executeSubmittableValidation(sample, enaAgentSampleValidator.enaSampleProcessor);
 
-        String validationMessage = enaAgentValidator.assembleErrorMessage(validationMessages);
+        String validationMessage = enaAgentSampleValidator.assembleErrorMessage(validationMessages, submittableType);
 
 
         assertThat("There should be no validation messages", validationMessage, is(expectedValidationErrorMessage));
@@ -47,12 +51,14 @@ public class EnaAgentValidationProcessorTest {
     @Test
     public void returnsErrorMessagesWhenValidationEnvelopeContainsANullSample() throws Exception {
         final Sample sample = null;
-        final String expectedValidationErrorMessage = EnaAgentValidator.NULL_SAMPLE_ERROR_MESSAGE;
+        final String submittableType = Sample.class.getSimpleName();
+        final String expectedValidationErrorMessage = EnaAgentSampleValidator.NULL_SAMPLE_ERROR_MESSAGE;
         final int expectedValidationMessageCount = 1;
 
-        Collection<ValidationMessage<Origin>> validationMessages = enaAgentValidator.executeSubmittableValidation(sample);
+        Collection<ValidationMessage<Origin>> validationMessages =
+                enaAgentSampleValidator.executeSubmittableValidation(sample, enaAgentSampleValidator.getEnaSampleProcessor());
 
-        String validationMessage = enaAgentValidator.assembleErrorMessage(validationMessages);
+        String validationMessage = enaAgentSampleValidator.assembleErrorMessage(validationMessages, submittableType);
 
         assertThat("Validation should fail with null sample",
                 validationMessage, is(expectedValidationErrorMessage));
@@ -62,8 +68,16 @@ public class EnaAgentValidationProcessorTest {
     }
 
     private Sample createSample() {
-        String alias = UUID.randomUUID().toString();
-        final Team team = TestHelper.getTeam("test-team");
+        String alias = getAlias();
+        final Team team = getTeam("test-team");
         return TestHelper.getSample(alias, team);
+    }
+
+    private Team getTeam(String centerName) {
+        return TestHelper.getTeam(centerName);
+    }
+
+    private String getAlias() {
+        return UUID.randomUUID().toString();
     }
 }

@@ -1,0 +1,111 @@
+package uk.ac.ebi.subs.ena.validator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
+import org.springframework.messaging.converter.MessageConverter;
+import uk.ac.ebi.embl.api.validation.Origin;
+import uk.ac.ebi.embl.api.validation.ValidationMessage;
+import uk.ac.ebi.subs.data.submittable.Submittable;
+import uk.ac.ebi.subs.ena.processor.ENAAgentProcessor;
+import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
+import uk.ac.ebi.subs.validator.data.SingleValidationResult;
+import uk.ac.ebi.subs.validator.data.ValidationAuthor;
+import uk.ac.ebi.subs.validator.data.ValidationStatus;
+import uk.ac.ebi.subs.validator.messaging.Exchanges;
+import uk.ac.ebi.subs.validator.messaging.RoutingKeys;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+/**
+ * Created by karoly on 14/06/2017.
+ */
+public abstract class EnaAgentAbstractValidator {
+
+    private static final Logger logger = LoggerFactory.getLogger(EnaAgentAbstractValidator.class);
+
+    RabbitMessagingTemplate rabbitMessagingTemplate;
+
+    ENAProcessorContainerService enaProcessorContainerService;
+
+    public static final String SUCCESS_MESSAGE = "Passed ENA %s validation with no errors";
+    public static final String NULL_SAMPLE_ERROR_MESSAGE = "%s is null";
+
+    public EnaAgentAbstractValidator() {
+    }
+
+    public EnaAgentAbstractValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
+                                     ENAProcessorContainerService enaProcessorContainerService) {
+        this.rabbitMessagingTemplate = rabbitMessagingTemplate;
+        this.rabbitMessagingTemplate.setMessageConverter(messageConverter);
+        this.enaProcessorContainerService = enaProcessorContainerService;
+    }
+
+    Collection<ValidationMessage<Origin>> executeSubmittableValidation(Submittable submittable,
+                                                                       ENAAgentProcessor eNAAgentProcessor) {
+        Collection<ValidationMessage<Origin>> validationMessages = new ArrayList<>();
+
+        if (submittable == null) {
+            eNAAgentProcessor.addNullSubmittableValidationMessage(validationMessages,
+                    eNAAgentProcessor.getSubmittableObjectTypeAsAString());
+        } else {
+            try {
+                eNAAgentProcessor.convertFromSubmittableToENASubmittable(submittable);
+            } catch (InstantiationException | IllegalAccessException e) {
+                logger.error("An exception occured: {}", e.getMessage());
+                validationMessages.add(ValidationMessage.error("ERAM.1.0.3", e.getMessage()));
+            }
+        }
+
+        return validationMessages;
+    }
+
+    void publishValidationMessage(Submittable submittable, Collection<ValidationMessage<Origin>> validationMessages) {
+        String validationMessage = assembleErrorMessage(validationMessages, submittable.getClass().getSimpleName());
+
+        if (validationMessages.isEmpty()) {
+            rabbitMessagingTemplate.convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_SUCCESS,
+                    buildSingleValidationResult(submittable, ValidationStatus.Pass, validationMessage));
+
+            logger.info("Validation successful for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
+        } else {
+            rabbitMessagingTemplate.convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_ERROR,
+                    buildSingleValidationResult(submittable, ValidationStatus.Error, validationMessage));
+
+            logger.info("Validation erred for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
+        }
+    }
+
+    private SingleValidationResult buildSingleValidationResult(Submittable submittable, ValidationStatus status, String validationMessages) {
+        SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, submittable.getId());
+        singleValidationResult.setUuid(UUID.randomUUID().toString());
+        singleValidationResult.setEntityUuid(submittable.getId());
+        singleValidationResult.setValidationStatus(status);
+
+        singleValidationResult.setMessage(validationMessages);
+
+        return singleValidationResult;
+    }
+
+    /**
+     * Assemble a collection of error messages to a String. If the collection is empty,
+     * then it will return a success message.
+     * @param validationMessages Collection of validation messages
+     * @return A list of validation messages converted into a String or a success message, if there were no errors.
+     */
+    String assembleErrorMessage(Collection<ValidationMessage<Origin>> validationMessages, String submittableType) {
+        String assembledValidationMessage = validationMessages.stream()
+                .map(ValidationMessage::getMessage)
+                .collect(Collectors.joining(", "));
+
+        if (assembledValidationMessage == null || assembledValidationMessage.equals("")) {
+            assembledValidationMessage = String.format(SUCCESS_MESSAGE, submittableType);
+        }
+
+        return assembledValidationMessage;
+    }
+
+}
