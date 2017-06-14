@@ -35,39 +35,41 @@ public class EnaAgentStudyValidationTest {
     EnaAgentStudyValidator enaAgentStudyValidator;
 
     private static final String CENTER_NAME = "test-team";
+    private final String SUBMITTABLETYPE = Study.class.getSimpleName();
 
     @Test
     public void returnsSuccessfullyWhenValidationEnvelopeContainsAValidStudy() throws Exception {
         final Study study = createStudy(CENTER_NAME);
-        final String submittableType = study.getClass().getSimpleName();
         final String expectedValidationErrorMessage =
-                String.format(EnaAgentSampleValidator.SUCCESS_MESSAGE, submittableType);
+                String.format(enaAgentStudyValidator.SUCCESS_MESSAGE, SUBMITTABLETYPE);
 
         Collection<ValidationMessage<Origin>> validationMessages =
-                enaAgentStudyValidator.executeSubmittableValidation(study, enaAgentStudyValidator.enaStudyProcessor);
+                enaAgentStudyValidator.executeSubmittableValidation(study, enaAgentStudyValidator.getEnaStudyProcessor());
 
-        String validationMessage = enaAgentStudyValidator.assembleErrorMessage(validationMessages, submittableType);
+        String validationMessage = enaAgentStudyValidator.assembleErrorMessage(validationMessages, SUBMITTABLETYPE);
 
 
         assertThat("There should be no validation messages", validationMessage, is(expectedValidationErrorMessage));
     }
 
-//    @Test
-//    public void returnsErrorMessagesWhenValidationEnvelopeContainsANullSample() throws Exception {
-//        final Sample sample = null;
-//        final String expectedValidationErrorMessage = EnaAgentValidator.NULL_SAMPLE_ERROR_MESSAGE;
-//        final int expectedValidationMessageCount = 1;
-//
-//        Collection<ValidationMessage<Origin>> validationMessages = enaAgentValidator.executeSubmittableValidation(sample);
-//
-//        String validationMessage = enaAgentValidator.assembleErrorMessage(validationMessages);
-//
-//        assertThat("Validation should fail with null sample",
-//                validationMessage, is(expectedValidationErrorMessage));
-//        assertThat("Validation message count should be 1",
-//                validationMessages.size(), is(expectedValidationMessageCount));
-//
-//    }
+    @Test
+    public void returnsErrorMessagesWhenValidationEnvelopeContainsANullSample() throws Exception {
+        final Sample sample = null;
+        final String expectedValidationErrorMessage =
+                String.format(enaAgentStudyValidator.NULL_SAMPLE_ERROR_MESSAGE, SUBMITTABLETYPE);
+        final int expectedValidationMessageCount = 1;
+
+        Collection<ValidationMessage<Origin>> validationMessages =
+                enaAgentStudyValidator.executeSubmittableValidation(sample, enaAgentStudyValidator.getEnaStudyProcessor());
+
+        String validationMessage = enaAgentStudyValidator.assembleErrorMessage(validationMessages, SUBMITTABLETYPE);
+
+        assertThat("Validation should fail with null study",
+                validationMessage, is(expectedValidationErrorMessage));
+        assertThat("Validation message count should be 1",
+                validationMessages.size(), is(expectedValidationMessageCount));
+
+    }
 
     private Sample createSample() {
         String alias = getAlias();

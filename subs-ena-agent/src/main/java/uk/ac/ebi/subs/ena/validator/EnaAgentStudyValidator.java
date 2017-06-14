@@ -39,6 +39,10 @@ public class EnaAgentStudyValidator extends EnaAgentAbstractValidator {
     @Autowired
     ENAStudyProcessor enaStudyProcessor;
 
+    public ENAStudyProcessor getEnaStudyProcessor() {
+        return enaStudyProcessor;
+    }
+
     /**
      * Do a validation for the sample submitted in the {@link ValidationMessageEnvelope}.
      * It produces a message according to the validation outcome.

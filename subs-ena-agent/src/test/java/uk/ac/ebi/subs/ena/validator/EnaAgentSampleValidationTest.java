@@ -40,7 +40,7 @@ public class EnaAgentSampleValidationTest {
         final String expectedValidationErrorMessage = String.format(EnaAgentSampleValidator.SUCCESS_MESSAGE, submittableType);
 
         Collection<ValidationMessage<Origin>> validationMessages =
-                enaAgentSampleValidator.executeSubmittableValidation(sample, enaAgentSampleValidator.enaSampleProcessor);
+                enaAgentSampleValidator.executeSubmittableValidation(sample, enaAgentSampleValidator.getEnaSampleProcessor());
 
         String validationMessage = enaAgentSampleValidator.assembleErrorMessage(validationMessages, submittableType);
 
@@ -52,7 +52,8 @@ public class EnaAgentSampleValidationTest {
     public void returnsErrorMessagesWhenValidationEnvelopeContainsANullSample() throws Exception {
         final Sample sample = null;
         final String submittableType = Sample.class.getSimpleName();
-        final String expectedValidationErrorMessage = EnaAgentSampleValidator.NULL_SAMPLE_ERROR_MESSAGE;
+        final String expectedValidationErrorMessage =
+                String.format(EnaAgentSampleValidator.NULL_SAMPLE_ERROR_MESSAGE, submittableType);
         final int expectedValidationMessageCount = 1;
 
         Collection<ValidationMessage<Origin>> validationMessages =
