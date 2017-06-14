@@ -12,27 +12,18 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import uk.ac.ebi.embl.api.validation.Origin;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.subs.data.submittable.Study;
-import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENAStudyProcessor;
-import uk.ac.ebi.subs.validator.data.SingleValidationResult;
-import uk.ac.ebi.subs.validator.data.ValidationAuthor;
 import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
-import uk.ac.ebi.subs.validator.data.ValidationStatus;
-import uk.ac.ebi.subs.validator.messaging.Exchanges;
 import uk.ac.ebi.subs.validator.messaging.Queues;
-import uk.ac.ebi.subs.validator.messaging.RoutingKeys;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * This class responsible to do the ENA related validations.
  */
 @Service
-public class EnaAgentStudyValidator extends EnaAgentAbstractValidator {
+public class EnaAgentStudyValidator implements EnaAgentValidator {
 
     private static final Logger logger = LoggerFactory.getLogger(EnaAgentStudyValidator.class);
 
@@ -42,6 +33,28 @@ public class EnaAgentStudyValidator extends EnaAgentAbstractValidator {
     public ENAStudyProcessor getEnaStudyProcessor() {
         return enaStudyProcessor;
     }
+
+    ENAProcessorContainerService enaProcessorContainerService;
+
+    RabbitMessagingTemplate rabbitMessagingTemplate;
+
+    @Override
+    public void setRabbitMessagingTemplate(RabbitMessagingTemplate rabbitMessagingTemplate) {
+        this.rabbitMessagingTemplate = rabbitMessagingTemplate;
+    }
+
+    @Override
+    public RabbitMessagingTemplate getRabbitMessagingTemplate() {
+        return rabbitMessagingTemplate;
+    }
+
+    public EnaAgentStudyValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
+                             ENAProcessorContainerService enaProcessorContainerService) {
+        this.rabbitMessagingTemplate = rabbitMessagingTemplate;
+        this.rabbitMessagingTemplate.setMessageConverter(messageConverter);
+        this.enaProcessorContainerService = enaProcessorContainerService;
+    }
+
 
     /**
      * Do a validation for the sample submitted in the {@link ValidationMessageEnvelope}.

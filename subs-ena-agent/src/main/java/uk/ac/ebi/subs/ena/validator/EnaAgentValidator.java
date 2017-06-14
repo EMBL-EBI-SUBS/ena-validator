@@ -3,6 +3,7 @@ package uk.ac.ebi.subs.ena.validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.converter.MessageConverter;
 import uk.ac.ebi.embl.api.validation.Origin;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
@@ -23,28 +24,17 @@ import java.util.stream.Collectors;
 /**
  * Created by karoly on 14/06/2017.
  */
-public abstract class EnaAgentAbstractValidator {
+public interface EnaAgentValidator {
 
-    private static final Logger logger = LoggerFactory.getLogger(EnaAgentAbstractValidator.class);
+    Logger logger = LoggerFactory.getLogger(EnaAgentValidator.class);
 
-    RabbitMessagingTemplate rabbitMessagingTemplate;
+    void setRabbitMessagingTemplate(RabbitMessagingTemplate rabbitMessagingTemplate);
+    RabbitMessagingTemplate getRabbitMessagingTemplate();
 
-    ENAProcessorContainerService enaProcessorContainerService;
+    String SUCCESS_MESSAGE = "Passed ENA %s validation with no errors";
+    String NULL_SAMPLE_ERROR_MESSAGE = "%s is null";
 
-    public static final String SUCCESS_MESSAGE = "Passed ENA %s validation with no errors";
-    public static final String NULL_SAMPLE_ERROR_MESSAGE = "%s is null";
-
-    public EnaAgentAbstractValidator() {
-    }
-
-    public EnaAgentAbstractValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
-                                     ENAProcessorContainerService enaProcessorContainerService) {
-        this.rabbitMessagingTemplate = rabbitMessagingTemplate;
-        this.rabbitMessagingTemplate.setMessageConverter(messageConverter);
-        this.enaProcessorContainerService = enaProcessorContainerService;
-    }
-
-    Collection<ValidationMessage<Origin>> executeSubmittableValidation(Submittable submittable,
+    default Collection<ValidationMessage<Origin>> executeSubmittableValidation(Submittable submittable,
                                                                        ENAAgentProcessor eNAAgentProcessor) {
         Collection<ValidationMessage<Origin>> validationMessages = new ArrayList<>();
 
@@ -63,23 +53,23 @@ public abstract class EnaAgentAbstractValidator {
         return validationMessages;
     }
 
-    void publishValidationMessage(Submittable submittable, Collection<ValidationMessage<Origin>> validationMessages) {
+    default void publishValidationMessage(Submittable submittable, Collection<ValidationMessage<Origin>> validationMessages) {
         String validationMessage = assembleErrorMessage(validationMessages, submittable.getClass().getSimpleName());
 
         if (validationMessages.isEmpty()) {
-            rabbitMessagingTemplate.convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_SUCCESS,
+            getRabbitMessagingTemplate().convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_SUCCESS,
                     buildSingleValidationResult(submittable, ValidationStatus.Pass, validationMessage));
 
             logger.info("Validation successful for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
         } else {
-            rabbitMessagingTemplate.convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_ERROR,
+            getRabbitMessagingTemplate().convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_ERROR,
                     buildSingleValidationResult(submittable, ValidationStatus.Error, validationMessage));
 
             logger.info("Validation erred for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
         }
     }
 
-    private SingleValidationResult buildSingleValidationResult(Submittable submittable, ValidationStatus status, String validationMessages) {
+    default SingleValidationResult buildSingleValidationResult(Submittable submittable, ValidationStatus status, String validationMessages) {
         SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, submittable.getId());
         singleValidationResult.setUuid(UUID.randomUUID().toString());
         singleValidationResult.setEntityUuid(submittable.getId());
@@ -96,7 +86,7 @@ public abstract class EnaAgentAbstractValidator {
      * @param validationMessages Collection of validation messages
      * @return A list of validation messages converted into a String or a success message, if there were no errors.
      */
-    String assembleErrorMessage(Collection<ValidationMessage<Origin>> validationMessages, String submittableType) {
+    default String assembleErrorMessage(Collection<ValidationMessage<Origin>> validationMessages, String submittableType) {
         String assembledValidationMessage = validationMessages.stream()
                 .map(ValidationMessage::getMessage)
                 .collect(Collectors.joining(", "));
