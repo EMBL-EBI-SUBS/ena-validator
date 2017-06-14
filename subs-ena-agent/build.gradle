@@ -20,7 +20,7 @@ dependencies {
 	compile 'org.springframework:spring-jdbc'
 	compile 'uk.ac.ebi.ena.sra:sra-xml:1.5.32'
 
-	compile 'com.github.EMBL-EBI-SUBS:validator-common:SUBS-458-remove_json_mapping_config-SNAPSHOT'
+	compile 'com.github.EMBL-EBI-SUBS:validator-common:master-SNAPSHOT'
 
 	testCompile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
 	runtime(group: 'com.oracle', name: 'ojdbc6', version: '11.2.0.3')

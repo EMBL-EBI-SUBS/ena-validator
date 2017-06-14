@@ -16,6 +16,7 @@ import uk.ac.ebi.subs.data.submittable.*;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENASampleProcessor;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
+import uk.ac.ebi.subs.validator.data.ValidationAuthor;
 import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.ValidationStatus;
 import uk.ac.ebi.subs.validator.messaging.Exchanges;
@@ -143,8 +144,9 @@ public class EnaAgentValidator {
     }
 
     private SingleValidationResult buildSingleValidationResult(Submittable submittable, ValidationStatus status, String validationMessages) {
-        SingleValidationResult singleValidationResult = new SingleValidationResult(Archive.Ena, submittable.getId());
+        SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, submittable.getId());
         singleValidationResult.setUuid(UUID.randomUUID().toString());
+        singleValidationResult.setEntityUuid(submittable.getId());
         singleValidationResult.setValidationStatus(status);
 
         singleValidationResult.setMessage(validationMessages);
