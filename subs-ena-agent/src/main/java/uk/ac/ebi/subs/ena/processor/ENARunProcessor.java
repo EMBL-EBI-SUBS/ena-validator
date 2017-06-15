@@ -1,28 +1,23 @@
 package uk.ac.ebi.subs.ena.processor;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.oxm.Marshaller;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.embl.api.validation.Origin;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
-import uk.ac.ebi.ena.sra.ExperimentInfo;
-import uk.ac.ebi.ena.sra.SRALoader;
-import uk.ac.ebi.ena.sra.xml.ExperimentType;
 import uk.ac.ebi.subs.data.component.Archive;
-import uk.ac.ebi.subs.data.component.SampleRef;
-import uk.ac.ebi.subs.data.component.SampleUse;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
-import uk.ac.ebi.subs.data.submittable.*;
+import uk.ac.ebi.subs.data.submittable.AssayData;
+import uk.ac.ebi.subs.data.submittable.BaseSubmittableFactory;
+import uk.ac.ebi.subs.data.submittable.ENARun;
+import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.loader.SRALoaderService;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ENARunProcessor extends AbstractENAProcessor<ENARun> {
@@ -58,12 +53,13 @@ public class ENARunProcessor extends AbstractENAProcessor<ENARun> {
 
     @Override
     public String getSubmittableObjectTypeAsAString() {
-        return Study.class.getSimpleName();
+        return AssayData.class.getSimpleName();
     }
 
     @Override
     public Collection<ValidationMessage<Origin>> convertFromSubmittableToENASubmittable(Submittable submittable) throws InstantiationException, IllegalAccessException {
-        return null;
+        ENARun enaSubmittable = (ENARun) BaseSubmittableFactory.create(ENARun.class, submittable);
+        return validateEntity(enaSubmittable);
     }
 
 }

@@ -3,13 +3,10 @@ package uk.ac.ebi.subs.ena.validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.converter.MessageConverter;
 import uk.ac.ebi.embl.api.validation.Origin;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.processor.ENAAgentProcessor;
-import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.ValidationAuthor;
 import uk.ac.ebi.subs.validator.data.ValidationStatus;
@@ -53,29 +50,32 @@ public interface EnaAgentValidator {
         return validationMessages;
     }
 
-    default void publishValidationMessage(Submittable submittable, Collection<ValidationMessage<Origin>> validationMessages) {
+    default void publishValidationMessage(Submittable submittable, Collection<ValidationMessage<Origin>> validationMessages,
+                                          String validationResultUuid) {
         String validationMessage = assembleErrorMessage(validationMessages, submittable.getClass().getSimpleName());
 
         if (validationMessages.isEmpty()) {
             getRabbitMessagingTemplate().convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_SUCCESS,
-                    buildSingleValidationResult(submittable, ValidationStatus.Pass, validationMessage));
+                    buildSingleValidationResult(submittable, ValidationStatus.Pass, validationMessage, validationResultUuid));
 
             logger.info("Validation successful for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
         } else {
             getRabbitMessagingTemplate().convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_ERROR,
-                    buildSingleValidationResult(submittable, ValidationStatus.Error, validationMessage));
+                    buildSingleValidationResult(submittable, ValidationStatus.Error, validationMessage, validationResultUuid));
 
             logger.info("Validation erred for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
         }
     }
 
-    default SingleValidationResult buildSingleValidationResult(Submittable submittable, ValidationStatus status, String validationMessages) {
+    default SingleValidationResult buildSingleValidationResult(Submittable submittable, ValidationStatus status,
+                                                               String validationMessages, String validationResultUuid) {
         SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, submittable.getId());
         singleValidationResult.setUuid(UUID.randomUUID().toString());
         singleValidationResult.setEntityUuid(submittable.getId());
         singleValidationResult.setValidationStatus(status);
 
         singleValidationResult.setMessage(validationMessages);
+        singleValidationResult.setValidationResultUUID(validationResultUuid);
 
         return singleValidationResult;
     }

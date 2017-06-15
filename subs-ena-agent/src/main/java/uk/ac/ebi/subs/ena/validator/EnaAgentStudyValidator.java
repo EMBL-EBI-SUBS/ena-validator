@@ -73,6 +73,6 @@ public class EnaAgentStudyValidator implements EnaAgentValidator {
 
         Collection<ValidationMessage<Origin>> validationMessages = executeSubmittableValidation(study, enaStudyProcessor);
 
-        publishValidationMessage(study, validationMessages);
+        publishValidationMessage(study, validationMessages, validationEnvelope.getValidationResultUUID());
     }
 }

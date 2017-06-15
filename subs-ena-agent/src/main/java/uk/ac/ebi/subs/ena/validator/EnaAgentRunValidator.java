@@ -11,9 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import uk.ac.ebi.embl.api.validation.Origin;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
-import uk.ac.ebi.subs.data.submittable.Sample;
+import uk.ac.ebi.subs.data.submittable.AssayData;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
-import uk.ac.ebi.subs.ena.processor.ENASampleProcessor;
+import uk.ac.ebi.subs.ena.processor.ENARunProcessor;
 import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.messaging.Queues;
 
@@ -23,20 +23,20 @@ import java.util.Collection;
  * This class responsible to do the ENA related validations.
  */
 @Service
-public class EnaAgentSampleValidator implements EnaAgentValidator {
+public class EnaAgentRunValidator implements EnaAgentValidator {
 
-    private static final Logger logger = LoggerFactory.getLogger(EnaAgentSampleValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(EnaAgentRunValidator.class);
 
     @Autowired
-    ENASampleProcessor enaSampleProcessor;
+    ENARunProcessor enaRunProcessor;
 
-    public ENASampleProcessor getEnaSampleProcessor() {
-        return enaSampleProcessor;
+    public ENARunProcessor getEnaRunProcessor() {
+        return enaRunProcessor;
     }
 
-    RabbitMessagingTemplate rabbitMessagingTemplate;
-
     ENAProcessorContainerService enaProcessorContainerService;
+
+    RabbitMessagingTemplate rabbitMessagingTemplate;
 
     @Override
     public void setRabbitMessagingTemplate(RabbitMessagingTemplate rabbitMessagingTemplate) {
@@ -48,30 +48,31 @@ public class EnaAgentSampleValidator implements EnaAgentValidator {
         return rabbitMessagingTemplate;
     }
 
-    public EnaAgentSampleValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
-                                  ENAProcessorContainerService enaProcessorContainerService) {
+    public EnaAgentRunValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
+                                ENAProcessorContainerService enaProcessorContainerService) {
         this.rabbitMessagingTemplate = rabbitMessagingTemplate;
         this.rabbitMessagingTemplate.setMessageConverter(messageConverter);
         this.enaProcessorContainerService = enaProcessorContainerService;
     }
 
+
     /**
-     * Do a validation for the sample submitted in the {@link ValidationMessageEnvelope}.
+     * Do a validation for the {@link AssayData} submitted in the {@link ValidationMessageEnvelope}.
      * It produces a message according to the validation outcome.
      *
-     * @param validationEnvelope {@link ValidationMessageEnvelope} that contains the sample to validate
+     * @param validationEnvelope {@link ValidationMessageEnvelope} that contains the assay data to validate
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
     @Transactional
-    @RabbitListener(queues = Queues.ENA_SAMPLE_VALIDATION)
-    public void validateSample(ValidationMessageEnvelope<Sample> validationEnvelope) {
+    @RabbitListener(queues = Queues.ENA_ASSAYDATA_VALIDATION)
+    public void validateAssayData(ValidationMessageEnvelope<AssayData> validationEnvelope) {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 
-        final Sample sample = validationEnvelope.getEntityToValidate();
+        final AssayData assayData = validationEnvelope.getEntityToValidate();
 
-        Collection<ValidationMessage<Origin>> validationMessages = executeSubmittableValidation(sample, enaSampleProcessor);
+        Collection<ValidationMessage<Origin>> validationMessages = executeSubmittableValidation(assayData, enaRunProcessor);
 
-        publishValidationMessage(sample, validationMessages, validationEnvelope.getValidationResultUUID());
+        publishValidationMessage(assayData, validationMessages, validationEnvelope.getValidationResultUUID());
     }
 }
