@@ -23,6 +23,7 @@ public interface ENAAgentProcessor<T extends ENASubmittable> extends AgentProces
     String getSubmittableObjectTypeAsAString();
     void addNullSubmittableValidationMessage(Collection<ValidationMessage<Origin>> validationMessages,
                                              String submittableTypeAsString);
-    Collection<ValidationMessage<Origin>> convertFromSubmittableToENASubmittable(Submittable submittable)
+    Collection<ValidationMessage<Origin>> validateEntity(T enaSubmittable);
+    ENASubmittable convertFromSubmittableToENASubmittable(Submittable submittable)
             throws InstantiationException, IllegalAccessException;
 }

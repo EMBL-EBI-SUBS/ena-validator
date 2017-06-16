@@ -49,8 +49,7 @@ public class ENASampleProcessor extends AbstractENAProcessor<ENASample> {
         return Sample.class.getSimpleName();
     }
 
-    public Collection<ValidationMessage<Origin>> convertFromSubmittableToENASubmittable(Submittable submittable) throws InstantiationException, IllegalAccessException {
-        ENASample enaSubmittable = (ENASample) BaseSubmittableFactory.create(ENASample.class, submittable);
-        return validateEntity(enaSubmittable);
+    public ENASubmittable convertFromSubmittableToENASubmittable(Submittable submittable) throws InstantiationException, IllegalAccessException {
+        return BaseSubmittableFactory.create(ENASample.class, submittable);
     }
 }

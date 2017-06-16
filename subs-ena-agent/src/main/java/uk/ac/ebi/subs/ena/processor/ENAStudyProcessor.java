@@ -9,10 +9,7 @@ import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.subs.data.Submission;
 import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
-import uk.ac.ebi.subs.data.submittable.BaseSubmittableFactory;
-import uk.ac.ebi.subs.data.submittable.ENAStudy;
-import uk.ac.ebi.subs.data.submittable.Study;
-import uk.ac.ebi.subs.data.submittable.Submittable;
+import uk.ac.ebi.subs.data.submittable.*;
 import uk.ac.ebi.subs.ena.loader.SRALoaderService;
 import uk.ac.ebi.subs.ena.loader.StudySRALoader;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
@@ -62,9 +59,8 @@ public class ENAStudyProcessor extends AbstractENAProcessor<ENAStudy>  {
         return Study.class.getSimpleName();
     }
 
-    public Collection<ValidationMessage<Origin>> convertFromSubmittableToENASubmittable(Submittable submittable) throws InstantiationException, IllegalAccessException {
-        ENAStudy enaSubmittable = (ENAStudy) BaseSubmittableFactory.create(ENAStudy.class, submittable);
-        return validateEntity(enaSubmittable);
+    public ENASubmittable convertFromSubmittableToENASubmittable(Submittable submittable) throws InstantiationException, IllegalAccessException {
+        return BaseSubmittableFactory.create(ENAStudy.class, submittable);
     }
 
 }

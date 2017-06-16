@@ -6,10 +6,7 @@ import uk.ac.ebi.embl.api.validation.Origin;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
-import uk.ac.ebi.subs.data.submittable.AssayData;
-import uk.ac.ebi.subs.data.submittable.BaseSubmittableFactory;
-import uk.ac.ebi.subs.data.submittable.ENARun;
-import uk.ac.ebi.subs.data.submittable.Submittable;
+import uk.ac.ebi.subs.data.submittable.*;
 import uk.ac.ebi.subs.ena.loader.SRALoaderService;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
@@ -57,9 +54,8 @@ public class ENARunProcessor extends AbstractENAProcessor<ENARun> {
     }
 
     @Override
-    public Collection<ValidationMessage<Origin>> convertFromSubmittableToENASubmittable(Submittable submittable) throws InstantiationException, IllegalAccessException {
-        ENARun enaSubmittable = (ENARun) BaseSubmittableFactory.create(ENARun.class, submittable);
-        return validateEntity(enaSubmittable);
+    public ENASubmittable convertFromSubmittableToENASubmittable(Submittable submittable) throws InstantiationException, IllegalAccessException {
+        return BaseSubmittableFactory.create(ENARun.class, submittable);
     }
 
 }

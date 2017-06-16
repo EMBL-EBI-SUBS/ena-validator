@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import uk.ac.ebi.embl.api.validation.Origin;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
+import uk.ac.ebi.subs.data.submittable.ENASubmittable;
 import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.processor.ENAAgentProcessor;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
@@ -40,7 +41,8 @@ public interface EnaAgentValidator {
                     eNAAgentProcessor.getSubmittableObjectTypeAsAString());
         } else {
             try {
-                eNAAgentProcessor.convertFromSubmittableToENASubmittable(submittable);
+                ENASubmittable eNASubmittable= eNAAgentProcessor.convertFromSubmittableToENASubmittable(submittable);
+                eNAAgentProcessor.validateEntity(eNASubmittable);
             } catch (InstantiationException | IllegalAccessException e) {
                 logger.error("An exception occured: {}", e.getMessage());
                 validationMessages.add(ValidationMessage.error("ERAM.1.0.3", e.getMessage()));

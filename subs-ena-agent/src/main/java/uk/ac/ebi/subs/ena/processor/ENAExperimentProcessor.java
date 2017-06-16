@@ -62,8 +62,8 @@ public class ENAExperimentProcessor extends AbstractENAProcessor<ENAExperiment> 
     }
 
     @Override
-    public Collection<ValidationMessage<Origin>> convertFromSubmittableToENASubmittable(Submittable submittable) throws InstantiationException, IllegalAccessException {
-        return null;
+    public ENASubmittable convertFromSubmittableToENASubmittable(Submittable submittable) throws InstantiationException, IllegalAccessException {
+        return BaseSubmittableFactory.create(ENAExperiment.class, submittable);
     }
 
 }
