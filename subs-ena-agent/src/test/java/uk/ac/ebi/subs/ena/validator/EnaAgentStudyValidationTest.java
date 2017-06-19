@@ -8,16 +8,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.embl.api.validation.Origin;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
-import uk.ac.ebi.subs.data.component.Team;
-import uk.ac.ebi.subs.data.submittable.Sample;
 import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
-import uk.ac.ebi.subs.ena.helper.TestHelper;
-import uk.ac.ebi.subs.ena.validator.EnaAgentSampleValidator;
-import uk.ac.ebi.subs.ena.validator.EnaAgentStudyValidator;
 
 import java.util.Collection;
-import java.util.UUID;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -35,18 +29,18 @@ public class EnaAgentStudyValidationTest {
     EnaAgentStudyValidator enaAgentStudyValidator;
 
     private static final String CENTER_NAME = "test-team";
-    private final String SUBMITTABLETYPE = Study.class.getSimpleName();
+    private final String SUBMITTABLE_TYPE = Study.class.getSimpleName();
 
     @Test
     public void returnsSuccessfullyWhenValidationEnvelopeContainsAValidStudy() throws Exception {
-        final Study study = createStudy(CENTER_NAME);
+        final Study study = ValidatorTestUtil.createStudy(CENTER_NAME);
         final String expectedValidationErrorMessage =
-                String.format(EnaAgentValidator.SUCCESS_MESSAGE, SUBMITTABLETYPE);
+                String.format(EnaAgentValidator.SUCCESS_MESSAGE, SUBMITTABLE_TYPE);
 
         Collection<ValidationMessage<Origin>> validationMessages =
                 enaAgentStudyValidator.executeSubmittableValidation(study, enaAgentStudyValidator.getEnaStudyProcessor());
 
-        String validationMessage = enaAgentStudyValidator.assembleErrorMessage(validationMessages, SUBMITTABLETYPE);
+        String validationMessage = enaAgentStudyValidator.assembleErrorMessage(validationMessages, SUBMITTABLE_TYPE);
 
         assertThat("There should be no validation messages", validationMessage, is(expectedValidationErrorMessage));
     }
@@ -55,31 +49,17 @@ public class EnaAgentStudyValidationTest {
     public void returnsErrorMessagesWhenValidationEnvelopeContainsANullStudy() throws Exception {
         final Study study = null;
         final String expectedValidationErrorMessage =
-                String.format(EnaAgentValidator.NULL_SAMPLE_ERROR_MESSAGE, SUBMITTABLETYPE);
+                String.format(EnaAgentValidator.NULL_SAMPLE_ERROR_MESSAGE, SUBMITTABLE_TYPE);
         final int expectedValidationMessageCount = 1;
 
         Collection<ValidationMessage<Origin>> validationMessages =
                 enaAgentStudyValidator.executeSubmittableValidation(study, enaAgentStudyValidator.getEnaStudyProcessor());
 
-        String validationMessage = enaAgentStudyValidator.assembleErrorMessage(validationMessages, SUBMITTABLETYPE);
+        String validationMessage = enaAgentStudyValidator.assembleErrorMessage(validationMessages, SUBMITTABLE_TYPE);
 
         assertThat("Validation should fail with null study",
                 validationMessage, is(expectedValidationErrorMessage));
         assertThat("Validation message count should be 1",
                 validationMessages.size(), is(expectedValidationMessageCount));
-    }
-
-    private Study createStudy(String centerName) {
-        String alias = getAlias();
-        final Team team = getTeam(centerName);
-        return TestHelper.getStudy(alias, team);
-    }
-
-    private Team getTeam(String centerName) {
-        return TestHelper.getTeam(centerName);
-    }
-
-    private String getAlias() {
-        return UUID.randomUUID().toString();
     }
 }

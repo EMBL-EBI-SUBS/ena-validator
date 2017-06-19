@@ -8,16 +8,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.embl.api.validation.Origin;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
-import uk.ac.ebi.subs.data.component.Team;
-import uk.ac.ebi.subs.data.submittable.*;
+import uk.ac.ebi.subs.data.submittable.Sample;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
-import uk.ac.ebi.subs.ena.helper.TestHelper;
-import uk.ac.ebi.subs.ena.validator.EnaAgentSampleValidator;
 
 import java.util.Collection;
-import java.util.UUID;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -35,7 +30,7 @@ public class EnaAgentSampleValidationTest {
 
     @Test
     public void returnsSuccessfullyWhenValidationEnvelopeContainsAValidSample() throws Exception {
-        final Sample sample = createSample();
+        final Sample sample = ValidatorTestUtil.createSample();
         final String submittableType = sample.getClass().getSimpleName();
         final String expectedValidationErrorMessage = String.format(EnaAgentSampleValidator.SUCCESS_MESSAGE, submittableType);
 
@@ -66,19 +61,5 @@ public class EnaAgentSampleValidationTest {
         assertThat("Validation message count should be 1",
                 validationMessages.size(), is(expectedValidationMessageCount));
 
-    }
-
-    private Sample createSample() {
-        String alias = getAlias();
-        final Team team = getTeam("test-team");
-        return TestHelper.getSample(alias, team);
-    }
-
-    private Team getTeam(String centerName) {
-        return TestHelper.getTeam(centerName);
-    }
-
-    private String getAlias() {
-        return UUID.randomUUID().toString();
     }
 }

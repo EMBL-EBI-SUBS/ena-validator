@@ -42,7 +42,7 @@ public interface EnaAgentValidator {
         } else {
             try {
                 ENASubmittable eNASubmittable= eNAAgentProcessor.convertFromSubmittableToENASubmittable(submittable);
-                eNAAgentProcessor.validateEntity(eNASubmittable);
+                validationMessages = eNAAgentProcessor.validateEntity(eNASubmittable);
             } catch (InstantiationException | IllegalAccessException e) {
                 logger.error("An exception occured: {}", e.getMessage());
                 validationMessages.add(ValidationMessage.error("ERAM.1.0.3", e.getMessage()));

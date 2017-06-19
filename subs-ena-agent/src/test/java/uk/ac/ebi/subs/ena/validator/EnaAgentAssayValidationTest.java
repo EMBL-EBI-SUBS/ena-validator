@@ -8,13 +8,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.embl.api.validation.Origin;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
-import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
-import uk.ac.ebi.subs.ena.helper.TestHelper;
 
 import java.util.Collection;
-import java.util.UUID;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -34,18 +31,50 @@ public class EnaAgentAssayValidationTest {
     private static final String CENTER_NAME = "test-team";
     private final String SUBMITTABLE_TYPE = Assay.class.getSimpleName();
 
+    // TODO: check it with Neil
+//    @Test
+//    public void returnsSuccessfullyWhenValidationEnvelopeContainsAValidAssay() throws Exception {
+//        final Assay assay = ValidatorTestUtil.createAssay(
+//                "Input_300Frag",
+//                "UU",
+//                "Input",
+//                "UU_HepG2_ChIP-seq_SOLiD");
+//
+//        final String expectedValidationErrorMessage =
+//                String.format(EnaAgentValidator.SUCCESS_MESSAGE, SUBMITTABLE_TYPE);
+//
+//        Collection<ValidationMessage<Origin>> validationMessages =
+//                enaAgentAssayValidator.executeSubmittableValidation(assay, enaAgentAssayValidator.getExperimentProcessor());
+//
+//        String validationMessage = enaAgentAssayValidator.assembleErrorMessage(validationMessages, SUBMITTABLE_TYPE);
+//
+//        assertThat("There should be no validation messages", validationMessage, is(expectedValidationErrorMessage));
+//    }
+
     @Test
-    public void returnsSuccessfullyWhenValidationEnvelopeContainsAValidAssay() throws Exception {
-        final Assay assay = createAssay(CENTER_NAME);
+    public void returnsSErrorMessagesWhenValidationEnvelopeContainsAnAssayWithUnknownSampleAndUnknownStudy() throws Exception {
+        final String assayAlias = "assayAlias";
+        final String samplaAlias = "samplaAlias";
+        final String studyAlias = "studyAlias";
+        final Assay assay = ValidatorTestUtil.createAssay(
+                assayAlias,
+                CENTER_NAME,
+                samplaAlias,
+                studyAlias);
         final String expectedValidationErrorMessage =
-                String.format(EnaAgentValidator.SUCCESS_MESSAGE, SUBMITTABLE_TYPE);
+                String.format(String.format("Unknown study ( name:%s) in experiment( name:%s) , Unknown sample ( name:%s) in experiment( name:%s) ",
+                        studyAlias, assayAlias, samplaAlias, assayAlias));
+        final int expectedValidationMessageCount = 2;
 
         Collection<ValidationMessage<Origin>> validationMessages =
                 enaAgentAssayValidator.executeSubmittableValidation(assay, enaAgentAssayValidator.getExperimentProcessor());
 
         String validationMessage = enaAgentAssayValidator.assembleErrorMessage(validationMessages, SUBMITTABLE_TYPE);
 
-        assertThat("There should be no validation messages", validationMessage, is(expectedValidationErrorMessage));
+        assertThat("Validation should fail with null assay data",
+                validationMessage, is(expectedValidationErrorMessage));
+        assertThat("Validation message count should be 2",
+                validationMessages.size(), is(expectedValidationMessageCount));
     }
 
     @Test
@@ -64,21 +93,5 @@ public class EnaAgentAssayValidationTest {
                 validationMessage, is(expectedValidationErrorMessage));
         assertThat("Validation message count should be 1",
                 validationMessages.size(), is(expectedValidationMessageCount));
-    }
-
-    private Assay createAssay(String centerName) {
-        String alias = getAlias();
-        final Team team = getTeam(centerName);
-        Assay assay = TestHelper.getAssay(alias, team, alias, alias);
-        assay.setId(UUID.randomUUID().toString());
-        return assay;
-    }
-
-    private Team getTeam(String centerName) {
-        return TestHelper.getTeam(centerName);
-    }
-
-    private String getAlias() {
-        return UUID.randomUUID().toString();
     }
 }
