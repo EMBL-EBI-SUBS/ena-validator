@@ -229,7 +229,7 @@ public class TestHelper {
         File file = new File();
         file.setType("fastq");
         file.setChecksum("12345678abcdefgh12345678abcdefgh");
-        file.setName("Test.fastq");
+        file.setName("Test.fastq.gz");
         file.setChecksumMethod("MD5");
         assayData.getFiles().add(file);
         return assayData;
