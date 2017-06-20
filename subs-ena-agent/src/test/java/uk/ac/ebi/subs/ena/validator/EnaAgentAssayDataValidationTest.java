@@ -47,7 +47,7 @@ public class EnaAgentAssayDataValidationTest {
 //        Collection<ValidationMessage<Origin>> validationMessages =
 //                enaAgentAssayDataValidator.executeSubmittableValidation(assayData, enaAgentAssayDataValidator.getEnaRunProcessor());
 //
-//        String validationMessage = enaAgentAssayDataValidator.assembleErrorMessage(validationMessages, SUBMITTABLE_TYPE);
+//        String validationMessage = enaAgentAssayDataValidator.assembleValidationMessage(validationMessages, SUBMITTABLE_TYPE);
 //
 //        assertThat("There should be no validation messages", validationMessage, is(expectedValidationErrorMessage));
 //    }
@@ -55,18 +55,21 @@ public class EnaAgentAssayDataValidationTest {
     @Test
     public void returnsErrorMessagesWhenValidationEnvelopeContainsANullAssayData() throws Exception {
         final AssayData assayData = null;
-        final String expectedValidationErrorMessage =
-                String.format(EnaAgentValidator.NULL_SAMPLE_ERROR_MESSAGE, SUBMITTABLE_TYPE);
+
+        final ValidationMessage<Origin> nullEntityValidationMessage =
+                ValidationMessage.error("ERAM.1.0.14", SUBMITTABLE_TYPE);
+        final String expectedValidationErrorMessage = String.format(nullEntityValidationMessage.getMessage());
+
         final int expectedValidationMessageCount = 1;
 
         Collection<ValidationMessage<Origin>> validationMessages =
                 enaAgentAssayDataValidator.executeSubmittableValidation(assayData, enaAgentAssayDataValidator.getEnaRunProcessor());
 
-        String validationMessage = enaAgentAssayDataValidator.assembleErrorMessage(validationMessages, SUBMITTABLE_TYPE);
+        String validationMessage = enaAgentAssayDataValidator.assembleValidationMessage(validationMessages, SUBMITTABLE_TYPE);
 
         assertThat("Validation should fail with null assay data",
                 validationMessage, is(expectedValidationErrorMessage));
-        assertThat("Validation message count should be 1",
+        assertThat("Validation message count should be at least 1",
                 validationMessages.size(), is(expectedValidationMessageCount));
     }
 }

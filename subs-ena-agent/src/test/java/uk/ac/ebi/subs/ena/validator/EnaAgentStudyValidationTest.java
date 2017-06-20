@@ -43,7 +43,7 @@ public class EnaAgentStudyValidationTest {
         Collection<ValidationMessage<Origin>> validationMessages =
                 enaAgentStudyValidator.executeSubmittableValidation(study, enaAgentStudyValidator.getEnaStudyProcessor());
 
-        String validationMessage = enaAgentStudyValidator.assembleErrorMessage(validationMessages, SUBMITTABLE_TYPE);
+        String validationMessage = enaAgentStudyValidator.assembleValidationMessage(validationMessages, SUBMITTABLE_TYPE);
 
         assertThat("There should be no validation messages", validationMessage, is(expectedValidationErrorMessage));
     }
@@ -58,7 +58,7 @@ public class EnaAgentStudyValidationTest {
         Collection<ValidationMessage<Origin>> validationMessages =
                 enaAgentStudyValidator.executeSubmittableValidation(study, enaAgentStudyValidator.getEnaStudyProcessor());
 
-        String validationMessage = enaAgentStudyValidator.assembleErrorMessage(validationMessages, SUBMITTABLE_TYPE);
+        String validationMessage = enaAgentStudyValidator.assembleValidationMessage(validationMessages, SUBMITTABLE_TYPE);
 
         assertThat("Validation should fail with null study",
                 validationMessage, is(expectedValidationErrorMessage));

@@ -47,9 +47,9 @@ public class EnaAgentAssayValidationTest {
 //                String.format(EnaAgentValidator.SUCCESS_MESSAGE, SUBMITTABLE_TYPE);
 //
 //        Collection<ValidationMessage<Origin>> validationMessages =
-//                enaAgentAssayValidator.executeSubmittableValidation(assay, enaAgentAssayValidator.getExperimentProcessor());
+//                enaAgentAssayValidator.executeSubmittableValidation(assay, enaAgentAssayValidator.getEnaExperimentProcessor());
 //
-//        String validationMessage = enaAgentAssayValidator.assembleErrorMessage(validationMessages, SUBMITTABLE_TYPE);
+//        String validationMessage = enaAgentAssayValidator.assembleValidationMessage(validationMessages, SUBMITTABLE_TYPE);
 //
 //        assertThat("There should be no validation messages", validationMessage, is(expectedValidationErrorMessage));
 //    }
@@ -70,9 +70,9 @@ public class EnaAgentAssayValidationTest {
         final int expectedValidationMessageCount = 2;
 
         Collection<ValidationMessage<Origin>> validationMessages =
-                enaAgentAssayValidator.executeSubmittableValidation(assay, enaAgentAssayValidator.getExperimentProcessor());
+                enaAgentAssayValidator.executeSubmittableValidation(assay, enaAgentAssayValidator.getEnaExperimentProcessor());
 
-        String validationMessage = enaAgentAssayValidator.assembleErrorMessage(validationMessages, SUBMITTABLE_TYPE);
+        String validationMessage = enaAgentAssayValidator.assembleValidationMessage(validationMessages, SUBMITTABLE_TYPE);
 
         assertThat("Validation should fail with null assay data",
                 validationMessage, is(expectedValidationErrorMessage));
@@ -88,9 +88,9 @@ public class EnaAgentAssayValidationTest {
         final int expectedValidationMessageCount = 1;
 
         Collection<ValidationMessage<Origin>> validationMessages =
-                enaAgentAssayValidator.executeSubmittableValidation(assay, enaAgentAssayValidator.getExperimentProcessor());
+                enaAgentAssayValidator.executeSubmittableValidation(assay, enaAgentAssayValidator.getEnaExperimentProcessor());
 
-        String validationMessage = enaAgentAssayValidator.assembleErrorMessage(validationMessages, SUBMITTABLE_TYPE);
+        String validationMessage = enaAgentAssayValidator.assembleValidationMessage(validationMessages, SUBMITTABLE_TYPE);
 
         assertThat("Validation should fail with null assay data",
                 validationMessage, is(expectedValidationErrorMessage));

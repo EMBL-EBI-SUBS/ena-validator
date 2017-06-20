@@ -30,8 +30,12 @@ public class EnaAgentExperimentValidator implements EnaAgentValidator {
     @Autowired
     ENAExperimentProcessor experimentProcessor;
 
-    public ENAExperimentProcessor getExperimentProcessor() {
+    public ENAExperimentProcessor getEnaExperimentProcessor() {
         return experimentProcessor;
+    }
+
+    public void setExperimentProcessor(ENAExperimentProcessor eNAExperimentProcessor) {
+        this.experimentProcessor = eNAExperimentProcessor;
     }
 
     ENAProcessorContainerService enaProcessorContainerService;

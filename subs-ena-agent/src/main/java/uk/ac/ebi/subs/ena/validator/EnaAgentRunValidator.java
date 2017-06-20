@@ -34,6 +34,10 @@ public class EnaAgentRunValidator implements EnaAgentValidator {
         return enaRunProcessor;
     }
 
+    public void setEnaRunProcessor(ENARunProcessor eNARunProcessor) {
+        this.enaRunProcessor = eNARunProcessor;
+    }
+
     ENAProcessorContainerService enaProcessorContainerService;
 
     RabbitMessagingTemplate rabbitMessagingTemplate;

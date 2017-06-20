@@ -40,7 +40,7 @@ public class EnaAgentSampleValidationTest {
         Collection<ValidationMessage<Origin>> validationMessages =
                 enaAgentSampleValidator.executeSubmittableValidation(sample, enaAgentSampleValidator.getEnaSampleProcessor());
 
-        String validationMessage = enaAgentSampleValidator.assembleErrorMessage(validationMessages, submittableType);
+        String validationMessage = enaAgentSampleValidator.assembleValidationMessage(validationMessages, submittableType);
 
 
         assertThat("There should be no validation messages", validationMessage, is(expectedValidationErrorMessage));
@@ -57,7 +57,7 @@ public class EnaAgentSampleValidationTest {
         Collection<ValidationMessage<Origin>> validationMessages =
                 enaAgentSampleValidator.executeSubmittableValidation(sample, enaAgentSampleValidator.getEnaSampleProcessor());
 
-        String validationMessage = enaAgentSampleValidator.assembleErrorMessage(validationMessages, submittableType);
+        String validationMessage = enaAgentSampleValidator.assembleValidationMessage(validationMessages, submittableType);
 
         assertThat("Validation should fail with null sample",
                 validationMessage, is(expectedValidationErrorMessage));

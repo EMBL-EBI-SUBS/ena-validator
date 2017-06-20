@@ -34,6 +34,10 @@ public class EnaAgentSampleValidator implements EnaAgentValidator {
         return enaSampleProcessor;
     }
 
+    public void setEnaSampleProcessor(ENASampleProcessor eNASampleProcessor) {
+        this.enaSampleProcessor = eNASampleProcessor;
+    }
+
     RabbitMessagingTemplate rabbitMessagingTemplate;
 
     ENAProcessorContainerService enaProcessorContainerService;

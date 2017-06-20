@@ -54,7 +54,7 @@ public interface EnaAgentValidator {
 
     default void publishValidationMessage(Submittable submittable, Collection<ValidationMessage<Origin>> validationMessages,
                                           String validationResultUuid) {
-        String validationMessage = assembleErrorMessage(validationMessages, submittable.getClass().getSimpleName());
+        String validationMessage = assembleValidationMessage(validationMessages, submittable.getClass().getSimpleName());
 
         if (validationMessages.isEmpty()) {
             getRabbitMessagingTemplate().convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_SUCCESS,
@@ -83,12 +83,12 @@ public interface EnaAgentValidator {
     }
 
     /**
-     * Assemble a collection of error messages to a String. If the collection is empty,
+     * Assemble a collection of validation messages to a String. If the collection is empty,
      * then it will return a success message.
      * @param validationMessages Collection of validation messages
-     * @return A list of validation messages converted into a String or a success message, if there were no errors.
+     * @return A list of validation messages converted into a String or a success message, if there were no validation errors.
      */
-    default String assembleErrorMessage(Collection<ValidationMessage<Origin>> validationMessages, String submittableType) {
+    default String assembleValidationMessage(Collection<ValidationMessage<Origin>> validationMessages, String submittableType) {
         String assembledValidationMessage = validationMessages.stream()
                 .map(ValidationMessage::getMessage)
                 .collect(Collectors.joining(", "));

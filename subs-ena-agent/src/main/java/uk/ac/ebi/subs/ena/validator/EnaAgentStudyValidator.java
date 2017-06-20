@@ -34,6 +34,10 @@ public class EnaAgentStudyValidator implements EnaAgentValidator {
         return enaStudyProcessor;
     }
 
+    public void setEnaStudyProcessor(ENAStudyProcessor eNAStudyProcessor) {
+        this.enaStudyProcessor = eNAStudyProcessor;
+    }
+
     ENAProcessorContainerService enaProcessorContainerService;
 
     RabbitMessagingTemplate rabbitMessagingTemplate;
