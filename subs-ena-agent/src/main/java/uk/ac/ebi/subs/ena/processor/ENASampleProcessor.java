@@ -30,7 +30,7 @@ public class ENASampleProcessor extends AbstractENAProcessor<ENASample> {
         final List<Sample> samples = envelope.getSamples();
         for (Sample sample : samples) {
             try {
-                final ENASample enaSubmittable = (ENASample) BaseSubmittableFactory.create(ENASample.class, sample);
+                final ENASample enaSubmittable = (ENASample) convertFromSubmittableToENASubmittable(sample);
                 processingCertificateList.add(process(enaSubmittable));
             } catch (IllegalAccessException e) {
 
