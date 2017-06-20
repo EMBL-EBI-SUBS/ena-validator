@@ -3,7 +3,6 @@ package uk.ac.ebi.subs.ena.loader;
 import uk.ac.ebi.embl.api.validation.ValidationResult;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
 
-import java.io.IOException;
 import java.sql.Connection;
 
 /**

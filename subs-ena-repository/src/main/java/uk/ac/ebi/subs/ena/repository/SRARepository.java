@@ -1,15 +1,8 @@
 package uk.ac.ebi.subs.ena.repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.data.repository.PagingAndSortingRepository;
-import uk.ac.ebi.subs.ena.data.AbstractSRAInfo;
 import uk.ac.ebi.subs.ena.data.SRAInfo;
-
-import java.util.List;
 
 /**
  * Created by neilg on 25/04/2017.

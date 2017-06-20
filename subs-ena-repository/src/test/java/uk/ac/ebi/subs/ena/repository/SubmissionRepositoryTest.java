@@ -3,11 +3,9 @@ package uk.ac.ebi.subs.ena.repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import uk.ac.ebi.ena.sra.xml.SUBMISSIONSETDocument;
 import uk.ac.ebi.ena.sra.xml.SubmissionSetType;
 import uk.ac.ebi.ena.sra.xml.SubmissionType;
-import uk.ac.ebi.ena.sra.xml.impl.ProjectTypeImpl;
 import uk.ac.ebi.subs.ena.data.Submission;
 import uk.ac.ebi.subs.ena.data.SubmissionStatus;
 

@@ -9,16 +9,14 @@ import uk.ac.ebi.ena.sra.xml.EXPERIMENTSETDocument;
 import uk.ac.ebi.ena.sra.xml.SAMPLESETDocument;
 import uk.ac.ebi.ena.sra.xml.STUDYSETDocument;
 import uk.ac.ebi.ena.sra.xml.SubmissionType;
-import uk.ac.ebi.subs.ena.EnaAgentApplication;
 import uk.ac.ebi.ena.sra.xml.SubmissionType.ACTIONS.ACTION.ADD.Schema;
+import uk.ac.ebi.subs.ena.EnaAgentApplication;
 
 import java.util.UUID;
 
 import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.junit.Assert.*;
-import static uk.ac.ebi.subs.ena.helper.TestHelper.getExperimentSetDocument;
-import static uk.ac.ebi.subs.ena.helper.TestHelper.getSamplesetDocument;
-import static uk.ac.ebi.subs.ena.helper.TestHelper.getStudysetDocument;
+import static org.junit.Assert.assertThat;
+import static uk.ac.ebi.subs.ena.helper.TestHelper.*;
 
 /**
  * Created by neilg on 17/05/2017.

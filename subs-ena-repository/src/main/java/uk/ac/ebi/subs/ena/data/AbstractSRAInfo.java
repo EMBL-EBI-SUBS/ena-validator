@@ -1,10 +1,8 @@
 package uk.ac.ebi.subs.ena.data;
 
-import org.w3c.dom.Document;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;

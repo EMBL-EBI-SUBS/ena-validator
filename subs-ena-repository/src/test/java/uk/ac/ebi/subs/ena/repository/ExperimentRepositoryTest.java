@@ -5,10 +5,7 @@ import org.w3c.dom.Document;
 import uk.ac.ebi.ena.sra.xml.EXPERIMENTSETDocument;
 import uk.ac.ebi.ena.sra.xml.ExperimentType;
 import uk.ac.ebi.subs.ena.data.Experiment;
-import uk.ac.ebi.subs.ena.data.SRAInfo;
 import uk.ac.ebi.subs.ena.data.SubmissionStatus;
-
-import java.util.List;
 
 /**
  * Created by neilg on 26/04/2017.

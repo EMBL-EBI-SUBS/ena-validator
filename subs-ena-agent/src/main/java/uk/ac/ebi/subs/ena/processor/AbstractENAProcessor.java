@@ -10,8 +10,6 @@ import uk.ac.ebi.embl.api.validation.ValidationResult;
 import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
-import uk.ac.ebi.subs.data.submittable.Sample;
-import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.loader.SRALoaderService;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 
