@@ -2,8 +2,8 @@ package uk.ac.ebi.subs.ena.config;
 
 //import org.eclipse.persistence.jaxb.JAXBContextProperties;
 //import org.eclipse.persistence.jaxb.MarshallerProperties;
+
 import org.eclipse.persistence.jaxb.JAXBContextProperties;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import uk.ac.ebi.ena.authentication.model.AuthResult;
@@ -22,14 +21,12 @@ import uk.ac.ebi.subs.data.submittable.ENAExperiment;
 import uk.ac.ebi.subs.data.submittable.ENARun;
 import uk.ac.ebi.subs.data.submittable.ENASample;
 import uk.ac.ebi.subs.data.submittable.ENAStudy;
-import uk.ac.ebi.subs.ena.loader.StudySRALoader;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.sql.DataSource;
 import javax.xml.transform.stream.StreamSource;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Configuration

@@ -1,6 +1,5 @@
 package uk.ac.ebi.subs.ena.repository;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,10 +11,6 @@ import uk.ac.ebi.ena.sra.xml.StudyType;
 import uk.ac.ebi.subs.ena.ENATestRepositoryApplication;
 import uk.ac.ebi.subs.ena.data.Study;
 import uk.ac.ebi.subs.ena.data.SubmissionStatus;
-
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by neilg on 25/04/2017.

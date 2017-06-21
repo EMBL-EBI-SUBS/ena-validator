@@ -1,7 +1,7 @@
 package uk.ac.ebi.subs.ena.repository;
 
-import uk.ac.ebi.subs.ena.data.SubmissionStatus;
 import uk.ac.ebi.subs.ena.data.SRAInfo;
+import uk.ac.ebi.subs.ena.data.SubmissionStatus;
 
 /**
  * Created by neilg on 26/04/2017.

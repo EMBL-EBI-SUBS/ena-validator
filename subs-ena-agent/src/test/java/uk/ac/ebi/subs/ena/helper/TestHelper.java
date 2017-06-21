@@ -2,8 +2,6 @@ package uk.ac.ebi.subs.ena.helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.assertj.core.util.VisibleForTesting;
-import org.junit.Test;
 import uk.ac.ebi.ena.sra.xml.*;
 import uk.ac.ebi.subs.data.Submission;
 import uk.ac.ebi.subs.data.component.*;
@@ -15,10 +13,12 @@ import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by neilg on 18/05/2017.
@@ -229,7 +229,7 @@ public class TestHelper {
         File file = new File();
         file.setType("fastq");
         file.setChecksum("12345678abcdefgh12345678abcdefgh");
-        file.setName("Test.fastq");
+        file.setName("Test.fastq.gz");
         file.setChecksumMethod("MD5");
         assayData.getFiles().add(file);
         return assayData;
