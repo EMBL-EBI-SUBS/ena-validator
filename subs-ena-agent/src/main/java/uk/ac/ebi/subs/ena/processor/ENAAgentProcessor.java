@@ -1,11 +1,14 @@
 package uk.ac.ebi.subs.ena.processor;
 
+import uk.ac.ebi.embl.api.validation.Origin;
+import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
+import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.loader.SRALoaderService;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 
 import javax.sql.DataSource;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Created by neilg on 17/05/2017.
