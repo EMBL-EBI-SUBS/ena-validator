@@ -69,6 +69,6 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
 
     @Override
     public String getName() {
-        return this.getClass().getName();
+        return this.getClass().getSimpleName();
     }
 }

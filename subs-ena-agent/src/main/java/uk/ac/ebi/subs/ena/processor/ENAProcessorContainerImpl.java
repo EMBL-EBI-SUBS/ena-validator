@@ -26,7 +26,6 @@ public class ENAProcessorContainerImpl implements ENAProcessorContainerService {
         enaAgentProcessorMap.put(enaSampleProcessor.getName(),enaSampleProcessor);
         enaAgentProcessorMap.put(enaExperimentProcessor.getName(),enaExperimentProcessor);
         ENAAgentProcessor [] enaAgentProcessors = {enaStudyProcessor,enaSampleProcessor,enaExperimentProcessor};
-        enaAgentProcessorList = Arrays.asList(enaAgentProcessors);
 
         if (enaProcessorNames.length == 0) {
             enaAgentProcessorList = new ArrayList<>(enaAgentProcessorMap.values());
