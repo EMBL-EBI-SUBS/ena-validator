@@ -1,27 +1,19 @@
 package uk.ac.ebi.subs.ena.loader;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
-import org.apache.commons.io.IOUtils;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import uk.ac.ebi.ena.sra.SRAFileHandler;
+import uk.ac.ebi.ena.sra.xml.*;
 
 import java.io.*;
 import java.net.URL;
 import java.util.UUID;
 
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.ena.sra.SRAFileHandler;
-import uk.ac.ebi.ena.sra.xml.*;
-
-import uk.ac.ebi.subs.ena.EnaAgentApplication;
-
 import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static uk.ac.ebi.subs.ena.helper.TestHelper.*;
 
 /**

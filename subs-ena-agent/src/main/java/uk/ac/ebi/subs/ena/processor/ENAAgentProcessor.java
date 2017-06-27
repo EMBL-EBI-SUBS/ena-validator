@@ -17,5 +17,11 @@ public interface ENAAgentProcessor<T extends ENASubmittable> extends AgentProces
     void setLoader (SRALoaderService<T> sraLoaderService);
     DataSource getDataSource ();
     void setDataSource (DataSource dataSource);
+    String getSubmittableObjectTypeAsAString();
+    void addNullSubmittableValidationMessage(Collection<ValidationMessage<Origin>> validationMessages,
+                                             String submittableTypeAsString);
+    Collection<ValidationMessage<Origin>> validateEntity(T enaSubmittable);
+    ENASubmittable convertFromSubmittableToENASubmittable(Submittable submittable)
+            throws InstantiationException, IllegalAccessException;
     String getName();
 }

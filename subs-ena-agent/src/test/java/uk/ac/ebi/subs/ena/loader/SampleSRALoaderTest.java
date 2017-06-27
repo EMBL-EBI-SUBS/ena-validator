@@ -9,11 +9,11 @@ import uk.ac.ebi.ena.sra.xml.SAMPLESETDocument;
 import uk.ac.ebi.ena.sra.xml.SubmissionType;
 import uk.ac.ebi.subs.data.submittable.ENASample;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
-import static org.hamcrest.core.StringStartsWith.startsWith;
 
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.Assert.assertThat;
 import static uk.ac.ebi.subs.ena.helper.TestHelper.getSamplesetDocument;
 
 /**

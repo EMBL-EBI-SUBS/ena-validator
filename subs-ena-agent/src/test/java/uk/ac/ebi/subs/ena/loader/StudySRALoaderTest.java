@@ -5,15 +5,15 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.ena.sra.xml.*;
-import uk.ac.ebi.subs.data.component.Team;
+import uk.ac.ebi.ena.sra.xml.STUDYSETDocument;
+import uk.ac.ebi.ena.sra.xml.SubmissionType;
 import uk.ac.ebi.subs.data.submittable.ENAStudy;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
 
 import java.util.UUID;
 
 import static org.hamcrest.core.StringStartsWith.startsWith;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static uk.ac.ebi.subs.ena.helper.TestHelper.getENAStudy;
 import static uk.ac.ebi.subs.ena.helper.TestHelper.getStudysetDocument;
 

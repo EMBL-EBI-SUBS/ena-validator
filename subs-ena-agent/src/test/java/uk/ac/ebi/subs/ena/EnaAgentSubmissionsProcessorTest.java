@@ -12,8 +12,6 @@ import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
 import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.data.submittable.Sample;
 import uk.ac.ebi.subs.data.submittable.Study;
-import uk.ac.ebi.subs.ena.data.Experiment;
-import uk.ac.ebi.subs.ena.data.Submission;
 import uk.ac.ebi.subs.ena.helper.TestHelper;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 import uk.ac.ebi.subs.processing.ProcessingCertificateEnvelope;
@@ -22,7 +20,7 @@ import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by neilg on 25/05/2017.

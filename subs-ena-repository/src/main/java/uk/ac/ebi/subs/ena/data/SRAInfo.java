@@ -2,8 +2,6 @@ package uk.ac.ebi.subs.ena.data;
 
 import org.w3c.dom.Document;
 
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
 import java.sql.Timestamp;
 
 /**
