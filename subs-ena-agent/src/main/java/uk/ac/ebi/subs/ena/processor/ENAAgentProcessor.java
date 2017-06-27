@@ -17,4 +17,5 @@ public interface ENAAgentProcessor<T extends ENASubmittable> extends AgentProces
     void setLoader (SRALoaderService<T> sraLoaderService);
     DataSource getDataSource ();
     void setDataSource (DataSource dataSource);
+    String getName();
 }

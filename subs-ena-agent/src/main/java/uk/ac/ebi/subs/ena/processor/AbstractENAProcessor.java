@@ -66,4 +66,9 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
     public static <T extends Throwable> RuntimeException rethrow(Throwable throwable) throws T {
         throw (T) throwable; // rely on vacuous cast
     }
+
+    @Override
+    public String getName() {
+        return this.getClass().getName();
+    }
 }
