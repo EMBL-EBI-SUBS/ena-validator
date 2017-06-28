@@ -26,4 +26,5 @@ public interface ENAAgentProcessor<T extends ENASubmittable> extends AgentProces
     Collection<ValidationMessage<Origin>> validateEntity(T enaSubmittable);
     ENASubmittable convertFromSubmittableToENASubmittable(Submittable submittable)
             throws InstantiationException, IllegalAccessException;
+    String getName();
 }
