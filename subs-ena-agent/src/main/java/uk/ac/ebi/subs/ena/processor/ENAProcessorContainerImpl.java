@@ -13,7 +13,7 @@ import java.util.*;
 @Service
 public class ENAProcessorContainerImpl implements ENAProcessorContainerService {
 
-    protected static final Logger logger = LoggerFactory.getLogger(ENAProcessorContainerService.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ENAProcessorContainerImpl.class);
 
     Map<String,ENAAgentProcessor> enaAgentProcessorMap;
 
