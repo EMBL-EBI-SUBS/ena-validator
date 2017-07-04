@@ -31,16 +31,14 @@ public class ENAStudyProcessor extends AbstractENAProcessor<ENAStudy>  {
         List<ProcessingCertificate> processingCertificateList = new ArrayList<>();
         final List<Study> studies = envelope.getStudies();
         for (Study study : studies) {
-            ProcessingCertificate processingCertificate = new ProcessingCertificate(study, Archive.Ena, ProcessingStatusEnum.Error);;
             try {
-                final ENAStudy enaSubmittable = (ENAStudy) BaseSubmittableFactory.create(ENAStudy.class, study);
-                processingCertificate = process(enaSubmittable);
+                final ENAStudy enaSubmittable = (ENAStudy) convertFromSubmittableToENASubmittable(study);
+                processingCertificateList.add(process(enaSubmittable));
             } catch (IllegalAccessException e) {
 
             } catch (InstantiationException e) {
 
             }
-            processingCertificateList.add(processingCertificate);
         }
         return processingCertificateList;
     }

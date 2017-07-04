@@ -31,16 +31,14 @@ public class ENARunProcessor extends AbstractENAProcessor<ENARun> {
         List<ProcessingCertificate> processingCertificateList = new ArrayList<>();
         final List<AssayData> assayDataList = envelope.getAssayData();
         for (AssayData assayData : assayDataList) {
-            ProcessingCertificate processingCertificate = new ProcessingCertificate(assayData, Archive.Ena, ProcessingStatusEnum.Error);;
             try {
-                final ENARun enaSubmittable = (ENARun) BaseSubmittableFactory.create(ENARun.class, assayData);
-                processingCertificate = process(enaSubmittable);
+                final ENARun enaSubmittable = (ENARun) convertFromSubmittableToENASubmittable(assayData);
+                processingCertificateList.add(process(enaSubmittable));
             } catch (IllegalAccessException e) {
 
             } catch (InstantiationException e) {
 
             }
-            processingCertificateList.add(processingCertificate);
         }
         return processingCertificateList;
     }
