@@ -115,7 +115,7 @@ public class EnaAgentConfigurationTest {
         study.setDescription("Description");
         study.setTitle("Title");
         Attribute attribute = new Attribute();
-        attribute.setName(ENAStudy.EXISTING_STUDY_TYPE);
+        attribute.setName("existing_study_type");
         attribute.setValue(UUID.randomUUID().toString());
         study.getAttributes().add(attribute);
         return study;

@@ -144,11 +144,11 @@ public class TestHelper {
         study.setTeam(team);
         study.setTitle("Study Title");
         Attribute studyAbstractAttibute = new Attribute();
-        studyAbstractAttibute.setName(ENAStudy.STUDY_ABSTRACT);
+        studyAbstractAttibute.setName("study_abstract");
         studyAbstractAttibute.setValue("Study abstract");
         study.getAttributes().add(studyAbstractAttibute);
         Attribute studyTypeAttribute = new Attribute();
-        studyTypeAttribute.setName(ENAStudy.EXISTING_STUDY_TYPE);
+        studyTypeAttribute.setName("existing_study_type");
         studyTypeAttribute.setValue("Whole Genome Sequencing");
         study.getAttributes().add(studyTypeAttribute);
         return study;
