@@ -14,10 +14,12 @@ import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.subs.data.submittable.AssayData;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENARunProcessor;
+import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.messaging.Queues;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * This class responsible to do the ENA related validations.
@@ -72,11 +74,8 @@ public class EnaAgentRunValidator implements EnaAgentValidator {
     @RabbitListener(queues = Queues.ENA_ASSAYDATA_VALIDATION)
     public void validateAssayData(ValidationMessageEnvelope<AssayData> validationEnvelope) {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
         final AssayData assayData = validationEnvelope.getEntityToValidate();
-
-        Collection<ValidationMessage<Origin>> validationMessages = executeSubmittableValidation(assayData, enaRunProcessor);
-
-        publishValidationMessage(assayData, validationMessages, validationEnvelope.getValidationResultUUID());
+        final List<SingleValidationResult> singleValidationResultCollection = executeSubmittableValidation(assayData, enaRunProcessor);
+        publishValidationMessage(assayData,singleValidationResultCollection,validationEnvelope.getValidationResultUUID(),validationEnvelope.getValidationResultVersion());
     }
 }

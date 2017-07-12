@@ -11,13 +11,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import uk.ac.ebi.embl.api.validation.Origin;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
+import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.data.submittable.Sample;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENASampleProcessor;
+import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.messaging.Queues;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * This class responsible to do the ENA related validations.
@@ -71,11 +74,9 @@ public class EnaAgentSampleValidator implements EnaAgentValidator {
     @RabbitListener(queues = Queues.ENA_SAMPLE_VALIDATION)
     public void validateSample(ValidationMessageEnvelope<Sample> validationEnvelope) {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
         final Sample sample = validationEnvelope.getEntityToValidate();
-
-        Collection<ValidationMessage<Origin>> validationMessages = executeSubmittableValidation(sample, enaSampleProcessor);
-
-        publishValidationMessage(sample, validationMessages, validationEnvelope.getValidationResultUUID());
+        final List<SingleValidationResult> singleValidationResultCollection = executeSubmittableValidation(sample, enaSampleProcessor);
+        publishValidationMessage(sample,singleValidationResultCollection,validationEnvelope.getValidationResultUUID(),validationEnvelope.getValidationResultVersion());
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
     }
 }
