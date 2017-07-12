@@ -8,9 +8,11 @@ import uk.ac.ebi.subs.data.submittable.*;
 import uk.ac.ebi.subs.ena.loader.SRALoaderService;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
+import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -32,7 +34,7 @@ public class ENARunProcessor extends AbstractENAProcessor<ENARun> {
         final List<AssayData> assayDataList = envelope.getAssayData();
         for (AssayData assayData : assayDataList) {
             try {
-                final ENARun enaSubmittable = (ENARun) convertFromSubmittableToENASubmittable(assayData);
+                final ENARun enaSubmittable = (ENARun) convertFromSubmittableToENASubmittable(assayData,new ArrayList<SingleValidationResult>());
                 processingCertificateList.add(process(enaSubmittable));
             } catch (IllegalAccessException e) {
 
@@ -49,8 +51,10 @@ public class ENARunProcessor extends AbstractENAProcessor<ENARun> {
     }
 
     @Override
-    public ENASubmittable convertFromSubmittableToENASubmittable(Submittable submittable) throws InstantiationException, IllegalAccessException {
-        return BaseSubmittableFactory.create(ENARun.class, submittable);
+    public ENASubmittable convertFromSubmittableToENASubmittable(Submittable submittable, Collection<SingleValidationResult> singleValidationResultList) throws InstantiationException, IllegalAccessException {
+        final ENASubmittable enaSubmittable = BaseSubmittableFactory.create(ENAStudy.class, submittable);
+        singleValidationResultList.addAll(enaSubmittable.getValidationResultList());
+        return enaSubmittable;
     }
 
 }
