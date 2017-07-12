@@ -22,8 +22,8 @@ import static org.junit.Assert.assertThat;
  *
  * Created by karoly on 09/06/2017.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {EnaAgentApplication.class})
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@SpringBootTest(classes = {EnaAgentApplication.class})
 @Transactional
 @Category(RabbitMQDependentTest.class)
 public class EnaAgentSampleValidationTest {
@@ -31,38 +31,4 @@ public class EnaAgentSampleValidationTest {
     @Autowired
     EnaAgentSampleValidator enaAgentSampleValidator;
 
-    @Test
-    public void returnsSuccessfullyWhenValidationEnvelopeContainsAValidSample() throws Exception {
-        final Sample sample = ValidatorTestUtil.createSample();
-        final String submittableType = sample.getClass().getSimpleName();
-        final String expectedValidationErrorMessage = String.format(EnaAgentSampleValidator.SUCCESS_MESSAGE, submittableType);
-
-        Collection<ValidationMessage<Origin>> validationMessages =
-                enaAgentSampleValidator.executeSubmittableValidation(sample, enaAgentSampleValidator.getEnaSampleProcessor());
-
-        String validationMessage = enaAgentSampleValidator.assembleValidationMessage(validationMessages, submittableType);
-
-
-        assertThat("There should be no validation messages", validationMessage, is(expectedValidationErrorMessage));
-    }
-
-    @Test
-    public void returnsErrorMessagesWhenValidationEnvelopeContainsANullSample() throws Exception {
-        final Sample sample = null;
-        final String submittableType = Sample.class.getSimpleName();
-        final String expectedValidationErrorMessage =
-                String.format(EnaAgentSampleValidator.NULL_SAMPLE_ERROR_MESSAGE, submittableType);
-        final int expectedValidationMessageCount = 1;
-
-        Collection<ValidationMessage<Origin>> validationMessages =
-                enaAgentSampleValidator.executeSubmittableValidation(sample, enaAgentSampleValidator.getEnaSampleProcessor());
-
-        String validationMessage = enaAgentSampleValidator.assembleValidationMessage(validationMessages, submittableType);
-
-        assertThat("Validation should fail with null sample",
-                validationMessage, is(expectedValidationErrorMessage));
-        assertThat("Validation message count should be 1",
-                validationMessages.size(), is(expectedValidationMessageCount));
-
-    }
 }
