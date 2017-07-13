@@ -86,28 +86,30 @@ subprojects {
 	}
 
 	remotes {
-		staging {
-			role('staging')
-			host = 'mac-subs-002'
+		agent {
+			role('agent')
+			host = 'mac-subs-004'
 		}
 	}
 
 	task sourceJar(type: Jar) { from sourceSets.main.allJava }
 
 
-	task deployJar(type: SshTask, dependsOn: 'build') {
+	task deployJar(type: SshTask, dependsOn: 'assemble') {
 		doLast {
 			def deployHome = "/data/" + project.name;
 			File jarDeployDir = new File(deployHome,"jar")
 
 			ssh.run {
-				session(remotes.staging) {
+				session(remotes.agent) {
+					println "Creating $project.name directory in /data"
+					execute "/data/create_dirs.sh $project.name", ignoreError: false
 					println "Uploading jar $jar.archivePath.name to $jarDeployDir area on $remote"
 					put(jar.archivePath.absolutePath, jarDeployDir.absolutePath)
 					println "creating symbolic link to $jar.archiveName"
 					def result = execute "ln -s -f $jarDeployDir/$jar.archiveName $jarDeployDir/$jar.baseName" + ".jar", ignoreError: true
 					println result
-
+					execute "chmod u+x $jarDeployDir/*", ignoreError: false
 				}
 			}
 		}
