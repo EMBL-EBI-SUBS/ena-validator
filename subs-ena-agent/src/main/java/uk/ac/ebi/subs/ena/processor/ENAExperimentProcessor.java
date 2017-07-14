@@ -3,6 +3,7 @@ package uk.ac.ebi.subs.ena.processor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.subs.data.component.Archive;
+import uk.ac.ebi.subs.data.component.SampleUse;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
 import uk.ac.ebi.subs.data.submittable.*;
 import uk.ac.ebi.subs.ena.loader.SRALoaderService;
@@ -34,6 +35,7 @@ public class ENAExperimentProcessor extends AbstractENAProcessor<ENAExperiment> 
         final List<Assay> assays = envelope.getAssays();
         for (Assay assay : assays) {
             try {
+                updateNullTeamName(assay);
                 final ENAExperiment enaSubmittable = (ENAExperiment) convertFromSubmittableToENASubmittable(assay,new ArrayList<SingleValidationResult>());
                 processingCertificateList.add((process(enaSubmittable)));
             } catch (IllegalAccessException e) {
@@ -50,8 +52,20 @@ public class ENAExperimentProcessor extends AbstractENAProcessor<ENAExperiment> 
         return Assay.class.getSimpleName();
     }
 
+    private void updateNullTeamName (Assay assay) {
+        if (assay.getStudyRef().getTeam() == null) {
+            assay.getStudyRef().setTeam(assay.getTeam().getName());
+        }
+        for (SampleUse sampleUse : assay.getSampleUses()) {
+            if (sampleUse.getSampleRef().getTeam() == null) {
+                sampleUse.getSampleRef().setTeam(assay.getTeam().getName());
+            }
+        }
+    }
+
     @Override
     public ENASubmittable convertFromSubmittableToENASubmittable(Submittable submittable,Collection<SingleValidationResult> singleValidationResultList) throws InstantiationException, IllegalAccessException {
+
         final ENASubmittable enaSubmittable = BaseSubmittableFactory.create(ENAExperiment.class, submittable);
         singleValidationResultList.addAll(enaSubmittable.getValidationResultList());
         return enaSubmittable;
