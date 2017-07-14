@@ -6,9 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.embl.api.validation.Origin;
-import uk.ac.ebi.embl.api.validation.ValidationMessage;
-import uk.ac.ebi.embl.api.validation.ValidationResult;
 import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.data.submittable.ENAExperiment;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
@@ -37,7 +34,7 @@ public class MockEnaAgentAssayValidationTest {
     private static final String STUDY_ALIAS = "studyAlias";
 
     @Autowired
-    EnaAgentExperimentValidator enaAgentAssayValidator;
+    ENAExperimentValidator enaAgentAssayValidator;
 
     private final String SUBMITTABLE_TYPE = Assay.class.getSimpleName();
 
