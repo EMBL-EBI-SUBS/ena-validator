@@ -7,14 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.embl.api.validation.Origin;
-import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
 import uk.ac.ebi.subs.ena.config.RabbitMQDependentTest;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 
-import java.util.Collection;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
@@ -28,10 +25,10 @@ import static org.junit.Assert.assertThat;
 @SpringBootTest(classes = {EnaAgentApplication.class})
 @Transactional
 @Category(RabbitMQDependentTest.class)
-public class EnaAgentAssayValidationTest {
+public class ENAExperimentValidatorTest {
 
     @Autowired
-    EnaAgentExperimentValidator enaAgentAssayValidator;
+    ENAExperimentValidator enaAgentAssayValidator;
 
     private static final String CENTER_NAME = "test-team";
     private final String SUBMITTABLE_TYPE = Assay.class.getSimpleName();

@@ -9,8 +9,6 @@ import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import uk.ac.ebi.embl.api.validation.Origin;
-import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.subs.data.submittable.AssayData;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENARunProcessor;
@@ -18,16 +16,15 @@ import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.messaging.Queues;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
  * This class responsible to do the ENA related validations.
  */
 @Service
-public class EnaAgentRunValidator implements EnaAgentValidator {
+public class ENARunValidator implements ENAValidator {
 
-    private static final Logger logger = LoggerFactory.getLogger(EnaAgentRunValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ENARunValidator.class);
 
     @Autowired
     ENARunProcessor enaRunProcessor;
@@ -54,8 +51,8 @@ public class EnaAgentRunValidator implements EnaAgentValidator {
         return rabbitMessagingTemplate;
     }
 
-    public EnaAgentRunValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
-                                ENAProcessorContainerService enaProcessorContainerService) {
+    public ENARunValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
+                           ENAProcessorContainerService enaProcessorContainerService) {
         this.rabbitMessagingTemplate = rabbitMessagingTemplate;
         this.rabbitMessagingTemplate.setMessageConverter(messageConverter);
         this.enaProcessorContainerService = enaProcessorContainerService;

@@ -3,8 +3,6 @@ package uk.ac.ebi.subs.ena.validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
-import uk.ac.ebi.embl.api.validation.Origin;
-import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
 import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.processor.ENAAgentProcessor;
@@ -16,17 +14,14 @@ import uk.ac.ebi.subs.validator.messaging.Exchanges;
 import uk.ac.ebi.subs.validator.messaging.RoutingKeys;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Created by karoly on 14/06/2017.
  */
-public interface EnaAgentValidator {
+public interface ENAValidator {
 
-    Logger logger = LoggerFactory.getLogger(EnaAgentValidator.class);
+    Logger logger = LoggerFactory.getLogger(ENAValidator.class);
 
     void setRabbitMessagingTemplate(RabbitMessagingTemplate rabbitMessagingTemplate);
     RabbitMessagingTemplate getRabbitMessagingTemplate();

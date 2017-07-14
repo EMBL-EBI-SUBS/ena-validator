@@ -9,8 +9,6 @@ import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import uk.ac.ebi.embl.api.validation.Origin;
-import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.ena.processor.ENAExperimentProcessor;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
@@ -18,16 +16,15 @@ import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.messaging.Queues;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
  * This class responsible to do the ENA related validations.
  */
 @Service
-public class EnaAgentExperimentValidator implements EnaAgentValidator {
+public class ENAExperimentValidator implements ENAValidator {
 
-    private static final Logger logger = LoggerFactory.getLogger(EnaAgentExperimentValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ENAExperimentValidator.class);
 
     @Autowired
     ENAExperimentProcessor experimentProcessor;
@@ -54,8 +51,8 @@ public class EnaAgentExperimentValidator implements EnaAgentValidator {
         return rabbitMessagingTemplate;
     }
 
-    public EnaAgentExperimentValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
-                                       ENAProcessorContainerService enaProcessorContainerService) {
+    public ENAExperimentValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
+                                  ENAProcessorContainerService enaProcessorContainerService) {
         this.rabbitMessagingTemplate = rabbitMessagingTemplate;
         this.rabbitMessagingTemplate.setMessageConverter(messageConverter);
         this.enaProcessorContainerService = enaProcessorContainerService;

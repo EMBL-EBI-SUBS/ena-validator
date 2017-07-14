@@ -9,36 +9,37 @@ import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import uk.ac.ebi.subs.data.submittable.Study;
+import uk.ac.ebi.subs.data.submittable.Sample;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
-import uk.ac.ebi.subs.ena.processor.ENAStudyProcessor;
+import uk.ac.ebi.subs.ena.processor.ENASampleProcessor;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.messaging.Queues;
+
 import java.util.List;
 
 /**
  * This class responsible to do the ENA related validations.
  */
 @Service
-public class EnaAgentStudyValidator implements EnaAgentValidator {
+public class ENASampleValidator implements ENAValidator {
 
-    private static final Logger logger = LoggerFactory.getLogger(EnaAgentStudyValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ENASampleValidator.class);
 
     @Autowired
-    ENAStudyProcessor enaStudyProcessor;
+    ENASampleProcessor enaSampleProcessor;
 
-    public ENAStudyProcessor getEnaStudyProcessor() {
-        return enaStudyProcessor;
+    public ENASampleProcessor getEnaSampleProcessor() {
+        return enaSampleProcessor;
     }
 
-    public void setEnaStudyProcessor(ENAStudyProcessor eNAStudyProcessor) {
-        this.enaStudyProcessor = eNAStudyProcessor;
+    public void setEnaSampleProcessor(ENASampleProcessor eNASampleProcessor) {
+        this.enaSampleProcessor = eNASampleProcessor;
     }
-
-    ENAProcessorContainerService enaProcessorContainerService;
 
     RabbitMessagingTemplate rabbitMessagingTemplate;
+
+    ENAProcessorContainerService enaProcessorContainerService;
 
     @Override
     public void setRabbitMessagingTemplate(RabbitMessagingTemplate rabbitMessagingTemplate) {
@@ -50,13 +51,12 @@ public class EnaAgentStudyValidator implements EnaAgentValidator {
         return rabbitMessagingTemplate;
     }
 
-    public EnaAgentStudyValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
-                             ENAProcessorContainerService enaProcessorContainerService) {
+    public ENASampleValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
+                              ENAProcessorContainerService enaProcessorContainerService) {
         this.rabbitMessagingTemplate = rabbitMessagingTemplate;
         this.rabbitMessagingTemplate.setMessageConverter(messageConverter);
         this.enaProcessorContainerService = enaProcessorContainerService;
     }
-
 
     /**
      * Do a validation for the sample submitted in the {@link ValidationMessageEnvelope}.
@@ -67,11 +67,12 @@ public class EnaAgentStudyValidator implements EnaAgentValidator {
      * @throws IllegalAccessException
      */
     @Transactional
-    @RabbitListener(queues = Queues.ENA_STUDY_VALIDATION)
-    public void validateStudy(ValidationMessageEnvelope<Study> validationEnvelope) {
+    @RabbitListener(queues = Queues.ENA_SAMPLE_VALIDATION)
+    public void validateSample(ValidationMessageEnvelope<Sample> validationEnvelope) {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-        final Study study = validationEnvelope.getEntityToValidate();
-        final List<SingleValidationResult> singleValidationResultCollection = executeSubmittableValidation(study,enaStudyProcessor );
-        publishValidationMessage(study,singleValidationResultCollection,validationEnvelope.getValidationResultUUID(),validationEnvelope.getValidationResultVersion());
+        final Sample sample = validationEnvelope.getEntityToValidate();
+        final List<SingleValidationResult> singleValidationResultCollection = executeSubmittableValidation(sample, enaSampleProcessor);
+        publishValidationMessage(sample,singleValidationResultCollection,validationEnvelope.getValidationResultUUID(),validationEnvelope.getValidationResultVersion());
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
     }
 }

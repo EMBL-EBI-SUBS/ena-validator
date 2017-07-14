@@ -6,10 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.embl.api.validation.Origin;
-import uk.ac.ebi.embl.api.validation.ValidationMessage;
-import uk.ac.ebi.embl.api.validation.ValidationResult;
-import uk.ac.ebi.subs.data.submittable.ENAExperiment;
 import uk.ac.ebi.subs.data.submittable.ENASample;
 import uk.ac.ebi.subs.data.submittable.Sample;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
@@ -30,10 +26,10 @@ import static org.mockito.Mockito.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
 @Transactional
-public class MockEnaAgentSampleValidationTest {
+public class MockENASampleValidatorTest {
 
     @Autowired
-    EnaAgentSampleValidator enaAgentSampleValidator;
+    ENASampleValidator enaAgentSampleValidator;
 
     Collection<SingleValidationResult> singleValidationResultCollection = new ArrayList<>();
 

@@ -6,15 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.embl.api.validation.Origin;
-import uk.ac.ebi.embl.api.validation.ValidationMessage;
-import uk.ac.ebi.embl.api.validation.ValidationResult;
 import uk.ac.ebi.subs.data.submittable.AssayData;
-import uk.ac.ebi.subs.data.submittable.ENARun;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
 import uk.ac.ebi.subs.ena.processor.ENARunProcessor;
-
-import java.util.Collection;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -26,14 +20,14 @@ import static org.mockito.Mockito.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
 @Transactional
-public class MockEnaAgentAssayDataValidationTest {
+public class MockENARunValidatorTest {
 
     private static final String ASSAY_DATA_ALIAS = "assayDataAlias";
     private static final String TEAM_NAME = "teamName";
     private static final String ASSAY_ALIAS = "assayAlias";
 
     @Autowired
-    EnaAgentRunValidator enaAgentAssayDataValidator;
+    ENARunValidator enaAgentAssayDataValidator;
 
     private final String SUBMITTABLE_TYPE = AssayData.class.getSimpleName();
 
