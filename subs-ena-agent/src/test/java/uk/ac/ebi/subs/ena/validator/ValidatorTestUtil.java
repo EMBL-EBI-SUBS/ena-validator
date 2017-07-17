@@ -23,7 +23,7 @@ public final class ValidatorTestUtil {
     public static Study createStudy(String centerName) {
         String alias = getAlias();
         final Team team = getTeam(centerName);
-        return TestHelper.getStudy(alias, team);
+        return TestHelper.getStudy(alias, team, "study_abstract","Whole Genome Sequencing");
     }
 
     public static Assay createAssay(String assayAlias, String centerName, String sampleAlias, String studyAlias) {

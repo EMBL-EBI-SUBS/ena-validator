@@ -3,7 +3,7 @@ apply plugin: 'java'
 dependencies {
 	compile(group: 'uk.ac.ebi.subs', name: 'subs-messaging', version: '1.0.0-SNAPSHOT', changing: true)
 	compile(group: 'uk.ac.ebi.subs', name: 'subs-processing-model', version: '1.0.0-SNAPSHOT', changing: true)
-	compile(group: 'uk.ac.ebi.subs', name: 'subs-ena-data-model', version: '1.1.0-SNAPSHOT', changing: true)
+	compile(group: 'uk.ac.ebi.subs', name: 'subs-ena-data-model', version: '1.1.1-SNAPSHOT', changing: true)
 	compile("uk.ac.ebi.subs:validator-common:1.11.0-SNAPSHOT")
 	compile project(':subs-ena-repository')
 	compile ("org.springframework:spring-oxm")

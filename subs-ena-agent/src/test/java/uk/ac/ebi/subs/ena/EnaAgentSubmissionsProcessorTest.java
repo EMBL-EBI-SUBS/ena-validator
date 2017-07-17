@@ -41,7 +41,7 @@ public class EnaAgentSubmissionsProcessorTest {
     public void handleSubmission() throws Exception {
         String alias = UUID.randomUUID().toString();
         final Team team = TestHelper.getTeam("test-team");
-        final Study study = TestHelper.getStudy(alias, team);
+        final Study study = TestHelper.getStudy(alias, team,"study_abstract","Whole Genome Sequencing");
         study.setId(UUID.randomUUID().toString());
         uk.ac.ebi.subs.data.Submission submission = new uk.ac.ebi.subs.data.Submission();
         submission.setTeam(team);
