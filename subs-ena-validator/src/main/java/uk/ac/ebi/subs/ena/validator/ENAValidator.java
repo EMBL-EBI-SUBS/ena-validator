@@ -16,6 +16,7 @@ import uk.ac.ebi.subs.validator.messaging.RoutingKeys;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by karoly on 14/06/2017.
@@ -81,6 +82,7 @@ public interface ENAValidator {
     default SingleValidationResult createEmptySingleValidationResult (Submittable submittable) {
         SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,submittable.getId());
         singleValidationResult.setValidationStatus(ValidationStatus.Pass);
+        singleValidationResult.setUuid(UUID.randomUUID().toString());
         return singleValidationResult;
     }
 
