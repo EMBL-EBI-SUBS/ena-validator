@@ -1,5 +1,6 @@
 package uk.ac.ebi.subs.ena.validator;
 
+import org.eclipse.persistence.annotations.TimeOfDay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
@@ -32,7 +33,8 @@ public interface ENAValidator {
 
         try {
             ENASubmittable eNASubmittable= eNAAgentProcessor.convertFromSubmittableToENASubmittable(submittable,singleValidationResultCollection);
-            singleValidationResultCollection.addAll(eNAAgentProcessor.validateEntity(eNASubmittable));
+            // TODO Temporary until we can figure out how to share the same transaction for the entire submission during validation
+            //singleValidationResultCollection.addAll(eNAAgentProcessor.validateEntity(eNASubmittable));
         } catch (InstantiationException | IllegalAccessException e) {
             logger.error("An exception occured: {}", e.getMessage());
             SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,submittable.getId());
