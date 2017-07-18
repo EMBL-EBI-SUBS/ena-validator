@@ -137,7 +137,7 @@ public class TestHelper {
         return team;
     }
 
-    public static Study getStudy (String alias, Team team) {
+    public static Study getStudy (String alias, Team team, String studyAbstract, String studyType) {
         Study study = new Study();
         study.setId(UUID.randomUUID().toString());
         study.setAlias(alias);
@@ -145,11 +145,11 @@ public class TestHelper {
         study.setTitle("Study Title");
         Attribute studyAbstractAttibute = new Attribute();
         studyAbstractAttibute.setName("study_abstract");
-        studyAbstractAttibute.setValue("Study abstract");
+        studyAbstractAttibute.setValue(studyAbstract);
         study.getAttributes().add(studyAbstractAttibute);
         Attribute studyTypeAttribute = new Attribute();
         studyTypeAttribute.setName("existing_study_type");
-        studyTypeAttribute.setValue("Whole Genome Sequencing");
+        studyTypeAttribute.setValue(studyType);
         study.getAttributes().add(studyTypeAttribute);
         return study;
     }
@@ -234,56 +234,4 @@ public class TestHelper {
         assayData.getFiles().add(file);
         return assayData;
     }
-
-    public static void main(String[] args) throws IOException, ParseException {
-        List<ProcessingCertificate> processingCertificateList = new ArrayList<>();
-        String releaseDateString = "01-07-2017";
-        final Date releaseDate = new SimpleDateFormat("dd-MM-yyyy").parse(releaseDateString);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        PrintWriter printWriter = new PrintWriter(System.out);
-
-        String alias = UUID.randomUUID().toString();
-        String submissionId = UUID.randomUUID().toString();
-        final Team team = TestHelper.getTeam("test-team");
-        final Study study = TestHelper.getStudy(alias, team);
-        study.setArchive(Archive.Ena);
-        study.setReleaseDate(releaseDate);
-        study.setId(UUID.randomUUID().toString());
-        ProcessingCertificate studyProcessingCertificate = new ProcessingCertificate(study,Archive.Ena, ProcessingStatusEnum.Received,"ERP023149");
-        Submission submission = new Submission();
-        submission.setTeam(team);
-        submission.setId(submissionId);
-        Date submissionDate = new Date();
-        submission.setSubmissionDate(submissionDate);
-        uk.ac.ebi.subs.data.component.Submitter submitter = new Submitter();
-        submitter.setEmail("subs-dev@ebi.ac.uk");
-        submission.setSubmitter(submitter);
-        SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope(submission);
-        final Sample sample = TestHelper.getSample(alias,team);
-        sample.setArchive(Archive.BioSamples);
-        sample.setId(UUID.randomUUID().toString());
-        submissionEnvelope.getStudies().add(study);
-        submissionEnvelope.getSamples().add(sample);
-        ProcessingCertificate sampleProcessingCertificate = new ProcessingCertificate(sample,Archive.Ena, ProcessingStatusEnum.Received,"ERS129091");
-        final Assay assay = TestHelper.getAssay(alias,team,alias,alias);
-        assay.setId(UUID.randomUUID().toString());
-        assay.setArchive(Archive.Ena);
-        submissionEnvelope.getAssays().add(assay);
-        ProcessingCertificate assayProcessingCertificate = new ProcessingCertificate(assay,Archive.Ena, ProcessingStatusEnum.Received,"ERX049598");
-        final AssayData assayData = TestHelper.getAssayData(alias,team,alias);
-        assayData.setId(UUID.randomUUID().toString());
-        assayData.setArchive(Archive.Ena);
-        submissionEnvelope.getAssayData().add(assayData);
-        ProcessingCertificate assayDataProcessingCertificate = new ProcessingCertificate(assayData,Archive.Ena, ProcessingStatusEnum.Received,"ERR028450");
-        objectMapper.writeValue(printWriter,submissionEnvelope);
-        processingCertificateList.add(studyProcessingCertificate);
-        processingCertificateList.add(sampleProcessingCertificate);
-        processingCertificateList.add(assayProcessingCertificate);
-        processingCertificateList.add(assayDataProcessingCertificate);
-        ProcessingCertificateEnvelope processingCertificateEnvelope = new ProcessingCertificateEnvelope(submission.getId(),processingCertificateList);
-        //objectMapper.writeValue(printWriter,processingCertificateEnvelope);
-    }
-
 }

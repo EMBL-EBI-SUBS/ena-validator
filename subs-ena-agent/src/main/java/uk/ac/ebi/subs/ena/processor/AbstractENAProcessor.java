@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.embl.api.validation.Origin;
+import uk.ac.ebi.embl.api.validation.Severity;
 import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.embl.api.validation.ValidationResult;
 import uk.ac.ebi.subs.data.component.Archive;
@@ -12,6 +13,9 @@ import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
 import uk.ac.ebi.subs.ena.loader.SRALoaderService;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
+import uk.ac.ebi.subs.validator.data.SingleValidationResult;
+import uk.ac.ebi.subs.validator.data.ValidationAuthor;
+import uk.ac.ebi.subs.validator.data.ValidationStatus;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -78,31 +82,24 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
      * @param enaSubmittable entity to validate
      * @return a {@link Collection} of {@link ValidationMessage}s if the validation erred or an empty list.
      */
-    public Collection<ValidationMessage<Origin>> validateEntity(T enaSubmittable) {
+    public Collection<SingleValidationResult> validateEntity(T enaSubmittable) {
         logger.info("Validation started for {} entity with id: {}", enaSubmittable.getClass().getSimpleName(),
                 enaSubmittable.getId());
 
-        Collection<ValidationMessage<Origin>> validationMessages = new ArrayList<>();
+        Collection<SingleValidationResult> singleValidationResultCollection = new ArrayList<>();
         try {
             ValidationResult validationResult = getValidationResult(enaSubmittable);
-            validationMessages = validationResult.getMessages();
+            singleValidationResultCollection.addAll(convertValidationMessages(enaSubmittable.getId().toString(), validationResult));
+            final Collection<ValidationMessage<Origin>> messages = validationResult.getMessages();
         } catch (InstantiationException | IllegalAccessException e) {
             logger.error("An exception occured: {}", e.getMessage());
-            validationMessages.add(ValidationMessage.error("ERAM.1.0.3", e.getMessage()));
+            SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,enaSubmittable.getId().toString());
+            singleValidationResult.setMessage(e.getMessage());
+            singleValidationResult.setValidationStatus(ValidationStatus.Error);
+            singleValidationResultCollection.add(singleValidationResult);
         }
 
-        return validationMessages;
-    }
-
-    /**
-     * Add a {@link ValidationMessage} when the submitted entity is null.
-     *
-     * @param validationMessages the collection of validation messages
-     * @param submittableTypeAsString the type of the entity in String
-     */
-    public void addNullSubmittableValidationMessage(Collection<ValidationMessage<Origin>> validationMessages,
-                                                    String submittableTypeAsString) {
-        validationMessages.add(ValidationMessage.error("ERAM.1.0.14", submittableTypeAsString));
+        return singleValidationResultCollection;
     }
 
     /**
@@ -121,5 +118,27 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
     @Override
     public String getName() {
         return this.getClass().getSimpleName();
+    }
+
+    /**
+     * Converts a collection of SRA validation messages to a collection {@link SingleValidationResult}
+     * @param {@link Collection} of {@link ValidationMessage}
+     * @return {@link Collection} of {@link SingleValidationResult}
+     */
+    Collection<SingleValidationResult> convertValidationMessages (String entityUUID, ValidationResult validationResult) {
+        Collection<SingleValidationResult> singleValidationResultCollection = new ArrayList<>();
+        for (ValidationMessage<Origin> validationMessage : validationResult.getMessages()) {
+            SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,entityUUID);
+            singleValidationResult.setMessage(validationMessage.getMessage());
+            if (validationMessage.getSeverity().equals(Severity.ERROR)) {
+                singleValidationResult.setValidationStatus(ValidationStatus.Error);
+            } else if (validationMessage.getSeverity().equals(Severity.WARNING)) {
+                singleValidationResult.setValidationStatus(ValidationStatus.Warning);
+            } else if (validationMessage.getSeverity().equals(Severity.FIX)) {
+                singleValidationResult.setValidationStatus(ValidationStatus.Error);
+
+            }
+        }
+        return singleValidationResultCollection;
     }
 }

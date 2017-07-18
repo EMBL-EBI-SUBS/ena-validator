@@ -50,7 +50,7 @@ public class ENAStudyProcessorTest {
     public void processSubmission() throws Exception {
         String alias = UUID.randomUUID().toString();
         final Team team = TestHelper.getTeam("test-team");
-        final Study study = TestHelper.getStudy(alias, team);
+        final Study study = TestHelper.getStudy(alias, team,"study_abstract", "Whole Genome Sequencing");
         study.setId(UUID.randomUUID().toString());
         Submission submission = new Submission();
         submission.setTeam(team);

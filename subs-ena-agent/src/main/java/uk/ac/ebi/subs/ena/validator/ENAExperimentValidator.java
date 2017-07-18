@@ -9,38 +9,37 @@ import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import uk.ac.ebi.embl.api.validation.Origin;
-import uk.ac.ebi.embl.api.validation.ValidationMessage;
-import uk.ac.ebi.subs.data.submittable.Sample;
+import uk.ac.ebi.subs.data.submittable.Assay;
+import uk.ac.ebi.subs.ena.processor.ENAExperimentProcessor;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
-import uk.ac.ebi.subs.ena.processor.ENASampleProcessor;
+import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.messaging.Queues;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * This class responsible to do the ENA related validations.
  */
 @Service
-public class EnaAgentSampleValidator implements EnaAgentValidator {
+public class ENAExperimentValidator implements ENAValidator {
 
-    private static final Logger logger = LoggerFactory.getLogger(EnaAgentSampleValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ENAExperimentValidator.class);
 
     @Autowired
-    ENASampleProcessor enaSampleProcessor;
+    ENAExperimentProcessor experimentProcessor;
 
-    public ENASampleProcessor getEnaSampleProcessor() {
-        return enaSampleProcessor;
+    public ENAExperimentProcessor getEnaExperimentProcessor() {
+        return experimentProcessor;
     }
 
-    public void setEnaSampleProcessor(ENASampleProcessor eNASampleProcessor) {
-        this.enaSampleProcessor = eNASampleProcessor;
+    public void setExperimentProcessor(ENAExperimentProcessor eNAExperimentProcessor) {
+        this.experimentProcessor = eNAExperimentProcessor;
     }
-
-    RabbitMessagingTemplate rabbitMessagingTemplate;
 
     ENAProcessorContainerService enaProcessorContainerService;
+
+    RabbitMessagingTemplate rabbitMessagingTemplate;
 
     @Override
     public void setRabbitMessagingTemplate(RabbitMessagingTemplate rabbitMessagingTemplate) {
@@ -52,30 +51,27 @@ public class EnaAgentSampleValidator implements EnaAgentValidator {
         return rabbitMessagingTemplate;
     }
 
-    public EnaAgentSampleValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
+    public ENAExperimentValidator(RabbitMessagingTemplate rabbitMessagingTemplate,
                                   ENAProcessorContainerService enaProcessorContainerService) {
         this.rabbitMessagingTemplate = rabbitMessagingTemplate;
-        this.rabbitMessagingTemplate.setMessageConverter(messageConverter);
         this.enaProcessorContainerService = enaProcessorContainerService;
     }
 
+
     /**
-     * Do a validation for the sample submitted in the {@link ValidationMessageEnvelope}.
+     * Do a validation for the {@link Assay} submitted in the {@link ValidationMessageEnvelope}.
      * It produces a message according to the validation outcome.
      *
-     * @param validationEnvelope {@link ValidationMessageEnvelope} that contains the sample to validate
+     * @param validationEnvelope {@link ValidationMessageEnvelope} that contains the assay to validate
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
     @Transactional
-    @RabbitListener(queues = Queues.ENA_SAMPLE_VALIDATION)
-    public void validateSample(ValidationMessageEnvelope<Sample> validationEnvelope) {
+    @RabbitListener(queues = Queues.ENA_ASSAY_VALIDATION)
+    public void validateAssay(ValidationMessageEnvelope<Assay> validationEnvelope) {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-
-        final Sample sample = validationEnvelope.getEntityToValidate();
-
-        Collection<ValidationMessage<Origin>> validationMessages = executeSubmittableValidation(sample, enaSampleProcessor);
-
-        publishValidationMessage(sample, validationMessages, validationEnvelope.getValidationResultUUID());
+        final Assay assay = validationEnvelope.getEntityToValidate();
+        final List<SingleValidationResult> singleValidationResultCollection = executeSubmittableValidation(assay, experimentProcessor);
+        publishValidationMessage(assay,singleValidationResultCollection,validationEnvelope.getValidationResultUUID(),validationEnvelope.getValidationResultVersion());
     }
 }
