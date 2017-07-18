@@ -54,7 +54,7 @@ public interface ENAValidator {
                 singleValidationResultCollection,validationResultVersion,validationResultUuid,ValidationAuthor.Ena
         );
 
-        if (hasValidationError(singleValidationResultCollection)) {
+        if (!hasValidationError(singleValidationResultCollection)) {
             getRabbitMessagingTemplate().convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_SUCCESS,singleValidationResultsEnvelope);
 
             logger.info("Validation successful for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
