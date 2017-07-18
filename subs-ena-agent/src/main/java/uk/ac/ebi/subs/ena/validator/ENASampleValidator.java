@@ -51,10 +51,9 @@ public class ENASampleValidator implements ENAValidator {
         return rabbitMessagingTemplate;
     }
 
-    public ENASampleValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
+    public ENASampleValidator(RabbitMessagingTemplate rabbitMessagingTemplate,
                               ENAProcessorContainerService enaProcessorContainerService) {
         this.rabbitMessagingTemplate = rabbitMessagingTemplate;
-        this.rabbitMessagingTemplate.setMessageConverter(messageConverter);
         this.enaProcessorContainerService = enaProcessorContainerService;
     }
 

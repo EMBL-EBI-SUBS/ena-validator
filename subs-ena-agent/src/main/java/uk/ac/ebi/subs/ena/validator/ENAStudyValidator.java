@@ -50,10 +50,9 @@ public class ENAStudyValidator implements ENAValidator {
         return rabbitMessagingTemplate;
     }
 
-    public ENAStudyValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
+    public ENAStudyValidator(RabbitMessagingTemplate rabbitMessagingTemplate,
                              ENAProcessorContainerService enaProcessorContainerService) {
         this.rabbitMessagingTemplate = rabbitMessagingTemplate;
-        this.rabbitMessagingTemplate.setMessageConverter(messageConverter);
         this.enaProcessorContainerService = enaProcessorContainerService;
     }
 

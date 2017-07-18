@@ -51,10 +51,9 @@ public class ENARunValidator implements ENAValidator {
         return rabbitMessagingTemplate;
     }
 
-    public ENARunValidator(RabbitMessagingTemplate rabbitMessagingTemplate, MessageConverter messageConverter,
+    public ENARunValidator(RabbitMessagingTemplate rabbitMessagingTemplate,
                            ENAProcessorContainerService enaProcessorContainerService) {
         this.rabbitMessagingTemplate = rabbitMessagingTemplate;
-        this.rabbitMessagingTemplate.setMessageConverter(messageConverter);
         this.enaProcessorContainerService = enaProcessorContainerService;
     }
 
