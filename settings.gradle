@@ -1,6 +1,6 @@
 rootProject.name = 'subs-ena'
 
-include "subs-ena-agent"
+include "subs-ena-agent-common"
 include "subs-ena-repository"
-
-
+include "subs-ena-validator"
+include "subs-ena-agent"
