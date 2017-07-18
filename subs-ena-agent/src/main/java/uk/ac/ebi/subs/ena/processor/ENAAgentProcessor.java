@@ -23,8 +23,6 @@ public interface ENAAgentProcessor<T extends ENASubmittable> extends AgentProces
     DataSource getDataSource ();
     void setDataSource (DataSource dataSource);
     String getSubmittableObjectTypeAsAString();
-    void addNullSubmittableValidationMessage(Collection<SingleValidationResult> validationMessages,
-                                             String submittableTypeAsString);
     Collection<SingleValidationResult> validateEntity(T enaSubmittable);
     ENASubmittable convertFromSubmittableToENASubmittable(Submittable submittable, Collection<SingleValidationResult> singleValidationResultList)
             throws InstantiationException, IllegalAccessException;

@@ -103,18 +103,6 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
     }
 
     /**
-     * Add a {@link SingleValidationResult} when the submitted entity is null.
-     *
-     * @param singleValidationResults {@link Collection} of {@link SingleValidationResult}
-     * @param submittableTypeAsString the type of the entity in String
-     */
-    public void addNullSubmittableValidationMessage(Collection<SingleValidationResult> singleValidationResults,
-                                                    String submittableTypeAsString) {
-        SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,null);
-        singleValidationResults.add(singleValidationResult);
-    }
-
-    /**
      * Cast a CheckedException as an unchecked one.
      *
      * @param throwable to cast
