@@ -46,6 +46,6 @@ deploy:
   only:
       - master
   script:
-    - ./gradlew -g /cache/.gradle clean subs-ena-agent:deployJarAgent
-    - ./gradlew -g /cache/.gradle clean subs-ena-validator:deployJarValidator
+    - ./gradlew -g /cache/.gradle -PartifactoryUsername=$artifactoryUsername -PartifactoryPassword=$artifactoryPassword clean subs-ena-agent:deployJarAgent
+    - ./gradlew -g /cache/.gradle -PartifactoryUsername=$artifactoryUsername -PartifactoryPassword=$artifactoryPassword clean subs-ena-validator:deployJarValidator
 
