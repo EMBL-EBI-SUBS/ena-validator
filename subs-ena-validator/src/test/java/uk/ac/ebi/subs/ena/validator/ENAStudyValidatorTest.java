@@ -1,5 +1,6 @@
 package uk.ac.ebi.subs.ena.validator;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -15,6 +16,7 @@ import uk.ac.ebi.subs.ena.helper.TestHelper;
 import uk.ac.ebi.subs.ena.processor.ENAStudyProcessor;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,4 +51,36 @@ public class ENAStudyValidatorTest {
         assertTrue("singleValidationResult",singleValidationResults.isEmpty());
     }
 
+    @Test
+    public void testMissingReleaseDate () {
+        final Team team = TestHelper.getTeam("my-team");
+        final Study study = TestHelper.getStudy(UUID.randomUUID().toString(), team, "study_abstract","Whole Genome Sequencing");
+        final List<SingleValidationResult> singleValidationResults = new ArrayList<>();
+        enaAgentStudyValidator.checkReleaseDate(study,singleValidationResults);
+        assertTrue("singleValidationResult",singleValidationResults.size() == 1);
+    }
+
+    @Test
+    public void testReleaseDateIntevalExceeded () {
+        final Team team = TestHelper.getTeam("my-team");
+        final Study study = TestHelper.getStudy(UUID.randomUUID().toString(), team, "study_abstract","Whole Genome Sequencing");
+        final List<SingleValidationResult> singleValidationResults = new ArrayList<>();
+        DateTime dateTime = new DateTime();
+        DateTime dateTimePlusOneDay = dateTime.plusDays(ENAStudyValidator.RELEASE_DATE_INTERVAL_DAYS + 1);
+        study.setReleaseDate(dateTimePlusOneDay.toDate());
+        enaAgentStudyValidator.checkReleaseDate(study,singleValidationResults,ENAStudyValidator.RELEASE_DATE_INTERVAL_DAYS);
+        assertTrue("singleValidationResult",singleValidationResults.size() == 1);
+    }
+
+    @Test
+    public void testValidaReleaseDate () {
+        final Team team = TestHelper.getTeam("my-team");
+        final Study study = TestHelper.getStudy(UUID.randomUUID().toString(), team, "study_abstract","Whole Genome Sequencing");
+        final List<SingleValidationResult> singleValidationResults = new ArrayList<>();
+        DateTime dateTime = new DateTime();
+        DateTime dateTimePlusOneDay = dateTime.plusDays(ENAStudyValidator.RELEASE_DATE_INTERVAL_DAYS - 1);
+        study.setReleaseDate(dateTimePlusOneDay.toDate());
+        enaAgentStudyValidator.checkReleaseDate(study,singleValidationResults,ENAStudyValidator.RELEASE_DATE_INTERVAL_DAYS);
+        assertTrue("singleValidationResult",singleValidationResults.isEmpty());
+    }
 }
