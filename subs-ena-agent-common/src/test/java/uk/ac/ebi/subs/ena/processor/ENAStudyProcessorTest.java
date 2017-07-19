@@ -16,6 +16,8 @@ import uk.ac.ebi.subs.ena.helper.TestHelper;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +33,8 @@ public class ENAStudyProcessorTest {
 
     @Autowired
     ENAStudyProcessor enaStudyProcessor;
+
+    static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @Test
     public void process () throws Exception {
@@ -51,6 +55,9 @@ public class ENAStudyProcessorTest {
         String alias = UUID.randomUUID().toString();
         final Team team = TestHelper.getTeam("test-team");
         final Study study = TestHelper.getStudy(alias, team,"study_abstract", "Whole Genome Sequencing");
+        String releaseDate = "2018-12-25";
+        final Date date = simpleDateFormat.parse(releaseDate);
+        study.setReleaseDate(date);
         study.setId(UUID.randomUUID().toString());
         Submission submission = new Submission();
         submission.setTeam(team);

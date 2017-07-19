@@ -53,7 +53,11 @@ public class StudySRALoader extends AbstractSRALoaderService<ENAStudy> {
     SubmissionType.ACTIONS createActions(SubmissionType submissionType, ENASubmittable enaSubmittable, String schema) {
         final SubmissionType.ACTIONS actions = super.createActions(submissionType, enaSubmittable, schema);
         final SubmissionType.ACTIONS.ACTION.HOLD hold = actions.addNewACTION().addNewHOLD();
+        ENAStudy enaStudy = (ENAStudy) enaSubmittable;
         Calendar calendar = Calendar.getInstance();
+        if (enaStudy.getBaseObject().getReleaseDate() != null) {
+            calendar.setTime(enaStudy.getBaseObject().getReleaseDate());
+        }
         hold.setHoldUntilDate(calendar);
         if (enaSubmittable.getAccession() != null) {
             hold.setTarget(enaSubmittable.getAccession());
