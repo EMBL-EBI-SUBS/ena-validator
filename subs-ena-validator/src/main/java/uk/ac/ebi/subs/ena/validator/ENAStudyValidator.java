@@ -1,5 +1,6 @@
 package uk.ac.ebi.subs.ena.validator;
 
+import org.joda.time.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -13,9 +14,12 @@ import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENAStudyProcessor;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
+import uk.ac.ebi.subs.validator.data.ValidationAuthor;
 import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
+import uk.ac.ebi.subs.validator.data.ValidationStatus;
 import uk.ac.ebi.subs.validator.messaging.Queues;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * This class responsible to do the ENA related validations.
@@ -27,6 +31,8 @@ public class ENAStudyValidator implements ENAValidator {
 
     @Autowired
     ENAStudyProcessor enaStudyProcessor;
+
+    public static final int RELEASE_DATE_INTERVAL_DAYS = 730;
 
     public ENAStudyProcessor getEnaStudyProcessor() {
         return enaStudyProcessor;
@@ -71,7 +77,33 @@ public class ENAStudyValidator implements ENAValidator {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         final Study study = validationEnvelope.getEntityToValidate();
         final List<SingleValidationResult> singleValidationResultCollection = executeSubmittableValidation(study,enaStudyProcessor );
+        checkReleaseDate(study,singleValidationResultCollection);
         checkForEmptySingleValidationResult(singleValidationResultCollection,study);
         publishValidationMessage(study,singleValidationResultCollection,validationEnvelope.getValidationResultUUID(),validationEnvelope.getValidationResultVersion());
+    }
+
+    void checkReleaseDate(Study study, List<SingleValidationResult> singleValidationResultCollection) {
+        checkReleaseDate(study,singleValidationResultCollection,RELEASE_DATE_INTERVAL_DAYS);
+    }
+
+    void checkReleaseDate(Study study, List<SingleValidationResult> singleValidationResultCollection, int intevalDays) {
+        if (study.getReleaseDate() != null) {
+            Interval interval = new Interval(new Instant().getMillis(),study.getReleaseDate().getTime());
+            final Days days = Days.daysBetween(new DateTime(), new DateTime(study.getReleaseDate()));
+            if (days.getDays() >= intevalDays) {
+                SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,study.getId());
+                singleValidationResult.setUuid(UUID.randomUUID().toString());
+                singleValidationResult.setValidationStatus(ValidationStatus.Error);
+                singleValidationResult.setMessage(String.format("Release date %s must not exceed two years from the present date",study.getReleaseDate()));
+                singleValidationResultCollection.add(singleValidationResult);
+            }
+        } else {
+            SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,study.getId());
+            singleValidationResult.setUuid(UUID.randomUUID().toString());
+            singleValidationResult.setValidationStatus(ValidationStatus.Error);
+            singleValidationResult.setMessage("A release date for a study must be provided");
+            singleValidationResultCollection.add(singleValidationResult);
+        }
+
     }
 }
