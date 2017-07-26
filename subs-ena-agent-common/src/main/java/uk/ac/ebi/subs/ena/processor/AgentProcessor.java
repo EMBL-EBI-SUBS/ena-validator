@@ -11,5 +11,4 @@ import java.util.List;
  */
 public interface AgentProcessor<T extends Submittable> {
     ProcessingCertificate process(T submittable);
-    List<ProcessingCertificate> processSubmission(SubmissionEnvelope envelope);
 }
