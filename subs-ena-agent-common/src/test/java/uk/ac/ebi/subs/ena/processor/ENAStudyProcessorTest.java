@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.subs.data.Submission;
 import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.component.Team;
@@ -15,8 +16,10 @@ import uk.ac.ebi.subs.ena.EnaAgentApplication;
 import uk.ac.ebi.subs.ena.helper.TestHelper;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
+import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +32,7 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
+@Transactional
 public class ENAStudyProcessorTest {
 
     @Autowired
@@ -59,18 +63,9 @@ public class ENAStudyProcessorTest {
         final Date date = simpleDateFormat.parse(releaseDate);
         study.setReleaseDate(date);
         study.setId(UUID.randomUUID().toString());
-        Submission submission = new Submission();
-        submission.setTeam(team);
-        SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope(submission);
-        submissionEnvelope.getStudies().add(study);
-        final List<ProcessingCertificate> processingCertificateList = enaStudyProcessor.processSubmission(submissionEnvelope);
-        assertThat("correct certs",
-                processingCertificateList,
-                containsInAnyOrder(
-                        new ProcessingCertificate(study, Archive.Ena, ProcessingStatusEnum.Received, study.getAccession())
-                )
-
-        );
+        final ArrayList<SingleValidationResult> singleValidationResultList = new ArrayList<>();
+        final ProcessingCertificate processingCertificate = enaStudyProcessor.processAndConvertSubmittable(study, singleValidationResultList);
+        assertThat(processingCertificate, is(equalTo(new ProcessingCertificate(study, Archive.Ena, ProcessingStatusEnum.Received, study.getAccession()))));
     }
 
 }
