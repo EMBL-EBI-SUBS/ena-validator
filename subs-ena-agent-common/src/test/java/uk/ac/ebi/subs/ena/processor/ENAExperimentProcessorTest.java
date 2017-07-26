@@ -6,16 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
 import uk.ac.ebi.subs.data.submittable.ENAExperiment;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
 import uk.ac.ebi.subs.ena.helper.TestHelper;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
+import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
@@ -44,8 +48,7 @@ public class ENAExperimentProcessorTest {
         ENAStudyProcessorTest.process(enaStudyProcessor,alias,team);
         final ENAExperiment enaExperiment = TestHelper.getENAExperiment(alias, team);
         final ProcessingCertificate processingCertificate = enaExperimentProcessor.process(enaExperiment);
-        assertThat("experiment accessioned", enaExperiment.getAccession(), startsWith("ERX"));
-        assertThat("correct certificate",processingCertificate.getProcessingStatus() , equalTo(ProcessingStatusEnum.Received));
+        assertThat(processingCertificate, is(equalTo(new ProcessingCertificate(enaExperiment, Archive.Ena, ProcessingStatusEnum.Received, enaExperiment.getAccession()))));
     }
 
 }

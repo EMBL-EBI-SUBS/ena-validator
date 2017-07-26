@@ -27,31 +27,19 @@ public class ENASampleProcessor extends AbstractENAProcessor<ENASample> {
     }
 
     @Override
-    public List<ProcessingCertificate> processSubmission(SubmissionEnvelope envelope) {
-        List<ProcessingCertificate> processingCertificateList = new ArrayList<>();
-        final List<Sample> samples = envelope.getSamples();
-        for (Sample sample : samples) {
-            try {
-                final ENASample enaSubmittable = (ENASample) convertFromSubmittableToENASubmittable(sample,new ArrayList<SingleValidationResult>());
-                processingCertificateList.add(process(enaSubmittable));
-            } catch (IllegalAccessException e) {
-
-            } catch (InstantiationException e) {
-
-            }
-        }
-        return processingCertificateList;
-    }
-
-    @Override
     public String getSubmittableObjectTypeAsAString() {
         return Sample.class.getSimpleName();
     }
 
     @Override
-    public ENASubmittable convertFromSubmittableToENASubmittable(Submittable submittable,Collection<SingleValidationResult> singleValidationResultList) throws InstantiationException, IllegalAccessException {
-        final ENASubmittable enaSubmittable = BaseSubmittableFactory.create(ENASample.class, submittable);
-        singleValidationResultList.addAll(enaSubmittable.getValidationResultList());
-        return enaSubmittable;
+    public ENASample convertFromSubmittableToENASubmittable(Submittable submittable,Collection<SingleValidationResult> singleValidationResultList) throws InstantiationException, IllegalAccessException {
+        final ENASample enaSample = (ENASample) BaseSubmittableFactory.create(ENASample.class, submittable);
+        singleValidationResultList.addAll(enaSample.getValidationResultList());
+        return enaSample;
+    }
+
+    @Override
+    public List<Sample> getSubmittables(SubmissionEnvelope submissionEnvelope) {
+        return submissionEnvelope.getSamples();
     }
 }

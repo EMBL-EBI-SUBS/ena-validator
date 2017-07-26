@@ -11,6 +11,7 @@ import uk.ac.ebi.embl.api.validation.ValidationResult;
 import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
+import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.loader.SRALoaderService;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
@@ -22,6 +23,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by neilg on 19/05/2017.
@@ -42,12 +44,28 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
         return dataSource;
     }
 
+    @Transactional
+    public ProcessingCertificate processAndConvertSubmittable(Submittable submittable, List<SingleValidationResult> singleValidationResultList) {
+        ProcessingCertificate processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Error);
+        try {
+            final T enaSubmittable = convertFromSubmittableToENASubmittable(submittable, singleValidationResultList);
+            processingCertificate = process(enaSubmittable);
+        } catch (InstantiationException e) {
+            logger.error("convertFromSubmittableToENASubmittable error ",e);
+        } catch (IllegalAccessException e) {
+            logger.error("convertFromSubmittableToENASubmittable error ",e);
+        }
+        return processingCertificate;
+    }
+
     @Override
     @Transactional
     public ProcessingCertificate process(T submittable) {
         Connection connection = DataSourceUtils.getConnection(dataSource);
+
         ProcessingCertificate processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Error);
         try {
+            //connection = dataSource.getConnection();
             sraLoaderService.executeSubmittableSRALoader(submittable,submittable.getAlias(),connection);
             processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Received,submittable.getAccession());
         } catch (Exception e) {

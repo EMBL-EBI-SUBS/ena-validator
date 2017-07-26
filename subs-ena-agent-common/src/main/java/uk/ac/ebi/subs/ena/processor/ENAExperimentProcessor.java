@@ -30,24 +30,6 @@ public class ENAExperimentProcessor extends AbstractENAProcessor<ENAExperiment> 
     }
 
     @Override
-    public List<ProcessingCertificate> processSubmission(SubmissionEnvelope envelope) {
-        List<ProcessingCertificate> processingCertificateList = new ArrayList<>();
-        final List<Assay> assays = envelope.getAssays();
-        for (Assay assay : assays) {
-            try {
-                updateNullTeamName(assay);
-                final ENAExperiment enaSubmittable = (ENAExperiment) convertFromSubmittableToENASubmittable(assay,new ArrayList<SingleValidationResult>());
-                processingCertificateList.add((process(enaSubmittable)));
-            } catch (IllegalAccessException e) {
-
-            } catch (InstantiationException e) {
-
-            }
-        }
-        return processingCertificateList;
-    }
-
-    @Override
     public String getSubmittableObjectTypeAsAString() {
         return Assay.class.getSimpleName();
     }
@@ -64,11 +46,16 @@ public class ENAExperimentProcessor extends AbstractENAProcessor<ENAExperiment> 
     }
 
     @Override
-    public ENASubmittable convertFromSubmittableToENASubmittable(Submittable submittable,Collection<SingleValidationResult> singleValidationResultList) throws InstantiationException, IllegalAccessException {
+    public ENAExperiment convertFromSubmittableToENASubmittable(Submittable submittable,Collection<SingleValidationResult> singleValidationResultList) throws InstantiationException, IllegalAccessException {
 
-        final ENASubmittable enaSubmittable = BaseSubmittableFactory.create(ENAExperiment.class, submittable);
-        singleValidationResultList.addAll(enaSubmittable.getValidationResultList());
-        return enaSubmittable;
+        final ENAExperiment enaExperiment = (ENAExperiment) BaseSubmittableFactory.create(ENAExperiment.class, submittable);
+        singleValidationResultList.addAll(enaExperiment.getValidationResultList());
+        return enaExperiment;
+    }
+
+    @Override
+    public List<Assay> getSubmittables(SubmissionEnvelope submissionEnvelope) {
+        return submissionEnvelope.getAssays();
     }
 
 }
