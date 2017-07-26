@@ -65,7 +65,6 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
 
         ProcessingCertificate processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Error);
         try {
-            //connection = dataSource.getConnection();
             sraLoaderService.executeSubmittableSRALoader(submittable,submittable.getAlias(),connection);
             processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Received,submittable.getAccession());
         } catch (Exception e) {
