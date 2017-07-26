@@ -73,12 +73,24 @@ public class ENAStudyValidatorTest {
     }
 
     @Test
-    public void testValidaReleaseDate () {
+    public void testValidReleaseDate () {
         final Team team = TestHelper.getTeam("my-team");
         final Study study = TestHelper.getStudy(UUID.randomUUID().toString(), team, "study_abstract","Whole Genome Sequencing");
         final List<SingleValidationResult> singleValidationResults = new ArrayList<>();
         DateTime dateTime = new DateTime();
         DateTime dateTimePlusOneDay = dateTime.plusDays(ENAStudyValidator.RELEASE_DATE_INTERVAL_DAYS - 1);
+        study.setReleaseDate(dateTimePlusOneDay.toDate());
+        enaAgentStudyValidator.checkReleaseDate(study,singleValidationResults,ENAStudyValidator.RELEASE_DATE_INTERVAL_DAYS);
+        assertTrue("singleValidationResult",singleValidationResults.isEmpty());
+    }
+
+    @Test
+    public void testValidPastReleaseDate () {
+        final Team team = TestHelper.getTeam("my-team");
+        final Study study = TestHelper.getStudy(UUID.randomUUID().toString(), team, "study_abstract","Whole Genome Sequencing");
+        final List<SingleValidationResult> singleValidationResults = new ArrayList<>();
+        DateTime dateTime = new DateTime();
+        DateTime dateTimePlusOneDay = dateTime.minusDays(ENAStudyValidator.RELEASE_DATE_INTERVAL_DAYS - 1);
         study.setReleaseDate(dateTimePlusOneDay.toDate());
         enaAgentStudyValidator.checkReleaseDate(study,singleValidationResults,ENAStudyValidator.RELEASE_DATE_INTERVAL_DAYS);
         assertTrue("singleValidationResult",singleValidationResults.isEmpty());
