@@ -88,14 +88,17 @@ public class ENAStudyValidator implements ENAValidator {
 
     void checkReleaseDate(Study study, List<SingleValidationResult> singleValidationResultCollection, int intevalDays) {
         if (study.getReleaseDate() != null) {
-            Interval interval = new Interval(new Instant().getMillis(),study.getReleaseDate().getTime());
-            final Days days = Days.daysBetween(new DateTime(), new DateTime(study.getReleaseDate()));
-            if (days.getDays() >= intevalDays) {
-                SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,study.getId());
-                singleValidationResult.setUuid(UUID.randomUUID().toString());
-                singleValidationResult.setValidationStatus(ValidationStatus.Error);
-                singleValidationResult.setMessage(String.format("Release date %s must not exceed two years from the present date",study.getReleaseDate()));
-                singleValidationResultCollection.add(singleValidationResult);
+            final Instant instant = new Instant();
+            if (study.getReleaseDate().getTime() > instant.getMillis()) {
+                Interval interval = new Interval(instant.getMillis(), study.getReleaseDate().getTime());
+                final Days days = Days.daysBetween(new DateTime(), new DateTime(study.getReleaseDate()));
+                if (days.getDays() >= intevalDays) {
+                    SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, study.getId());
+                    singleValidationResult.setUuid(UUID.randomUUID().toString());
+                    singleValidationResult.setValidationStatus(ValidationStatus.Error);
+                    singleValidationResult.setMessage(String.format("Release date %s must not exceed two years from the present date", study.getReleaseDate()));
+                    singleValidationResultCollection.add(singleValidationResult);
+                }
             }
         } else {
             SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,study.getId());
