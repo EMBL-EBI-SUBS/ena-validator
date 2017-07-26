@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import uk.ac.ebi.ena.authentication.model.AuthResult;
@@ -22,6 +23,7 @@ import uk.ac.ebi.subs.data.submittable.ENARun;
 import uk.ac.ebi.subs.data.submittable.ENASample;
 import uk.ac.ebi.subs.data.submittable.ENAStudy;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
@@ -100,14 +102,12 @@ public class EnaAgentConfiguration {
         return dataSource;
     }
 
-    //@Bean
-    //public DataSourceTransactionManager transactionManager() {
-    //    return new DataSourceTransactionManager(dataSource());
-    //}
-
-    public JpaTransactionManager transactionManager() {
+    @Bean
+    public JpaTransactionManager transactionManager()
+    {
         return new JpaTransactionManager();
     }
+
 
     @Bean
     SRALoader sraLoader(@Value("${ena.transaction_mode}") String transactionMode) {
