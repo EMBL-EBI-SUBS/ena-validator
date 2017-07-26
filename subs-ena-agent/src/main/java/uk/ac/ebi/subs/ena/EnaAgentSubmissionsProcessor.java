@@ -7,6 +7,10 @@ import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.stereotype.Service;
+import uk.ac.ebi.subs.data.component.Archive;
+import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
+import uk.ac.ebi.subs.data.submittable.ENASubmittable;
+import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.processor.ENAAgentProcessor;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.messaging.Exchanges;
@@ -16,6 +20,7 @@ import uk.ac.ebi.subs.processing.ProcessingCertificate;
 import uk.ac.ebi.subs.processing.ProcessingCertificateEnvelope;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 import uk.ac.ebi.subs.processing.UpdatedSamplesEnvelope;
+import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,11 +68,15 @@ public class EnaAgentSubmissionsProcessor {
 
     }
 
-    ProcessingCertificateEnvelope processSubmission(SubmissionEnvelope submissionEnvelope) {
+    ProcessingCertificateEnvelope processSubmission(SubmissionEnvelope submissionEnvelope)  {
         List<ProcessingCertificate> processingCertificateList = new ArrayList<>();
 
         for (ENAAgentProcessor enaAgentProcessor : enaProcessorContainerService.getENAAgentProcessorList()) {
-            processingCertificateList.addAll(enaAgentProcessor.processSubmission(submissionEnvelope));
+            final List<Submittable> submittables = enaAgentProcessor.getSubmittables(submissionEnvelope);
+            for (Submittable submittable : submittables) {
+                ProcessingCertificate processingCertificate = enaAgentProcessor.processAndConvertSubmittable(submittable,new ArrayList<SingleValidationResult>());
+                processingCertificateList.add(processingCertificate);
+            }
         }
 
         return new ProcessingCertificateEnvelope(submissionEnvelope.getSubmission().getId(),processingCertificateList);
