@@ -148,7 +148,7 @@ public class TestHelper {
         studyAbstractAttibute.setValue(studyAbstract);
         study.getAttributes().add(studyAbstractAttibute);
         Attribute studyTypeAttribute = new Attribute();
-        studyTypeAttribute.setName("existing_study_type");
+        studyTypeAttribute.setName(ENAStudy.STUDY_TYPE);
         studyTypeAttribute.setValue(studyType);
         study.getAttributes().add(studyTypeAttribute);
         return study;
