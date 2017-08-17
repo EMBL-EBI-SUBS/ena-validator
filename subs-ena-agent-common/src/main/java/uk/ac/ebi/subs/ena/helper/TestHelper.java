@@ -171,7 +171,6 @@ public class TestHelper {
         a.setAlias(alias);
         a.setTeam(team);
         a.setTitle("Assay Title ");
-        a.setArchive(Archive.Ena);
         a.setDescription("Test assay");
         Attribute platformAttribute = new Attribute();
         platformAttribute.setName(ENAExperiment.PLATFORM_TYPE);
