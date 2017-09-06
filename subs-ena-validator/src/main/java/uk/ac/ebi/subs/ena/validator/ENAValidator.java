@@ -56,11 +56,11 @@ public interface ENAValidator {
         );
 
         if (!hasValidationError(singleValidationResultCollection)) {
-            getRabbitMessagingTemplate().convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_SUCCESS,singleValidationResultsEnvelope);
+            getRabbitMessagingTemplate().convertAndSend(Exchanges.SUBMISSIONS, RoutingKeys.EVENT_VALIDATION_SUCCESS,singleValidationResultsEnvelope);
 
             logger.info("Validation successful for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
         } else {
-            getRabbitMessagingTemplate().convertAndSend(Exchanges.VALIDATION, RoutingKeys.EVENT_VALIDATION_ERROR,singleValidationResultsEnvelope);
+            getRabbitMessagingTemplate().convertAndSend(Exchanges.SUBMISSIONS, RoutingKeys.EVENT_VALIDATION_ERROR,singleValidationResultsEnvelope);
 
             logger.info("Validation erred for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
         }
