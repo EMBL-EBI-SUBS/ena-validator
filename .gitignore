@@ -3,6 +3,7 @@
 build
 .gradle
 .gradle/*
+subs-ena.iml
 .DS_Store
 classes
 gradle.properties
