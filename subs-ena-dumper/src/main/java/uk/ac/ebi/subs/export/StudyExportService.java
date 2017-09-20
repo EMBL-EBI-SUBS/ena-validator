@@ -12,6 +12,7 @@ import uk.ac.ebi.subs.ena.repository.StudyRepository;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.xpath.XPathExpressionException;
+import java.time.LocalDate;
 
 @Service
 public class StudyExportService extends AbstractExportService<Study,ENAStudy> {
@@ -25,7 +26,8 @@ public class StudyExportService extends AbstractExportService<Study,ENAStudy> {
     @Override
     protected Study getSubmittable(SubmittableSRAInfo submittable) throws XPathExpressionException, JAXBException, IllegalAccessException {
         final Study study = super.getSubmittable(submittable);
-        study.setReleaseDate(new java.util.Date());
+        LocalDate releaseDate = LocalDate.parse("2017-01-01");
+        study.setReleaseDate(java.sql.Date.valueOf(releaseDate));
         return study;
     }
 }
