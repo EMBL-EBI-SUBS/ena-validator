@@ -14,6 +14,7 @@ import org.w3c.dom.Node;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
 import uk.ac.ebi.subs.data.submittable.MappingHelper;
 import uk.ac.ebi.subs.data.submittable.Submittable;
+import uk.ac.ebi.subs.ena.data.SRAInfo;
 import uk.ac.ebi.subs.ena.data.SubmittableSRAInfo;
 import uk.ac.ebi.subs.ena.repository.SampleRepository;
 import uk.ac.ebi.subs.ena.repository.SubmittableSRARepository;
@@ -54,6 +55,7 @@ public class AbstractExportService<K extends Submittable,V extends ENASubmittabl
         this.objectMapper = objectMapper;
         this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         this.objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        this.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         try {
             unmarshaller = MappingHelper.createUnmarshaller(enaSubmittableClass, MappingHelper.SUBMITTABLE_PACKAGE, enaMarshaller, MappingHelper.COMPONENT_PACKAGE, MappingHelper.ATTRIBUTE_MAPPING);
             xPath = xPathFactory.newXPath();
@@ -73,13 +75,8 @@ public class AbstractExportService<K extends Submittable,V extends ENASubmittabl
 
             for (SubmittableSRAInfo submittableSRAInfo : submittableList) {
                 try {
-                    final LocalDateTime localDateTime = submittableSRAInfo.getFirstCreated().toLocalDateTime();
-                    Path resolve = path.resolve(Integer.toString(localDateTime.getYear())).resolve(localDateTime.getMonth().name()).resolve(Integer.toString(localDateTime.getDayOfMonth()));
-                    final K submittable = getSubmittable(submittableSRAInfo);
-                    Files.createDirectories(resolve);
-                    final Path exportPath = resolve.resolve(submittable.getAccession() + ".json");
-                    objectMapper.writeValue(exportPath.toFile(),submittable);
-                    logger.trace("Dumped " + submittable.getAccession());
+                    Path resolve = getPathForDate(path, submittableSRAInfo);
+                    writeSubmittableSRAInfo(submittableSRAInfo, resolve);
                 }  catch (Exception e) {
                     logger.info("Error in running sampleXPathExpression",e);
                 }
@@ -90,6 +87,39 @@ public class AbstractExportService<K extends Submittable,V extends ENASubmittabl
         }
 
         logger.info("Dumped " + rowCount + " objects");
+    }
+
+    static Path getPathForDate(Path path, SRAInfo sraInfo) {
+        final LocalDateTime localDateTime = sraInfo.getFirstCreated().toLocalDateTime();
+        return path.resolve(Integer.toString(localDateTime.getYear())).resolve(localDateTime.getMonth().name()).resolve(Integer.toString(localDateTime.getDayOfMonth()));
+    }
+
+    private void writeSubmittableSRAInfo(SubmittableSRAInfo submittableSRAInfo, Path resolve) throws XPathExpressionException, JAXBException, IllegalAccessException, IOException {
+        final K submittable = getSubmittable(submittableSRAInfo);
+        writeSubmittableJSON(resolve, submittable);
+    }
+
+    private void writeSubmittableJSON(Path resolve, K submittable) throws IOException {
+        Files.createDirectories(resolve);
+        final Path exportPath = resolve.resolve(submittable.getAccession() + ".json");
+        submittable.setAccession(null);
+        objectMapper.writeValue(exportPath.toFile(),submittable);
+        logger.trace("Dumped " + submittable.getAccession());
+    }
+
+    @Override
+    public void exportBySubmissionId(Path path, String submissionId) {
+        final List<? extends SubmittableSRAInfo> submittableList = submittableSRARepository.findBySubmissionId(submissionId);
+        final Path submissionPath = path.resolve(submissionId);
+
+        for (SubmittableSRAInfo submittableSRAInfo : submittableList) {
+            try {
+                writeSubmittableSRAInfo(submittableSRAInfo, submissionPath);
+            }  catch (Exception e) {
+                logger.info("Error in dumping submission " + submissionId,e);
+            }
+        }
+
     }
 
     protected K getSubmittable(SubmittableSRAInfo submittable) throws XPathExpressionException, JAXBException, IllegalAccessException {
