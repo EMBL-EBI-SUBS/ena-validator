@@ -6,7 +6,10 @@ import org.hibernate.usertype.UserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,6 +37,9 @@ public class XMLType implements UserType{
 
     static {
         try {
+            dbFactory.setValidating(true);
+            dbFactory.setIgnoringElementContentWhitespace(true);
+            dbFactory.setValidating(false);
             documentBuilder = dbFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             log.error("Error initialising XMLType", e);
@@ -78,6 +84,7 @@ public class XMLType implements UserType{
         try {
             if (xmlType != null) {
                 document = documentBuilder.parse(new InputSource(xmlType.getCharacterStream()));
+                document.normalizeDocument();
             } else {
                 document = documentBuilder.newDocument();
             }
