@@ -40,9 +40,6 @@ public class EnaAgentConfiguration {
     @Autowired
     private ApplicationContext appContext;
 
-    @Value("${ena.submission_account_id}")
-    String submissionAccountId;
-
     @Value("classpath:uk/ac/ebi/subs/data/component/attribute_mapping.xml")
     Resource componentMappingResource;
 
