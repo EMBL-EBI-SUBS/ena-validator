@@ -2,7 +2,7 @@ apply plugin: 'java'
 
 dependencies {
 	compile(group: 'uk.ac.ebi.subs', name: 'subs-processing-model', version: '1.0.0-SNAPSHOT', changing: true)
-	compile(group: 'uk.ac.ebi.subs', name: 'subs-ena-data-model', version: '0.2.0-SNAPSHOT', changing: true)
+	compile(group: 'uk.ac.ebi.subs', name: 'subs-ena-data-model', version: '0.3.1-SNAPSHOT', changing: true)
 	compile project(':subs-ena-repository')
 	compile ("org.springframework:spring-oxm")
 	compile ('uk.ac.ebi.ena.sra:sra-core:1.14.39-SUBS-343-usidev') {
