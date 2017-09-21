@@ -1,12 +1,14 @@
 package uk.ac.ebi.subs.ena.validator;
 
-import org.joda.time.*;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Instant;
+import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -14,12 +16,12 @@ import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENAStudyProcessor;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
-import uk.ac.ebi.subs.validator.data.ValidationAuthor;
 import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
-import uk.ac.ebi.subs.validator.data.ValidationStatus;
+import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
+import uk.ac.ebi.subs.validator.data.structures.ValidationAuthor;
 import uk.ac.ebi.subs.validator.messaging.Queues;
+
 import java.util.List;
-import java.util.UUID;
 
 /**
  * This class responsible to do the ENA related validations.
@@ -94,16 +96,14 @@ public class ENAStudyValidator implements ENAValidator {
                 final Days days = Days.daysBetween(new DateTime(), new DateTime(study.getReleaseDate()));
                 if (days.getDays() >= intevalDays) {
                     SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, study.getId());
-                    singleValidationResult.setUuid(UUID.randomUUID().toString());
-                    singleValidationResult.setValidationStatus(ValidationStatus.Error);
+                    singleValidationResult.setValidationStatus(SingleValidationResultStatus.Error);
                     singleValidationResult.setMessage(String.format("Release date %s must not exceed two years from the present date", study.getReleaseDate()));
                     singleValidationResultCollection.add(singleValidationResult);
                 }
             }
         } else {
             SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,study.getId());
-            singleValidationResult.setUuid(UUID.randomUUID().toString());
-            singleValidationResult.setValidationStatus(ValidationStatus.Error);
+            singleValidationResult.setValidationStatus(SingleValidationResultStatus.Error);
             singleValidationResult.setMessage("A release date for a study must be provided");
             singleValidationResultCollection.add(singleValidationResult);
         }

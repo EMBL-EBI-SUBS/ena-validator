@@ -1,6 +1,5 @@
 package uk.ac.ebi.subs.ena.validator;
 
-import org.eclipse.persistence.annotations.TimeOfDay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
@@ -9,14 +8,13 @@ import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.processor.ENAAgentProcessor;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.SingleValidationResultsEnvelope;
-import uk.ac.ebi.subs.validator.data.ValidationAuthor;
-import uk.ac.ebi.subs.validator.data.ValidationStatus;
+import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
+import uk.ac.ebi.subs.validator.data.structures.ValidationAuthor;
 import uk.ac.ebi.subs.validator.messaging.Exchanges;
 import uk.ac.ebi.subs.validator.messaging.RoutingKeys;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by karoly on 14/06/2017.
@@ -40,7 +38,7 @@ public interface ENAValidator {
             logger.error("An exception occured: {}", e.getMessage());
             SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,submittable.getId());
             singleValidationResult.setMessage(e.getMessage());
-            singleValidationResult.setValidationStatus(ValidationStatus.Error);
+            singleValidationResult.setValidationStatus(SingleValidationResultStatus.Error);
             singleValidationResultCollection.add(singleValidationResult);
         }
 
@@ -68,7 +66,7 @@ public interface ENAValidator {
 
     default boolean hasValidationError(List<SingleValidationResult> validationResults) {
         SingleValidationResult errorValidationResult = validationResults.stream().filter(
-                validationResult -> validationResult.getValidationStatus() == ValidationStatus.Error)
+                validationResult -> validationResult.getValidationStatus() == SingleValidationResultStatus.Error)
                 .findAny()
                 .orElse(null);
 
@@ -81,8 +79,7 @@ public interface ENAValidator {
 
     default SingleValidationResult createEmptySingleValidationResult (Submittable submittable) {
         SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,submittable.getId());
-        singleValidationResult.setValidationStatus(ValidationStatus.Pass);
-        singleValidationResult.setUuid(UUID.randomUUID().toString());
+        singleValidationResult.setValidationStatus(SingleValidationResultStatus.Pass);
         return singleValidationResult;
     }
 
