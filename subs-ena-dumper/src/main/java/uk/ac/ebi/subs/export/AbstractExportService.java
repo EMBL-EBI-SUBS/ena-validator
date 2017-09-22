@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.w3c.dom.Node;
+import uk.ac.ebi.subs.data.client.PartOfSubmission;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
 import uk.ac.ebi.subs.data.submittable.MappingHelper;
 import uk.ac.ebi.subs.data.submittable.Submittable;
@@ -18,6 +19,7 @@ import uk.ac.ebi.subs.ena.data.SRAInfo;
 import uk.ac.ebi.subs.ena.data.SubmittableSRAInfo;
 import uk.ac.ebi.subs.ena.repository.SampleRepository;
 import uk.ac.ebi.subs.ena.repository.SubmittableSRARepository;
+import uk.ac.ebi.subs.stresstest.ClientCompleteSubmission;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.xml.bind.JAXBException;
@@ -37,7 +39,7 @@ import java.time.Month;
 import java.util.Iterator;
 import java.util.List;
 
-public class AbstractExportService<K extends Submittable,V extends ENASubmittable<K>> implements ExportService {
+public abstract class AbstractExportService<K extends Submittable,V extends ENASubmittable<K>> implements ExportService {
     public static final int PAGE_SIZE = 10000;
     SubmittableSRARepository<? extends SubmittableSRAInfo> submittableSRARepository;
     Class<V> enaSubmittableClass;
@@ -89,6 +91,38 @@ public class AbstractExportService<K extends Submittable,V extends ENASubmittabl
         logger.info("Dumped " + rowCount + " objects");
     }
 
+    @Override
+    public void export(ClientCompleteSubmission clientCompleteSubmission, String submissionId) {
+        final List<? extends SubmittableSRAInfo> submittableList = submittableSRARepository.findBySubmissionId(submissionId);
+
+        for (SubmittableSRAInfo submittableSRAInfo : submittableList) {
+            try {
+                final K submittable = getSubmittable(submittableSRAInfo);
+                updateClientCompleteSubmission(clientCompleteSubmission,submittable);
+            }  catch (Exception e) {
+                logger.info("Error in dumping submission " + submissionId,e);
+            }
+        }
+
+    }
+
+    @Override
+    public void exportBySubmissionId(Path path, String submissionId) {
+        final List<? extends SubmittableSRAInfo> submittableList = submittableSRARepository.findBySubmissionId(submissionId);
+        final Path submissionPath = path.resolve(submissionId);
+
+        for (SubmittableSRAInfo submittableSRAInfo : submittableList) {
+            try {
+                writeSubmittableSRAInfo(submittableSRAInfo, submissionPath);
+            }  catch (Exception e) {
+                logger.info("Error in dumping submission " + submissionId,e);
+            }
+        }
+
+    }
+
+    protected abstract void updateClientCompleteSubmission(ClientCompleteSubmission clientCompleteSubmission, K submittable);
+
     static Path getPathForDate(Path path, SRAInfo sraInfo) {
         final LocalDateTime localDateTime = sraInfo.getFirstCreated().toLocalDateTime();
         return path.resolve(Integer.toString(localDateTime.getYear())).resolve(localDateTime.getMonth().name()).resolve(Integer.toString(localDateTime.getDayOfMonth()));
@@ -107,20 +141,7 @@ public class AbstractExportService<K extends Submittable,V extends ENASubmittabl
         logger.trace("Dumped " + submittable.getAccession());
     }
 
-    @Override
-    public void exportBySubmissionId(Path path, String submissionId) {
-        final List<? extends SubmittableSRAInfo> submittableList = submittableSRARepository.findBySubmissionId(submissionId);
-        final Path submissionPath = path.resolve(submissionId);
 
-        for (SubmittableSRAInfo submittableSRAInfo : submittableList) {
-            try {
-                writeSubmittableSRAInfo(submittableSRAInfo, submissionPath);
-            }  catch (Exception e) {
-                logger.info("Error in dumping submission " + submissionId,e);
-            }
-        }
-
-    }
 
     protected K getSubmittable(SubmittableSRAInfo submittable) throws XPathExpressionException, JAXBException, IllegalAccessException {
         Node node = submittable.getDocument();
