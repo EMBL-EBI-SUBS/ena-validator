@@ -1,6 +1,7 @@
 package uk.ac.ebi.subs.export;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.core.env.SystemEnvironmentPropertySource;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
@@ -9,10 +10,12 @@ import uk.ac.ebi.subs.data.submittable.MappingHelper;
 import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.ena.data.SubmittableSRAInfo;
 import uk.ac.ebi.subs.ena.repository.StudyRepository;
+import uk.ac.ebi.subs.stresstest.ClientCompleteSubmission;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.xpath.XPathExpressionException;
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class StudyExportService extends AbstractExportService<Study,ENAStudy> {
@@ -29,5 +32,12 @@ public class StudyExportService extends AbstractExportService<Study,ENAStudy> {
         LocalDate releaseDate = LocalDate.parse("2017-01-01");
         study.setReleaseDate(java.sql.Date.valueOf(releaseDate));
         return study;
+    }
+
+    @Override
+    protected void updateClientCompleteSubmission(ClientCompleteSubmission clientCompleteSubmission, Study submittable) {
+        uk.ac.ebi.subs.data.client.Study study = new uk.ac.ebi.subs.data.client.Study();
+        BeanUtils.copyProperties(submittable,study);
+        clientCompleteSubmission.getStudies().add(study);
     }
 }

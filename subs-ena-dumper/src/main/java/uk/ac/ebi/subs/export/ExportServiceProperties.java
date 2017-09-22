@@ -16,7 +16,9 @@ class ExportServiceProperties {
     @NotEmpty
     String submissionAccountId;
 
-    boolean bySubmission = false;
+    boolean bySubmission = true;
+
+    boolean completeSubmissionFormat = true;
 
     public String[] getServices() {
         return services;
@@ -48,5 +50,13 @@ class ExportServiceProperties {
 
     public void setBySubmission(boolean bySubmission) {
         this.bySubmission = bySubmission;
+    }
+
+    public boolean isCompleteSubmissionFormat() {
+        return completeSubmissionFormat;
+    }
+
+    public void setCompleteSubmissionFormat(boolean completeSubmissionFormat) {
+        this.completeSubmissionFormat = completeSubmissionFormat;
     }
 }
