@@ -98,6 +98,7 @@ public abstract class AbstractExportService<K extends Submittable,V extends ENAS
         for (SubmittableSRAInfo submittableSRAInfo : submittableList) {
             try {
                 final K submittable = getSubmittable(submittableSRAInfo);
+                submittable.setAccession(null);
                 updateClientCompleteSubmission(clientCompleteSubmission,submittable);
             }  catch (Exception e) {
                 logger.info("Error in dumping submission " + submissionId,e);
@@ -140,8 +141,6 @@ public abstract class AbstractExportService<K extends Submittable,V extends ENAS
         objectMapper.writeValue(exportPath.toFile(),submittable);
         logger.trace("Dumped " + submittable.getAccession());
     }
-
-
 
     protected K getSubmittable(SubmittableSRAInfo submittable) throws XPathExpressionException, JAXBException, IllegalAccessException {
         Node node = submittable.getDocument();
