@@ -46,11 +46,10 @@ public class ENAExportService {
                 this.exportServiceList.add(exportService);
             }
         }
-        this.exportServiceList = exportServiceList;
     }
 
     public void export () {
-        if (exportServiceProperties.isCompleteSubmissionFormat()) {
+        if (exportServiceProperties.isBySubmission()) {
             enaSubmissionExportService.export(exportServiceList, Paths.get(exportServiceProperties.getPath()),exportServiceProperties.getSubmissionAccountId());
         } else {
             enaSubmittableExportService.export(exportServiceList, Paths.get(exportServiceProperties.getPath()),exportServiceProperties.getSubmissionAccountId());
