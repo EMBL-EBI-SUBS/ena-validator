@@ -33,7 +33,7 @@ public class ENASampleProcessor extends AbstractENAProcessor<ENASample> {
 
     @Override
     public ENASample convertFromSubmittableToENASubmittable(Submittable submittable,Collection<SingleValidationResult> singleValidationResultList) throws InstantiationException, IllegalAccessException {
-        final ENASample enaSample = (ENASample) BaseSubmittableFactory.create(ENASample.class, submittable);
+        final ENASample enaSample = ENASubmittable.create(ENASample.class, submittable);
         singleValidationResultList.addAll(enaSample.getValidationResultList());
         return enaSample;
     }

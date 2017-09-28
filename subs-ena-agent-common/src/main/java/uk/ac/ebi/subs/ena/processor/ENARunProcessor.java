@@ -35,7 +35,7 @@ public class ENARunProcessor extends AbstractENAProcessor<ENARun> {
 
     @Override
     public ENARun convertFromSubmittableToENASubmittable(Submittable submittable, Collection<SingleValidationResult> singleValidationResultList) throws InstantiationException, IllegalAccessException {
-        final ENARun enaRun = (ENARun) BaseSubmittableFactory.create(ENAStudy.class, submittable);
+        final ENARun enaRun = ENASubmittable.create(ENARun.class, submittable);
         singleValidationResultList.addAll(enaRun.getValidationResultList());
         return enaRun;
     }

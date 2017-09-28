@@ -34,7 +34,7 @@ public class ENAStudyProcessor extends AbstractENAProcessor<ENAStudy>  {
     }
 
     public ENAStudy convertFromSubmittableToENASubmittable(Submittable submittable, Collection<SingleValidationResult> singleValidationResultList) throws InstantiationException, IllegalAccessException {
-        final ENAStudy enaStudy = (ENAStudy) BaseSubmittableFactory.create(ENAStudy.class, submittable);
+        final ENAStudy enaStudy = ENASubmittable.create(ENAStudy.class, submittable);
         singleValidationResultList.addAll(enaStudy.getValidationResultList());
         return enaStudy;
     }
