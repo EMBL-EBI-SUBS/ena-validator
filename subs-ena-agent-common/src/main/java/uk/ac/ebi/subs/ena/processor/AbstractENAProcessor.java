@@ -15,8 +15,8 @@ import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.loader.SRALoaderService;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
-import uk.ac.ebi.subs.validator.data.ValidationAuthor;
-import uk.ac.ebi.subs.validator.data.ValidationStatus;
+import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
+import uk.ac.ebi.subs.validator.data.structures.ValidationAuthor;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -112,7 +112,7 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
             logger.error("An exception occured: {}", e.getMessage());
             SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,enaSubmittable.getId().toString());
             singleValidationResult.setMessage(e.getMessage());
-            singleValidationResult.setValidationStatus(ValidationStatus.Error);
+            singleValidationResult.setValidationStatus(SingleValidationResultStatus.Error);
             singleValidationResultCollection.add(singleValidationResult);
         }
 
@@ -148,11 +148,11 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
             SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,entityUUID);
             singleValidationResult.setMessage(validationMessage.getMessage());
             if (validationMessage.getSeverity().equals(Severity.ERROR)) {
-                singleValidationResult.setValidationStatus(ValidationStatus.Error);
+                singleValidationResult.setValidationStatus(SingleValidationResultStatus.Error);
             } else if (validationMessage.getSeverity().equals(Severity.WARNING)) {
-                singleValidationResult.setValidationStatus(ValidationStatus.Warning);
+                singleValidationResult.setValidationStatus(SingleValidationResultStatus.Warning);
             } else if (validationMessage.getSeverity().equals(Severity.FIX)) {
-                singleValidationResult.setValidationStatus(ValidationStatus.Error);
+                singleValidationResult.setValidationStatus(SingleValidationResultStatus.Error);
 
             }
         }
