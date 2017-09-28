@@ -47,7 +47,6 @@ public class ENAExperimentProcessor extends AbstractENAProcessor<ENAExperiment> 
 
     @Override
     public ENAExperiment convertFromSubmittableToENASubmittable(Submittable submittable,Collection<SingleValidationResult> singleValidationResultList) throws InstantiationException, IllegalAccessException {
-
         final ENAExperiment enaExperiment = ENASubmittable.create(ENAExperiment.class, submittable);
         singleValidationResultList.addAll(enaExperiment.getValidationResultList());
         return enaExperiment;
