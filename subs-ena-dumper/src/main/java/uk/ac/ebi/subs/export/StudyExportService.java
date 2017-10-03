@@ -29,7 +29,7 @@ public class StudyExportService extends AbstractExportService<Study,ENAStudy> {
     @Override
     protected Study getSubmittable(SubmittableSRAInfo submittable) throws XPathExpressionException, JAXBException, IllegalAccessException {
         final Study study = super.getSubmittable(submittable);
-        LocalDate releaseDate = LocalDate.parse("2017-01-01");
+        LocalDate releaseDate = LocalDate.parse("2019-01-01");
         study.setReleaseDate(java.sql.Date.valueOf(releaseDate));
         return study;
     }
