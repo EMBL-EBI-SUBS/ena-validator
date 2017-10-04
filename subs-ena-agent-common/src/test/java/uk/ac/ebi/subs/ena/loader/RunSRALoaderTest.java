@@ -1,11 +1,12 @@
 package uk.ac.ebi.subs.ena.loader;
 
 import org.apache.commons.io.IOUtils;
+import org.eclipse.persistence.annotations.TimeOfDay;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import uk.ac.ebi.ena.sra.SRAFileHandler;
+
 import uk.ac.ebi.ena.sra.xml.*;
 
 import java.io.*;
@@ -49,7 +50,8 @@ public class RunSRALoaderTest extends AbstractSRALoaderTest {
     @Before
     public void setUp () throws Exception {
         tempDir = new File(System.getProperty("java.io.tmpdir"));
-        System.setProperty(SRAFileHandler.SRA_UPLOAD_DIR_PATH_PROPERTY, tempDir.getAbsolutePath());
+        //@TODO need to set this when we handles files
+        //System.setProperty(SRAFileHandler.SRA_UPLOAD_DIR_PATH_PROPERTY, tempDir.getAbsolutePath());
         final URL url = getClass().getResource(FASTQ_FILE);
         File fastQFile = new File(url.toURI());
         File destinationFile = new File(tempDir,fastQFile.getName());
