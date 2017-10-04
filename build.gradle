@@ -12,7 +12,7 @@ buildscript {
 }
 
 allprojects {
-	ext.version_base = '0.2.2-SNAPSHOT'
+	ext.version_base = '0.2.3-SNAPSHOT'
 	version = version_base
 	group = 'uk.ac.ebi.subs.ena'
 }
