@@ -1,7 +1,6 @@
 package uk.ac.ebi.subs.ena.loader;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.persistence.annotations.TimeOfDay;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
