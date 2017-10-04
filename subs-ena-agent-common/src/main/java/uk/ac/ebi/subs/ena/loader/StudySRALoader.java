@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.oxm.Marshaller;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.ena.sra.StudyInfo;
+import uk.ac.ebi.ena.sra.SubmissionObject;
+import uk.ac.ebi.ena.sra.SubmissionObjects;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 import uk.ac.ebi.ena.sra.xml.SubmissionType;
 import uk.ac.ebi.subs.data.submittable.ENAStudy;
@@ -13,6 +15,7 @@ import uk.ac.ebi.subs.ena.processor.SRALoaderAccessionException;
 
 import java.sql.Connection;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,16 +29,17 @@ public class StudySRALoader extends AbstractSRALoaderService<ENAStudy> {
     public String executeSRALoader(String submissionXML, String submittableXML, Connection connection) throws Exception {
         String accession = null;
         try {
-            if (sraLoader.eraputRestWebin(submissionXML,
-                    submittableXML, null, null, null, null, null, null, null, null,
-                    null, authResult, null, connection) == 0) {
-                final Map<StudyType, StudyInfo> studys = sraLoader.getStudys();
-                if (studys != null) {
-                    if (studys.values().iterator().hasNext()) {
-                        accession = studys.values().iterator().next().getStudyAccession();
-                        logger.info("Created ENA study with accession " + accession);
-                    }
+            sraLoader.eraput(submissionXML,
+                    submittableXML, null, null , null, null, null, null, null, null,
+                    null, true, authResult, null, connection);
+            if (sraLoader.getValidationResult().isValid()) {
+                final SubmissionObjects submissionObjects = sraLoader.getSubmissionObjects();
+                final List<SubmissionObject.StudySubmissionObject> submittableObjectList = submissionObjects.getStudys();
+
+                for (SubmissionObject.SubmissionSubmittableObject submissionObject : submittableObjectList) {
+                    accession = submissionObject.getInfo().getId();
                 }
+
             } else {
                 logValidationErrors();
             }
