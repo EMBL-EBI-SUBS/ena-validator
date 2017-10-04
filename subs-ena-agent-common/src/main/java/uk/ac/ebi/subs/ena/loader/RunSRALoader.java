@@ -5,11 +5,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.oxm.Marshaller;
 import org.springframework.stereotype.Component;
 import uk.ac.ebi.ena.sra.RunInfo;
+import uk.ac.ebi.ena.sra.SubmissionObject;
+import uk.ac.ebi.ena.sra.SubmissionObjects;
 import uk.ac.ebi.ena.sra.xml.RunType;
 import uk.ac.ebi.subs.data.submittable.ENARun;
 import uk.ac.ebi.subs.ena.processor.SRALoaderAccessionException;
 
 import java.sql.Connection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,16 +25,17 @@ public class RunSRALoader extends AbstractSRALoaderService<ENARun> {
     public String executeSRALoader(String submissionXML, String submittableXML, Connection connection) throws Exception {
         String accession = null;
         try {
-            if (sraLoader.eraputRestWebin(submissionXML,
-                    null, null, null, submittableXML, null, null, null, null, null,
-                    null, authResult, null, connection) == 0) {
-                final Map<RunType, RunInfo> runs = sraLoader.getRuns();
-                if (runs != null) {
-                    if (runs.values().iterator().hasNext()) {
-                        accession = runs.values().iterator().next().getRunAccession();
-                        logger.info("Created ENA run with accession " + accession);
-                    }
+            sraLoader.eraput(submissionXML,
+                    null, null, null , submittableXML, null, null, null, null, null,
+                    null, true, authResult, null, connection);
+            if (sraLoader.getValidationResult().isValid()) {
+                final SubmissionObjects submissionObjects = sraLoader.getSubmissionObjects();
+                final List<SubmissionObject.RunSubmissionObject> submittableObjectList = submissionObjects.getRuns();
+
+                for (SubmissionObject.SubmissionSubmittableObject submissionObject : submittableObjectList) {
+                    accession = submissionObject.getInfo().getId();
                 }
+
             } else {
                 logValidationErrors();
             }
