@@ -1,7 +1,8 @@
 apply plugin: 'java'
 
 dependencies {
-	compile("uk.ac.ebi.subs:validator-common:0.3.0-SNAPSHOT")
+	compile("uk.ac.ebi.subs:validator-common:0.5.0-SNAPSHOT")
+    compile("uk.ac.ebi.subs:subs-messaging:0.3.0-SNAPSHOT")
 	compile project(':subs-ena-agent-common')
 	testCompile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
 	testCompile('org.springframework.boot:spring-boot-starter-test')
