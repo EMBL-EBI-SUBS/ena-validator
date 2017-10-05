@@ -39,6 +39,7 @@ public abstract class AbstractSRALoaderTest {
         final SubmissionSetType submissionSetType = submissionsetDocument.addNewSUBMISSIONSET();
         final SubmissionType submissionType = submissionSetType.addNewSUBMISSION();
         submissionType.setAlias(alias);
+        submissionType.setCenterName(centerName);
         final SubmissionType.ACTIONS.ACTION.ADD add = submissionType.addNewACTIONS().addNewACTION().addNewADD();
         add.setSchema(schema);
         add.setSource(source);
