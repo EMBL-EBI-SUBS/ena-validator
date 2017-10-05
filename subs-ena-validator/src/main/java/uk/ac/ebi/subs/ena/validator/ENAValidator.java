@@ -6,15 +6,17 @@ import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
 import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.processor.ENAAgentProcessor;
+import uk.ac.ebi.subs.messaging.Exchanges;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.SingleValidationResultsEnvelope;
 import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
 import uk.ac.ebi.subs.validator.data.structures.ValidationAuthor;
-import uk.ac.ebi.subs.validator.messaging.Exchanges;
-import uk.ac.ebi.subs.validator.messaging.RoutingKeys;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static uk.ac.ebi.subs.ena.config.EnaValidatorRoutingKeys.EVENT_VALIDATION_ERROR;
+import static uk.ac.ebi.subs.ena.config.EnaValidatorRoutingKeys.EVENT_VALIDATION_SUCCESS;
 
 /**
  * Created by karoly on 14/06/2017.
@@ -36,12 +38,11 @@ public interface ENAValidator {
             //singleValidationResultCollection.addAll(eNAAgentProcessor.validateEntity(eNASubmittable));
         } catch (InstantiationException | IllegalAccessException e) {
             logger.error("An exception occured: {}", e.getMessage());
-            SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,submittable.getId());
+            SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, submittable.getId());
             singleValidationResult.setMessage(e.getMessage());
             singleValidationResult.setValidationStatus(SingleValidationResultStatus.Error);
             singleValidationResultCollection.add(singleValidationResult);
         }
-
 
         return singleValidationResultCollection;
     }
@@ -50,15 +51,15 @@ public interface ENAValidator {
                                           String validationResultUuid, int validationResultVersion) {
 
         SingleValidationResultsEnvelope singleValidationResultsEnvelope = new SingleValidationResultsEnvelope(
-                singleValidationResultCollection,validationResultVersion,validationResultUuid,ValidationAuthor.Ena
+                singleValidationResultCollection, validationResultVersion, validationResultUuid, ValidationAuthor.Ena
         );
 
         if (!hasValidationError(singleValidationResultCollection)) {
-            getRabbitMessagingTemplate().convertAndSend(Exchanges.SUBMISSIONS, RoutingKeys.EVENT_VALIDATION_SUCCESS,singleValidationResultsEnvelope);
+            getRabbitMessagingTemplate().convertAndSend(Exchanges.SUBMISSIONS, EVENT_VALIDATION_SUCCESS, singleValidationResultsEnvelope);
 
             logger.info("Validation successful for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
         } else {
-            getRabbitMessagingTemplate().convertAndSend(Exchanges.SUBMISSIONS, RoutingKeys.EVENT_VALIDATION_ERROR,singleValidationResultsEnvelope);
+            getRabbitMessagingTemplate().convertAndSend(Exchanges.SUBMISSIONS, EVENT_VALIDATION_ERROR, singleValidationResultsEnvelope);
 
             logger.info("Validation erred for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
         }
@@ -78,9 +79,8 @@ public interface ENAValidator {
     }
 
     default SingleValidationResult createEmptySingleValidationResult (Submittable submittable) {
-        SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,submittable.getId());
+        SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, submittable.getId());
         singleValidationResult.setValidationStatus(SingleValidationResultStatus.Pass);
         return singleValidationResult;
     }
-
 }

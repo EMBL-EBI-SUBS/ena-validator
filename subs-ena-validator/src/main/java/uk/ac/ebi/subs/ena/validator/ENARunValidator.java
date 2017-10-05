@@ -13,9 +13,10 @@ import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENARunProcessor;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
-import uk.ac.ebi.subs.validator.messaging.Queues;
 
 import java.util.List;
+
+import static uk.ac.ebi.subs.ena.config.EnaValidatorQueues.ENA_ASSAYDATA_VALIDATION;
 
 /**
  * This class responsible to do the ENA related validations.
@@ -66,7 +67,7 @@ public class ENARunValidator implements ENAValidator {
      * @throws IllegalAccessException
      */
     @Transactional
-    @RabbitListener(queues = Queues.ENA_ASSAYDATA_VALIDATION)
+    @RabbitListener(queues = ENA_ASSAYDATA_VALIDATION)
     public void validateAssayData(ValidationMessageEnvelope<AssayData> validationEnvelope) {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         final AssayData assayData = validationEnvelope.getEntityToValidate();
