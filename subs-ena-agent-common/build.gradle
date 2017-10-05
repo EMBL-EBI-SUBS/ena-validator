@@ -5,11 +5,10 @@ dependencies {
 	compile(group: 'uk.ac.ebi.subs', name: 'subs-ena-data-model', version: '0.3.2-SNAPSHOT', changing: true)
 	compile project(':subs-ena-repository')
 	compile ("org.springframework:spring-oxm")
-	compile ('uk.ac.ebi.ena.sra:sra-core:1.14.39-SUBS-343-usidev') {
+	compile ('uk.ac.ebi.ena.sra:sra-core:1.+') {
 		exclude group : 'org.slf4j'
 	}
 	compile 'org.springframework:spring-jdbc'
-	compile 'uk.ac.ebi.ena.sra:sra-xml:1.5.32'
 
 	testCompile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
 	runtime(group: 'com.oracle', name: 'ojdbc6', version: '11.2.0.3')
