@@ -1,8 +1,11 @@
 package uk.ac.ebi.subs.ena.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 import uk.ac.ebi.subs.ena.data.SRAInfo;
+
+import java.util.List;
 
 /**
  * Created by neilg on 25/04/2017.
@@ -10,6 +13,9 @@ import uk.ac.ebi.subs.ena.data.SRAInfo;
 @NoRepositoryBean
 public interface SRARepository<T extends SRAInfo> extends CrudRepository<T, String> {
     T findByAliasAndSubmissionAccountId(String alias, String submissionAccountId);
+    Long countBySubmissionAccountId(String submissionAccountId);
+    List<T> findBySubmissionAccountId(String submissionAccountId);
+    List<T> findBySubmissionAccountId(String submissionAccountId, Pageable pageable);
 
     @Override
     <S extends T> S save(S entity);

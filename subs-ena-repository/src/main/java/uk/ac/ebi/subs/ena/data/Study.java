@@ -56,6 +56,9 @@ public class Study extends AbstractSubmittableSRAInfo<Study> {
     }
 
     public Timestamp getHoldDate() {
+        if (holdDate == null && getStatusId() == 4) {
+            return new java.sql.Timestamp(System.currentTimeMillis());
+        }
         return holdDate;
     }
 

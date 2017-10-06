@@ -34,14 +34,11 @@ import java.util.Map;
 @Configuration
 public class EnaAgentConfiguration {
 
-    String SUBMITTABLE_PACKAGE = "uk.ac.ebi.subs.data.submittable";
-    String COMPONENT_PACKAGE = "uk.ac.ebi.subs.data.component";
+    static String SUBMITTABLE_PACKAGE = "uk.ac.ebi.subs.data.submittable";
+    static String COMPONENT_PACKAGE = "uk.ac.ebi.subs.data.component";
 
     @Autowired
     private ApplicationContext appContext;
-
-    @Value("${ena.submission_account_id}")
-    String submissionAccountId;
 
     @Value("classpath:uk/ac/ebi/subs/data/component/attribute_mapping.xml")
     Resource componentMappingResource;
