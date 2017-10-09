@@ -16,7 +16,7 @@ import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENAStudyProcessor;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
-import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
+import uk.ac.ebi.subs.validator.data.StudyValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
 import uk.ac.ebi.subs.validator.data.structures.ValidationAuthor;
 
@@ -67,16 +67,16 @@ public class ENAStudyValidator implements ENAValidator {
 
 
     /**
-     * Do a validation for the sample submitted in the {@link ValidationMessageEnvelope}.
+     * Do a validation for the sample submitted in the {@link StudyValidationMessageEnvelope}.
      * It produces a message according to the validation outcome.
      *
-     * @param validationEnvelope {@link ValidationMessageEnvelope} that contains the sample to validate
+     * @param validationEnvelope {@link StudyValidationMessageEnvelope} that contains the sample to validate
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
     @Transactional
     @RabbitListener(queues = ENA_STUDY_VALIDATION)
-    public void validateStudy(ValidationMessageEnvelope<Study> validationEnvelope) {
+    public void validateStudy(StudyValidationMessageEnvelope validationEnvelope) {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         final Study study = validationEnvelope.getEntityToValidate();
         final List<SingleValidationResult> singleValidationResultCollection = executeSubmittableValidation(study,enaStudyProcessor );

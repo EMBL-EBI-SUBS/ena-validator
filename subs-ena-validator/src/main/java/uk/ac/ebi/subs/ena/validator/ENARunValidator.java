@@ -11,8 +11,8 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import uk.ac.ebi.subs.data.submittable.AssayData;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENARunProcessor;
+import uk.ac.ebi.subs.validator.data.AssayDataValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
-import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 
 import java.util.List;
 
@@ -59,16 +59,16 @@ public class ENARunValidator implements ENAValidator {
 
 
     /**
-     * Do a validation for the {@link AssayData} submitted in the {@link ValidationMessageEnvelope}.
+     * Do a validation for the {@link AssayData} submitted in the {@link AssayDataValidationMessageEnvelope}.
      * It produces a message according to the validation outcome.
      *
-     * @param validationEnvelope {@link ValidationMessageEnvelope} that contains the assay data to validate
+     * @param validationEnvelope {@link AssayDataValidationMessageEnvelope} that contains the assay data to validate
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
     @Transactional
     @RabbitListener(queues = ENA_ASSAYDATA_VALIDATION)
-    public void validateAssayData(ValidationMessageEnvelope<AssayData> validationEnvelope) {
+    public void validateAssayData(AssayDataValidationMessageEnvelope validationEnvelope) {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         final AssayData assayData = validationEnvelope.getEntityToValidate();
         final List<SingleValidationResult> singleValidationResultCollection = executeSubmittableValidation(assayData, enaRunProcessor);

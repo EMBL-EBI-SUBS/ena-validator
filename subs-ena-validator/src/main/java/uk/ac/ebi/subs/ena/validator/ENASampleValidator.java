@@ -11,8 +11,8 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import uk.ac.ebi.subs.data.submittable.Sample;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENASampleProcessor;
+import uk.ac.ebi.subs.validator.data.SampleValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
-import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 
 import java.util.List;
 
@@ -58,16 +58,16 @@ public class ENASampleValidator implements ENAValidator {
     }
 
     /**
-     * Do a validation for the sample submitted in the {@link ValidationMessageEnvelope}.
+     * Do a validation for the sample submitted in the {@link SampleValidationMessageEnvelope}.
      * It produces a message according to the validation outcome.
      *
-     * @param validationEnvelope {@link ValidationMessageEnvelope} that contains the sample to validate
+     * @param validationEnvelope {@link SampleValidationMessageEnvelope} that contains the sample to validate
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
     @Transactional
     @RabbitListener(queues = ENA_SAMPLE_VALIDATION)
-    public void validateSample(ValidationMessageEnvelope<Sample> validationEnvelope) {
+    public void validateSample(SampleValidationMessageEnvelope validationEnvelope) {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         final Sample sample = validationEnvelope.getEntityToValidate();
         final List<SingleValidationResult> singleValidationResultCollection = executeSubmittableValidation(sample, enaSampleProcessor);
