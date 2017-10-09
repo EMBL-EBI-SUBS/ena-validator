@@ -13,7 +13,6 @@ import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENARunProcessor;
 import uk.ac.ebi.subs.validator.data.AssayDataValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
-import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 
 import java.util.List;
 
@@ -60,10 +59,10 @@ public class ENARunValidator implements ENAValidator {
 
 
     /**
-     * Do a validation for the {@link AssayData} submitted in the {@link ValidationMessageEnvelope}.
+     * Do a validation for the {@link AssayData} submitted in the {@link AssayDataValidationMessageEnvelope}.
      * It produces a message according to the validation outcome.
      *
-     * @param validationEnvelope {@link ValidationMessageEnvelope} that contains the assay data to validate
+     * @param validationEnvelope {@link AssayDataValidationMessageEnvelope} that contains the assay data to validate
      * @throws InstantiationException
      * @throws IllegalAccessException
      */

@@ -17,7 +17,6 @@ import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENAStudyProcessor;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.StudyValidationMessageEnvelope;
-import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
 import uk.ac.ebi.subs.validator.data.structures.ValidationAuthor;
 
@@ -68,10 +67,10 @@ public class ENAStudyValidator implements ENAValidator {
 
 
     /**
-     * Do a validation for the sample submitted in the {@link ValidationMessageEnvelope}.
+     * Do a validation for the sample submitted in the {@link StudyValidationMessageEnvelope}.
      * It produces a message according to the validation outcome.
      *
-     * @param validationEnvelope {@link ValidationMessageEnvelope} that contains the sample to validate
+     * @param validationEnvelope {@link StudyValidationMessageEnvelope} that contains the sample to validate
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
