@@ -11,6 +11,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import uk.ac.ebi.subs.data.submittable.AssayData;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
 import uk.ac.ebi.subs.ena.processor.ENARunProcessor;
+import uk.ac.ebi.subs.validator.data.AssayDataValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 
@@ -68,7 +69,7 @@ public class ENARunValidator implements ENAValidator {
      */
     @Transactional
     @RabbitListener(queues = ENA_ASSAYDATA_VALIDATION)
-    public void validateAssayData(ValidationMessageEnvelope<AssayData> validationEnvelope) {
+    public void validateAssayData(AssayDataValidationMessageEnvelope validationEnvelope) {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         final AssayData assayData = validationEnvelope.getEntityToValidate();
         final List<SingleValidationResult> singleValidationResultCollection = executeSubmittableValidation(assayData, enaRunProcessor);
