@@ -26,10 +26,10 @@ springBoot {
 remotes {
     submission_dev {
         role('dev')
-        host = 'mac-subs-006'
+        host = 'mac-subs-004'
     }
     submission_test {
         role('test')
-        host = 'mac-subs-008'
+        host = 'mac-subs-003'
     }
 }
