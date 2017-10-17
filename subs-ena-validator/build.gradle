@@ -24,3 +24,18 @@ bootRepackage {
 springBoot {
     executable = true
 }
+
+remotes {
+    submission_dev {
+        role('dev')
+        host = 'mac-subs-006'
+    }
+    submission_test {
+        role('test')
+        host = 'mac-subs-008'
+    }
+}
+
+
+
+
