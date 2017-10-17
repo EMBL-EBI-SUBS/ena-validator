@@ -15,7 +15,7 @@ allprojects {
 	ext.version_base = '0.2.4-SNAPSHOT'
 	version = version_base
 	group = 'uk.ac.ebi.subs.ena'
-	ext.gradle_env = hasProperty('env') ? env : 'dev'
+	ext.gradle_env = findProperty('env') ? env : 'dev'
 }
 
 subprojects {
@@ -133,6 +133,27 @@ subprojects {
 				}
 				url "http://ena-dev:8081/artifactory/libs-snapshot-local"
 			}
+		}
+	}
+
+	task deployJar(type: SshTask, dependsOn: 'assemble') {
+		doLast {
+			File jarDeployDir = new File("/data/$gradle_env/$project.name/jar")
+			ssh.run {
+				session(remotes.role(gradle_env)) {
+					execute "/homes/sub_adm/create_dirs.sh $gradle_env $project.name", ignoreError: false
+					println "Uploading jar $jar.archivePath.name to $jarDeployDir area on $remote"
+					put(jar.archivePath.absolutePath, jarDeployDir.absolutePath)
+					println "creating symbolic link to $jar.archiveName"
+					def result = execute "ln -s -f $jarDeployDir/$jar.archiveName $jarDeployDir/$jar.baseName" + ".jar", ignoreError: true
+					println result
+					println "updating permissions of $jarDeployDir/$jar.archiveName"
+					execute "chmod u+x $jarDeployDir/*", ignoreError: false
+				}
+			}
+		}
+		ssh.settings {
+			knownHosts = allowAnyHosts
 		}
 	}
 
