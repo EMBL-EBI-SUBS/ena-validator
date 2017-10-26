@@ -1,9 +1,5 @@
 package uk.ac.ebi.subs.ena.validator;
 
-import org.joda.time.DateTime;
-import org.joda.time.Days;
-import org.joda.time.Instant;
-import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -21,9 +17,12 @@ import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
 import uk.ac.ebi.subs.validator.data.structures.ValidationAuthor;
 
 import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
+import static java.time.temporal.ChronoUnit.DAYS;
 import static uk.ac.ebi.subs.ena.config.EnaValidatorQueues.ENA_STUDY_VALIDATION;
 
 /**
@@ -93,11 +92,11 @@ public class ENAStudyValidator implements ENAValidator {
 
     void checkReleaseDate(Study study, List<SingleValidationResult> singleValidationResultCollection, int intevalDays) {
         if (study.getReleaseDate() != null) {
-            final Instant instant = new Instant();
+            final Instant instant = Instant.now();
             final long releaseDateInMillis = Date.from(study.getReleaseDate().atStartOfDay(ZoneId.systemDefault()).toInstant()).toInstant().toEpochMilli();
-            if ( releaseDateInMillis > instant.getMillis()) {
-                final Days days = Days.daysBetween(new DateTime(), new DateTime(study.getReleaseDate()));
-                if (days.getDays() >= intevalDays) {
+            if ( releaseDateInMillis > instant.toEpochMilli()) {
+                final long daysBetween = DAYS.between(LocalDate.now(), study.getReleaseDate());
+                if (daysBetween >= intevalDays) {
                     SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, study.getId());
                     singleValidationResult.setValidationStatus(SingleValidationResultStatus.Error);
                     singleValidationResult.setMessage(String.format("Release date %s must not exceed two years from the present date", study.getReleaseDate()));
