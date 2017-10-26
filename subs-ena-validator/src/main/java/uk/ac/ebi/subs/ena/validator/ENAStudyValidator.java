@@ -20,6 +20,8 @@ import uk.ac.ebi.subs.validator.data.StudyValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
 import uk.ac.ebi.subs.validator.data.structures.ValidationAuthor;
 
+import java.sql.Date;
+import java.time.ZoneId;
 import java.util.List;
 
 import static uk.ac.ebi.subs.ena.config.EnaValidatorQueues.ENA_STUDY_VALIDATION;
@@ -92,8 +94,8 @@ public class ENAStudyValidator implements ENAValidator {
     void checkReleaseDate(Study study, List<SingleValidationResult> singleValidationResultCollection, int intevalDays) {
         if (study.getReleaseDate() != null) {
             final Instant instant = new Instant();
-            if (study.getReleaseDate().getTime() > instant.getMillis()) {
-                Interval interval = new Interval(instant.getMillis(), study.getReleaseDate().getTime());
+            final long releaseDateInMillis = Date.from(study.getReleaseDate().atStartOfDay(ZoneId.systemDefault()).toInstant()).toInstant().toEpochMilli();
+            if ( releaseDateInMillis > instant.getMillis()) {
                 final Days days = Days.daysBetween(new DateTime(), new DateTime(study.getReleaseDate()));
                 if (days.getDays() >= intevalDays) {
                     SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, study.getId());
