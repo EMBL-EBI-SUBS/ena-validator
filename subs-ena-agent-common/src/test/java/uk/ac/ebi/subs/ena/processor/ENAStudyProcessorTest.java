@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.subs.data.Submission;
 import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
@@ -15,13 +14,11 @@ import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
 import uk.ac.ebi.subs.ena.helper.TestHelper;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
-import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
@@ -59,8 +56,7 @@ public class ENAStudyProcessorTest {
         String alias = UUID.randomUUID().toString();
         final Team team = TestHelper.getTeam("test-team");
         final Study study = TestHelper.getStudy(alias, team,"study_abstract", "Whole Genome Sequencing");
-        String releaseDate = "2018-12-25";
-        final Date date = simpleDateFormat.parse(releaseDate);
+        final LocalDate date = LocalDate.parse("2018-12-25");
         study.setReleaseDate(date);
         study.setId(UUID.randomUUID().toString());
         final ArrayList<SingleValidationResult> singleValidationResultList = new ArrayList<>();
