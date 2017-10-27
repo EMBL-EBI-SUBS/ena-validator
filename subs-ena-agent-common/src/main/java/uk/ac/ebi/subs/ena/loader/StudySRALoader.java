@@ -4,19 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.oxm.Marshaller;
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.ena.sra.StudyInfo;
 import uk.ac.ebi.ena.sra.SubmissionObject;
 import uk.ac.ebi.ena.sra.SubmissionObjects;
-import uk.ac.ebi.ena.sra.xml.StudyType;
 import uk.ac.ebi.ena.sra.xml.SubmissionType;
 import uk.ac.ebi.subs.data.submittable.ENAStudy;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
 import uk.ac.ebi.subs.ena.processor.SRALoaderAccessionException;
 
 import java.sql.Connection;
+import java.sql.Date;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by neilg on 12/04/2017.
@@ -60,7 +59,8 @@ public class StudySRALoader extends AbstractSRALoaderService<ENAStudy> {
         ENAStudy enaStudy = (ENAStudy) enaSubmittable;
         Calendar calendar = Calendar.getInstance();
         if (enaStudy.getBaseObject().getReleaseDate() != null) {
-            calendar.setTime(enaStudy.getBaseObject().getReleaseDate());
+            calendar.setTime(
+                    Date.from(enaStudy.getBaseObject().getReleaseDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
         }
         hold.setHoldUntilDate(calendar);
         if (enaSubmittable.getAccession() != null) {

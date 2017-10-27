@@ -12,7 +12,7 @@ buildscript {
 }
 
 allprojects {
-	ext.version_base = '0.2.4-SNAPSHOT'
+	ext.version_base = '0.3.0-SNAPSHOT'
 	version = version_base
 	group = 'uk.ac.ebi.subs.ena'
 	ext.gradle_env = findProperty('env') ? env : 'dev'
