@@ -1,7 +1,7 @@
 apply plugin: 'java'
 
 dependencies {
-	compile('uk.ac.ebi.subs:subs-messaging:0.3.0-SNAPSHOT')
+    compile("uk.ac.ebi.subs:subs-messaging:0.4.0-SNAPSHOT")
 	compile project(':subs-ena-agent-common')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile("junit:junit")
