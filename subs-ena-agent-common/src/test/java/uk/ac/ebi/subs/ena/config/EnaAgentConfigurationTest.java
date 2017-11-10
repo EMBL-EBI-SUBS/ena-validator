@@ -18,14 +18,12 @@ import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.submittable.*;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
 
-import javax.sql.DataSource;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.sql.Connection;
 import java.util.UUID;
 
 import static org.junit.Assert.assertNotNull;
@@ -49,9 +47,6 @@ public class EnaAgentConfigurationTest {
     @Autowired
     @Qualifier("run")
     Marshaller runMarshaller;
-
-    @Autowired
-    DataSource dataSource;
 
     static final String team = "my-team";
 
@@ -96,17 +91,6 @@ public class EnaAgentConfigurationTest {
         final Element documentElement = document.getDocumentElement();
         assertNotNull(documentElement.getLocalName());
     }
-
-
-    @Test
-    public void testDataSource() throws Exception {
-        Connection connection = dataSource.getConnection();
-        final boolean valid = connection.isValid(100);
-        connection.close();
-        assertTrue(valid);
-    }
-
-
 
     public Study createStudy (String name, String team) {
         Study study = new Study();
