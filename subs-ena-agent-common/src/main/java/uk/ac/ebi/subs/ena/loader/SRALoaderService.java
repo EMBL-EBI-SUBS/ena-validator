@@ -1,15 +1,17 @@
 package uk.ac.ebi.subs.ena.loader;
 
-import uk.ac.ebi.embl.api.validation.ValidationResult;
+import uk.ac.ebi.ena.sra.xml.RECEIPTDocument;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
-
-import java.sql.Connection;
 
 /**
  * Created by neilg on 12/04/2017.
  */
 public interface SRALoaderService<T extends ENASubmittable> {
-    void executeSubmittableSRALoader(T enaSubmittable, String submissionAlias, Connection connection) throws Exception;
-    String executeSRALoader(String submissionXML, String submittableXML, Connection connection) throws Exception;
-    ValidationResult getValidationResult();
+    boolean executeSRASubmission(T enaSubmittable, String submissionAlias, boolean validateOnly) throws Exception;
+    boolean executeSRASubmission(String submissionXML, String submittableXML) throws Exception;
+    //ValidationResult getValidationResult();
+    String getSchema ();
+    String [] getErrorMessages();
+    String [] getInfoMessages();
+    String getAccession();
 }
