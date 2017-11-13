@@ -5,7 +5,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.subs.data.submittable.ENAStudy;
 import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
@@ -15,8 +14,6 @@ import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
@@ -24,7 +21,6 @@ import static org.mockito.Mockito.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
-@Transactional
 public class MockEnaAgentStudyValidationTest {
 
     private static final String TEAM_NAME = "teamName";
