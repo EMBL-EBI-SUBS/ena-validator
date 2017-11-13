@@ -1,0 +1,4 @@
+ena:
+  experiment_sample_id: SRS000081
+  processor_list: ENAStudyProcessor,ENAExperimentProcessor
+
