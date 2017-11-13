@@ -1,23 +1,18 @@
 package uk.ac.ebi.subs.ena.loader;
 
-import org.apache.xmlbeans.XmlError;
-import org.apache.xmlbeans.XmlOptions;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.oxm.Marshaller;
-import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
-import uk.ac.ebi.embl.api.validation.Origin;
-import uk.ac.ebi.embl.api.validation.ValidationMessage;
-import uk.ac.ebi.embl.api.validation.ValidationResult;
-import uk.ac.ebi.ena.authentication.model.AuthResult;
-import uk.ac.ebi.ena.sra.SRALoader;
+import uk.ac.ebi.ena.sra.xml.ID;
+import uk.ac.ebi.ena.sra.xml.RECEIPTDocument;
 import uk.ac.ebi.ena.sra.xml.SUBMISSIONSETDocument;
 import uk.ac.ebi.ena.sra.xml.SubmissionType;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
 
-import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,33 +22,35 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.io.StringWriter;
-import java.sql.Connection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 
 /**
  * Created by neilg on 12/04/2017.
  */
 public abstract class AbstractSRALoaderService<T extends ENASubmittable> implements SRALoaderService<T> {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-    protected SRALoader sraLoader;
-    protected AuthResult authResult;
-    protected XmlOptions xmlOptions = new XmlOptions();
-    protected List<XmlError> validationErrorList;
-    protected String schema;
 
     protected Marshaller marshaller;
     static DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
     static DocumentBuilder documentBuilder;
     static TransformerFactory transformerFactory;
 
-    @Value("${ena.principal}")
-    String principal;
+    RECEIPTDocument.RECEIPT receipt = null;
+    String accession = null;
 
     @Value("${ena.login_name}")
     String loginName;
+
+    @Value("${ena.password}")
+    String password;
+
+    @Value("${ena.submission.url}")
+    String submissionUrl;
 
     static {
         try {
@@ -63,50 +60,66 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
         }
     }
 
-    @PostConstruct
-    protected void init () {
-        authResult = new AuthResult();
-        authResult.setLoginName(loginName);
-        authResult.setPrinciple(principal);
-        authResult.setRoles(createAuthMap());
-        sraLoader = new SRALoader();
-        sraLoader.setTransactionMode(SRALoader.TransactionMode.NOT_TRANSACTIONAL);
-    }
-
-    private static Map<String, Boolean> createAuthMap() {
-        Map<String, Boolean> roles = new HashMap<>();
-        roles.put("EGA", false);
-        roles.put("SUPER_USER", false);
-        return roles;
-    }
-
+    /*
     @Override
     public ValidationResult getValidationResult() {
-        ValidationResult validationResult = sraLoader.getValidationResult();
-        return sraLoader.getValidationResult();
+        return validationResult;
     }
 
     protected void logValidationErrors() {
         for (ValidationMessage<Origin> validationMessage : getValidationResult().getMessages())
             logger.error(validationMessage.getMessage());
     }
+    */
 
     @Override
-    public void executeSubmittableSRALoader(ENASubmittable enaSubmittable, String submissionAlias, Connection connection) throws Exception {
-        final String submissionXML = createSubmissionXML(enaSubmittable, enaSubmittable.getId().toString());
+    public boolean executeSRASubmission(String submissionXML, String submittableXML) throws Exception {
+        final Path submissionPath = Files.createTempFile("submission", ".xml");
+        final File submissionFile = submissionPath.toFile();
+        Files.write(submissionPath, submissionXML.getBytes(StandardCharsets.UTF_8));
+        submissionFile.deleteOnExit();
+
+        final Path studyPath = Files.createTempFile("study", ".xml");
+        final File studyFile = studyPath.toFile();
+        Files.write(studyPath, submittableXML.getBytes(StandardCharsets.UTF_8));
+        studyFile.deleteOnExit();
+
+
+        final HttpResponse<String> stringHttpResponse = Unirest.post(submissionUrl).basicAuth(loginName, password)
+                .field("SUBMISSION", submissionFile)
+                .field(getSchema().toUpperCase(), studyFile).asString();
+        logger.info(stringHttpResponse.getBody());
+        final RECEIPTDocument receiptDocument = RECEIPTDocument.Factory.parse(stringHttpResponse.getBody());
+        receipt = receiptDocument.getRECEIPT();
+
+        if (receipt.getSuccess()) {
+            final ID[] iDs = getIDs(receipt);
+            if (iDs.length != 1) {
+                throw new Exception("Found " + iDs.length + " accessions");
+            }
+            accession = iDs[0].getAccession();
+        }
+
+        return receipt.getSuccess();
+    }
+
+    @Override
+    public boolean executeSRASubmission(ENASubmittable enaSubmittable, String submissionAlias, boolean validateOnly) throws Exception {
+        final String submissionXML = createSubmissionXML(enaSubmittable, enaSubmittable.getId().toString(), validateOnly);
         Document document = documentBuilder.newDocument();
         marshaller.marshal(enaSubmittable,new DOMResult(document));
         String submittableXML = getDocumentString(document);
-        final String accession = executeSRALoader(submissionXML, submittableXML, connection);
-        enaSubmittable.setAccession(accession);
+        final boolean success = executeSRASubmission(submissionXML, submittableXML);
+        enaSubmittable.setAccession(getAccession());
+        return success;
     }
 
-    private String createSubmissionXML(ENASubmittable enaSubmittable, String submissionAlias) {
+    private String createSubmissionXML(ENASubmittable enaSubmittable, String submissionAlias, boolean validateOnly) {
         final SUBMISSIONSETDocument submissionsetDocument = SUBMISSIONSETDocument.Factory.newInstance();
         final SubmissionType submissionType = submissionsetDocument.addNewSUBMISSIONSET().addNewSUBMISSION();
         submissionType.setCenterName(enaSubmittable.getTeam().getName());
         submissionType.setAlias(submissionAlias);
-        createActions(submissionType,enaSubmittable,getSchema());
+        createActions(submissionType,enaSubmittable,getSchema(), validateOnly);
         return submissionsetDocument.xmlText();
     }
 
@@ -118,7 +131,7 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
      * @param schema
      * @return
      */
-    SubmissionType.ACTIONS createActions(SubmissionType submissionType, ENASubmittable enaSubmittable, String schema) {
+    SubmissionType.ACTIONS createActions(SubmissionType submissionType, ENASubmittable enaSubmittable, String schema, boolean validateOnly) {
         final SubmissionType.ACTIONS actions = submissionType.addNewACTIONS();
         final SubmissionType.ACTIONS.ACTION action = actions.addNewACTION();
         if (enaSubmittable.isAccessioned()) {
@@ -127,12 +140,11 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
         } else {
             SubmissionType.ACTIONS.ACTION.ADD add = action.addNewADD();
             add.setSchema(uk.ac.ebi.ena.sra.xml.SubmissionType.ACTIONS.ACTION.ADD.Schema.Enum.forString(schema));
-            add.setSource(schema + "xml");
+            add.setSource(schema + ".xml");
         }
+        if (validateOnly) actions.addNewACTION().addNewVALIDATE();
         return actions;
     }
-
-    abstract String getSchema ();
 
     String getDocumentString (Document document) throws TransformerException {
         DOMSource domSource = new DOMSource(document);
@@ -142,14 +154,6 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
         Transformer transformer = transformerFactory.newTransformer();
         transformer.transform(domSource, result);
         return writer.toString();
-    }
-
-    public String getPrincipal() {
-        return principal;
-    }
-
-    public void setPrincipal(String principal) {
-        this.principal = principal;
     }
 
     public String getLoginName() {
@@ -167,4 +171,29 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
     public void setMarshaller(Marshaller marshaller) {
         this.marshaller = marshaller;
     }
+
+    @Override
+    public String[] getErrorMessages() {
+        String [] errorMessages = new String[0];
+        if (receipt != null) {
+            errorMessages = receipt.getMESSAGES().getERRORArray();
+        }
+        return errorMessages;
+    }
+
+    @Override
+    public String[] getInfoMessages() {
+        String [] infoMessages = new String[0];
+        if (receipt != null) {
+            infoMessages = receipt.getMESSAGES().getINFOArray();
+        }
+        return infoMessages;
+    }
+
+    @Override
+    public String getAccession() {
+        return accession;
+    }
+
+    abstract ID[] getIDs (RECEIPTDocument.RECEIPT receipt);
 }
