@@ -14,7 +14,6 @@ import static org.junit.Assert.assertThat;
  */
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@SpringBootTest(classes = {EnaAgentApplication.class})
-@Transactional
 @Category(RabbitMQDependentTest.class)
 public class ENASampleValidatorTest {
 

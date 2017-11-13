@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
@@ -28,7 +27,6 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
-@Transactional
 @Category(RabbitMQDependentTest.class)
 public class ENAStudyValidatorTest {
 

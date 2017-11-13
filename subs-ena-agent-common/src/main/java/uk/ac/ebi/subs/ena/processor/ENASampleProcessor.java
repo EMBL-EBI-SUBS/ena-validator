@@ -21,11 +21,6 @@ public class ENASampleProcessor extends AbstractENAProcessor<ENASample> {
         this.sraLoaderService = sraLoaderService;
     }
 
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
     @Override
     public String getSubmittableObjectTypeAsAString() {
         return Sample.class.getSimpleName();

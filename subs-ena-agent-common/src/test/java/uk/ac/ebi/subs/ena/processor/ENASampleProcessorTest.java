@@ -5,8 +5,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.subs.data.Submission;
 import uk.ac.ebi.subs.data.component.Archive;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
@@ -15,11 +13,9 @@ import uk.ac.ebi.subs.data.submittable.Sample;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
 import uk.ac.ebi.subs.ena.helper.TestHelper;
 import uk.ac.ebi.subs.processing.ProcessingCertificate;
-import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
@@ -30,7 +26,6 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
-@Transactional
 public class ENASampleProcessorTest {
 
     @Autowired
