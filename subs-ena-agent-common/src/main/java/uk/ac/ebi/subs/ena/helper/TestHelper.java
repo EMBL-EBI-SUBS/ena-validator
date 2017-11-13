@@ -174,7 +174,7 @@ public class TestHelper {
         a.setDescription("Test assay");
         Attribute platformAttribute = new Attribute();
         platformAttribute.setName(ENAExperiment.PLATFORM_TYPE);
-        platformAttribute.setValue("Illumina");
+        platformAttribute.setValue("ILLUMINA");
         a.getAttributes().add(platformAttribute);
         Attribute instrumentAttribute = new Attribute();
         instrumentAttribute.setName(ENAExperiment.INSTRUMENT_MODEL);
