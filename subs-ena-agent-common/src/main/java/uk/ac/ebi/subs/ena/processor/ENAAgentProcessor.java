@@ -1,7 +1,5 @@
 package uk.ac.ebi.subs.ena.processor;
 
-import uk.ac.ebi.embl.api.validation.Origin;
-import uk.ac.ebi.embl.api.validation.ValidationMessage;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
 import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.loader.SRALoaderService;
@@ -21,9 +19,6 @@ public interface ENAAgentProcessor<T extends ENASubmittable> extends AgentProces
     List<? extends Submittable> getSubmittables (SubmissionEnvelope submissionEnvelope);
     SRALoaderService<T> getLoader ();
     void setLoader (SRALoaderService<T> sraLoaderService);
-    DataSource getDataSource ();
-    void setDataSource (DataSource dataSource);
-    String getSubmittableObjectTypeAsAString();
     Collection<SingleValidationResult> validateEntity(T enaSubmittable);
     T convertFromSubmittableToENASubmittable(Submittable submittable, Collection<SingleValidationResult> singleValidationResultList)
             throws InstantiationException, IllegalAccessException;
