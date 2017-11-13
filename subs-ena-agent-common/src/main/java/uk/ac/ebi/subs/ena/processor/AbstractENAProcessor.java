@@ -36,7 +36,9 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
         ProcessingCertificate processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Error);
         try {
             final T enaSubmittable = convertFromSubmittableToENASubmittable(submittable, singleValidationResultList);
-            processingCertificate = process(enaSubmittable);
+            if (enaSubmittable.isValid()) {
+                processingCertificate = process(enaSubmittable);
+            }
         } catch (InstantiationException e) {
             logger.error("convertFromSubmittableToENASubmittable error ",e);
         } catch (IllegalAccessException e) {
@@ -47,13 +49,14 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
 
     @Override
     public ProcessingCertificate process(T submittable) {
-        //Connection connection = DataSourceUtils.getConnection(dataSource);
-
         ProcessingCertificate processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Error);
 
         try {
-            sraLoaderService.executeSRASubmission(submittable,submittable.getAlias(),false);
-            processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Received,submittable.getAccession());
+            if (sraLoaderService.executeSRASubmission(submittable,submittable.getAlias(),false)) {
+                processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Received, submittable.getAccession());
+            } else {
+                final String[] errorMessages = sraLoaderService.getErrorMessages();
+            }
         } catch (Exception e) {
             logger.error("Error processing submittable : " + submittable.getId(),e);
         }
@@ -71,9 +74,7 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
                 enaSubmittable.getId());
 
         Collection<SingleValidationResult> singleValidationResultCollection = new ArrayList<>();
-        //ValidationResult validationResult = getValidationResult(enaSubmittable);
-        singleValidationResultCollection.addAll(convertValidationMessages(enaSubmittable.getId().toString(), null));
-            //final Collection<ValidationMessage<Origin>> messages = validationResult.getMessages();
+        //singleValidationResultCollection.addAll(convertValidationMessages(enaSubmittable.getId().toString(), null));
         return singleValidationResultCollection;
     }
 
@@ -96,26 +97,19 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
     }
 
     /**
-     * Converts a collection of SRA validation messages to a collection {@link SingleValidationResult}
+     * Converts a collection of SRA receipt messages to a collection {@link SingleValidationResult}
      * @param {@link Collection} of
      * @return {@link Collection} of {@link SingleValidationResult}
      */
-    Collection<SingleValidationResult> convertValidationMessages (String entityUUID, RECEIPTDocument.RECEIPT.MESSAGES messages) {
+    Collection<SingleValidationResult> convertMessages (String entityUUID, String[] errorMessages, SingleValidationResultStatus singleValidationResultStatus) {
         Collection<SingleValidationResult> singleValidationResultCollection = new ArrayList<>();
-        /*
-        for (ValidationMessage<Origin> validationMessage : validationResult.getMessages()) {
-            SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,entityUUID);
-            singleValidationResult.setMessage(validationMessage.getMessage());
-            if (validationMessage.getSeverity().equals(Severity.ERROR)) {
-                singleValidationResult.setValidationStatus(SingleValidationResultStatus.Error);
-            } else if (validationMessage.getSeverity().equals(Severity.WARNING)) {
-                singleValidationResult.setValidationStatus(SingleValidationResultStatus.Warning);
-            } else if (validationMessage.getSeverity().equals(Severity.FIX)) {
-                singleValidationResult.setValidationStatus(SingleValidationResultStatus.Error);
 
-            }
+        for (String errorMessage : errorMessages) {
+            SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,entityUUID);
+            singleValidationResult.setMessage(errorMessage);
+            singleValidationResult.setValidationStatus(singleValidationResultStatus);
         }
-        */
+
         return singleValidationResultCollection;
     }
 
