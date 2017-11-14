@@ -95,7 +95,7 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
     /**
      * Executes an ENA for an ENA submittable
      */
-    public boolean executeSRASubmission(ENASubmittable enaSubmittable, String submissionAlias, boolean validateOnly) throws Exception {
+    public boolean executeSRASubmission(ENASubmittable enaSubmittable, boolean validateOnly) throws Exception {
         final String submissionXML = createSubmissionXML(enaSubmittable, enaSubmittable.getId().toString(), validateOnly);
         Document document = documentBuilder.newDocument();
         marshaller.marshal(enaSubmittable,new DOMResult(document));
