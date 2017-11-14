@@ -66,7 +66,6 @@ public class ENARunValidator implements ENAValidator {
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    @Transactional
     @RabbitListener(queues = ENA_ASSAYDATA_VALIDATION)
     public void validateAssayData(AssayDataValidationMessageEnvelope validationEnvelope) {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

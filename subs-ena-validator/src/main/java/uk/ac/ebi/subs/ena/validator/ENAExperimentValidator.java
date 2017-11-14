@@ -66,7 +66,6 @@ public class ENAExperimentValidator implements ENAValidator {
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    @Transactional
     @RabbitListener(queues = ENA_ASSAY_VALIDATION)
     public void validateAssay(AssayValidationMessageEnvelope validationEnvelope) {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
