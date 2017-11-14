@@ -1,4 +1,7 @@
 ena:
   experiment_sample_id: SRS000081
   processor_list: ENAStudyProcessor,ENAExperimentProcessor
-
+  login_name: ${enaLoginName}
+  password: ${enaPassword}
+  submission:
+    url: https://www-test.ebi.ac.uk/ena/submit/drop-box/submit
