@@ -1,6 +1,5 @@
 package uk.ac.ebi.subs.ena.loader;
 
-import uk.ac.ebi.ena.sra.xml.RECEIPTDocument;
 import uk.ac.ebi.subs.data.submittable.ENASubmittable;
 
 /**
