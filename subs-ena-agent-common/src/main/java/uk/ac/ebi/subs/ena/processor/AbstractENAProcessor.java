@@ -52,7 +52,7 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
         ProcessingCertificate processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Error);
 
         try {
-            if (sraLoaderService.executeSRASubmission(submittable,submittable.getAlias(),false)) {
+            if (sraLoaderService.executeSRASubmission(submittable,false)) {
                 processingCertificate = new ProcessingCertificate(submittable, Archive.Ena, ProcessingStatusEnum.Received, submittable.getAccession());
             } else {
                 final String[] errorMessages = sraLoaderService.getErrorMessages();
