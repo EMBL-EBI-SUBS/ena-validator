@@ -2,21 +2,16 @@ package uk.ac.ebi.subs.ena.loader;
 
 import org.junit.After;
 import org.junit.Before;
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ena.sra.xml.SUBMISSIONSETDocument;
 import uk.ac.ebi.ena.sra.xml.SubmissionSetType;
 import uk.ac.ebi.ena.sra.xml.SubmissionType;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.ena.helper.TestHelper;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.List;
 
 public abstract class AbstractSRALoaderTest {
-
-    @Autowired
-    DataSource dataSource;
 
     Connection connection = null;
 
@@ -25,13 +20,10 @@ public abstract class AbstractSRALoaderTest {
 
     @Before
     public void setUp() throws Exception {
-        connection = dataSource.getConnection();
     }
 
     @After
     public void tearDown() throws Exception {
-        connection.rollback();
-        connection.close();
     }
 
     protected String createSubmittable (String source, SubmissionType.ACTIONS.ACTION.ADD.Schema.Enum schema, String alias) {

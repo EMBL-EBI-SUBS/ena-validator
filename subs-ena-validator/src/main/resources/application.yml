@@ -1,0 +1,5 @@
+spring:
+  main:
+    web-environment: false
+ena:
+  processor_list: ENAStudyProcessor,ENAExperimentProcessor

@@ -12,7 +12,7 @@ buildscript {
 }
 
 allprojects {
-	ext.version_base = '0.3.0-SNAPSHOT'
+	ext.version_base = '0.4.0-SNAPSHOT'
 	version = version_base
 	group = 'uk.ac.ebi.subs.ena'
 	ext.gradle_env = findProperty('env') ? env : 'dev'
@@ -49,11 +49,16 @@ subprojects {
 	}
 
 	processResources {
-		filesMatching('application.properties') {
+		filesMatching('application.yml') {
 			expand(project.properties)
 		}
 	}
 
+	processTestResources {
+		filesMatching('application.yml') {
+			expand(project.properties)
+		}
+	}
 
 	ssh.settings {
 		user = 'sub_adm'

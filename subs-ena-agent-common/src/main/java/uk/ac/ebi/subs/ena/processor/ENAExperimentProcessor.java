@@ -24,11 +24,6 @@ public class ENAExperimentProcessor extends AbstractENAProcessor<ENAExperiment> 
         this.sraLoaderService = sraLoaderService;
     }
 
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
     @Override
     public String getSubmittableObjectTypeAsAString() {
         return Assay.class.getSimpleName();

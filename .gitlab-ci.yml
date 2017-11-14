@@ -32,20 +32,20 @@ before_script:
 build:
   stage: build
   script:
-    - ./gradlew -g /cache/.gradle -PartifactoryUsername=$artifactoryUsername -PartifactoryPassword=$artifactoryPassword clean assemble
+    - ./gradlew -g /cache/.gradle -PartifactoryUsername=$artifactoryUsername -PartifactoryPassword=$artifactoryPassword -PenaLoginName=Webin-46220 -PenaPassword=Nq9F5Ig clean assemble
   allow_failure: false
 
 # Use the generated build output to run the tests.
 test:
   stage: test
   script:
-    - ./gradlew -g /cache/.gradle -PartifactoryUsername=$artifactoryUsername -PartifactoryPassword=$artifactoryPassword check
+    - ./gradlew -g /cache/.gradle -PartifactoryUsername=$artifactoryUsername -PartifactoryPassword=$artifactoryPassword -PenaLoginName=Webin-46220 -PenaPassword=Nq9F5Ig check
 
 deploy:
   stage: deploy
   only:
       - master
   script:
-    - ./gradlew -PartifactoryUsername=$artifactoryUsername -PartifactoryPassword=$artifactoryPassword clean subs-ena-agent:deployJar
-    - ./gradlew -PartifactoryUsername=$artifactoryUsername -PartifactoryPassword=$artifactoryPassword clean subs-ena-validator:deployJar
+    - ./gradlew -PartifactoryUsername=$artifactoryUsername -PartifactoryPassword=$artifactoryPassword -PenaLoginName=Webin-46220 -PenaPassword=Nq9F5Ig clean subs-ena-agent:deployJar
+    - ./gradlew -PartifactoryUsername=$artifactoryUsername -PartifactoryPassword=$artifactoryPassword -PenaLoginName=Webin-46220 -PenaPassword=Nq9F5Ig clean subs-ena-validator:deployJar
 

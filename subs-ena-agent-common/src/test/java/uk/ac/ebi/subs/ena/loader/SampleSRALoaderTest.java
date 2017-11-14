@@ -30,7 +30,8 @@ public class SampleSRALoaderTest extends AbstractSRALoaderTest {
         String alias = UUID.randomUUID().toString();
         SAMPLESETDocument samplesetDocument = getSamplesetDocument(alias,getCenterName());
         String submissionXML = createSubmittable("sample.xml", SubmissionType.ACTIONS.ACTION.ADD.Schema.SAMPLE,alias);
-        final String accession = sraLoader.executeSRALoader(submissionXML, samplesetDocument.xmlText(), connection);
+        sraLoader.executeSRASubmission(submissionXML, samplesetDocument.xmlText());
+        final String accession = sraLoader.getAccession();
         assertThat(accession,startsWith("ERS"));
     }
 
@@ -42,7 +43,7 @@ public class SampleSRALoaderTest extends AbstractSRALoaderTest {
         enaSample.setTeam(getTeam());
         enaSample.setTaxonId(9606l);
         enaSample.setId(UUID.randomUUID().toString());
-        sraLoader.executeSubmittableSRALoader(enaSample,alias,connection);
+        sraLoader.executeSRASubmission(enaSample,false);
         String accession = enaSample.getAccession();
         assertThat(accession,startsWith("ERS"));
     }

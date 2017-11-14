@@ -88,20 +88,24 @@ public class RunSRALoaderTest extends AbstractSRALoaderTest {
         String alias = UUID.randomUUID().toString();
         STUDYSETDocument studysetDocument = getStudysetDocument(alias,getCenterName());
         String studySubmissionXML = createSubmittable("study.xml", SubmissionType.ACTIONS.ACTION.ADD.Schema.STUDY,alias + "_study");
-        final String studyAccession = studySRALoader.executeSRALoader(studySubmissionXML, studysetDocument.xmlText(), connection);
+        studySRALoader.executeSRASubmission(studySubmissionXML, studysetDocument.xmlText());
+        final String studyAccession = studySRALoader.getAccession();
 
         SAMPLESETDocument samplesetDocument = getSamplesetDocument(alias,getCenterName());
         String sampleSubmissionXML = createSubmittable("sample.xml", SubmissionType.ACTIONS.ACTION.ADD.Schema.SAMPLE,alias + "sample");
-        final String sampleAccession = sampleSRALoader.executeSRALoader(sampleSubmissionXML, samplesetDocument.xmlText(), connection);
+        sampleSRALoader.executeSRASubmission(sampleSubmissionXML, samplesetDocument.xmlText());
+        final String sampleAccession = sampleSRALoader.getAccession();
 
         EXPERIMENTSETDocument experimentsetDocument = getExperimentSetDocument(alias,alias,alias,getCenterName());
         String experimentSubmissionXML = createSubmittable("experiment.xml", SubmissionType.ACTIONS.ACTION.ADD.Schema.EXPERIMENT,alias);
-        final String experimentAccession = experimentSRALoader.executeSRALoader(experimentSubmissionXML, experimentsetDocument.xmlText(), connection);
-        assertThat(experimentAccession,startsWith("ERX"));
+        experimentSRALoader.executeSRASubmission(experimentSubmissionXML, experimentsetDocument.xmlText());
+        final String experimentAccession = sampleSRALoader.getAccession();
+                assertThat(experimentAccession,startsWith("ERX"));
 
         RUNSETDocument runsetDocument = getRunSetDocument(alias,alias,getCenterName(),FASTQ_FILE_NAME,"fastq");
         String runSubmissionXML = createSubmittable("run.xml",SubmissionType.ACTIONS.ACTION.ADD.Schema.RUN,alias);
-        final String runAccession = runSRALoader.executeSRALoader(runSubmissionXML,runsetDocument.xmlText(),connection);
+        runSRALoader.executeSRASubmission(runSubmissionXML,runsetDocument.xmlText());
+        final String runAccession = runSRALoader.getAccession();
         assertThat(runAccession,startsWith("ERR"));
     }
 

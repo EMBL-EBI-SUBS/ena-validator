@@ -38,16 +38,21 @@ public class ExperimentSRALoaderTest extends AbstractSRALoaderTest {
         String alias = UUID.randomUUID().toString();
         STUDYSETDocument studysetDocument = getStudysetDocument(alias,getCenterName());
         String studySubmissionXML = createSubmittable("study.xml", SubmissionType.ACTIONS.ACTION.ADD.Schema.STUDY,alias + "_study");
-        final String studyAccession = studySRALoader.executeSRALoader(studySubmissionXML, studysetDocument.xmlText(), connection);
+        studySRALoader.executeSRASubmission(studySubmissionXML, studysetDocument.xmlText());
+        final String studyAccession = studySRALoader.getAccession();
 
         SAMPLESETDocument samplesetDocument = getSamplesetDocument(alias,getCenterName());
         String sampleSubmissionXML = createSubmittable("sample.xml", SubmissionType.ACTIONS.ACTION.ADD.Schema.SAMPLE,alias + "sample");
-        final String sampleAccession = sampleSRALoader.executeSRALoader(sampleSubmissionXML, samplesetDocument.xmlText(), connection);
+        sampleSRALoader.executeSRASubmission(sampleSubmissionXML, samplesetDocument.xmlText());
+        final String sampleAccession = sampleSRALoader.getAccession();
         EXPERIMENTSETDocument experimentsetDocument = getExperimentSetDocument(alias,alias,alias,getCenterName());
 
         String experimentSubmissionXML = createSubmittable("experiment.xml", Schema.EXPERIMENT,alias);
-        final String experimentAccession = experimentSRALoader.executeSRALoader(experimentSubmissionXML, experimentsetDocument.xmlText(), connection);
+        experimentSRALoader.executeSRASubmission(experimentSubmissionXML, experimentsetDocument.xmlText());
+        final String experimentAccession = experimentSRALoader.getAccession();
         assertThat(experimentAccession,startsWith("ERX"));
     }
+
+
 
 }

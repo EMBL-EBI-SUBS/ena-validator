@@ -5,8 +5,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.subs.data.component.Archive;
+import uk.ac.ebi.subs.data.component.Attribute;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.status.ProcessingStatusEnum;
 import uk.ac.ebi.subs.data.submittable.Assay;
@@ -27,18 +27,13 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
-@Transactional
 public class EnaAgentSubmissionsProcessorTest {
 
     @Autowired
     EnaAgentSubmissionsProcessor enaAgentSubmissionsProcessor;
 
     @Test
-    public void handleSampleUpdate() throws Exception {
-    }
-
-    @Test
-    public void handleSubmission() throws Exception {
+    public void submissionTest() throws Exception {
         String alias = UUID.randomUUID().toString();
         final Team team = TestHelper.getTeam("test-team");
         final Study study = TestHelper.getStudy(alias, team,"study_abstract","Whole Genome Sequencing");
@@ -63,6 +58,50 @@ public class EnaAgentSubmissionsProcessorTest {
 
         );
 
+    }
+
+    @Test
+    public void studyUpdateTest() throws Exception {
+        String alias = UUID.randomUUID().toString();
+        final Team team = TestHelper.getTeam("test-team");
+        final Study study = TestHelper.getStudy(alias, team,"study_abstract","Whole Genome Sequencing");
+        study.setId(UUID.randomUUID().toString());
+        uk.ac.ebi.subs.data.Submission submission = new uk.ac.ebi.subs.data.Submission();
+        submission.setTeam(team);
+        SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope(submission);
+        submissionEnvelope.getStudies().add(study);
+        final ProcessingCertificateEnvelope processingCertificateEnvelope = enaAgentSubmissionsProcessor.processSubmission(submissionEnvelope);
+        ProcessingCertificate studyProcessingCertificate = new ProcessingCertificate(study, Archive.Ena, ProcessingStatusEnum.Received, study.getAccession());
+        assertThat("correct study certs",
+                processingCertificateEnvelope.getProcessingCertificates(),
+                containsInAnyOrder(
+                        studyProcessingCertificate
+                )
+
+        );
+
+        final Study study2 = TestHelper.getStudy(alias, team,"study_abstract","Whole Genome Sequencing");
+        study2.setAccession(study.getAccession());
+        final Attribute attribute = new Attribute();
+        attribute.setName("Test Update Attribute");
+        attribute.setValue("Test Update Value");
+        study2.getAttributes().add(attribute);
+        study2.setId(UUID.randomUUID().toString());
+
+        uk.ac.ebi.subs.data.Submission updateSubmission = new uk.ac.ebi.subs.data.Submission();
+        updateSubmission.setTeam(team);
+        SubmissionEnvelope updateSubmissionEnvelope = new SubmissionEnvelope(updateSubmission);
+        updateSubmissionEnvelope.getStudies().add(study2);
+        final ProcessingCertificateEnvelope updateProcessingCertificateEnvelope = enaAgentSubmissionsProcessor.processSubmission(updateSubmissionEnvelope);
+        ProcessingCertificate studyUpdateProcessingCertificate =
+                new ProcessingCertificate(study2, Archive.Ena, ProcessingStatusEnum.Received, study.getAccession());
+        assertThat("correct study certs",
+                updateProcessingCertificateEnvelope.getProcessingCertificates(),
+                containsInAnyOrder(
+                        studyUpdateProcessingCertificate
+                )
+
+        );
     }
 
 }
