@@ -2,6 +2,7 @@ package uk.ac.ebi.subs.ena.loader;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +24,9 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,34 +63,17 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
         }
     }
 
-    /*
     @Override
-    public ValidationResult getValidationResult() {
-        return validationResult;
-    }
-
-    protected void logValidationErrors() {
-        for (ValidationMessage<Origin> validationMessage : getValidationResult().getMessages())
-            logger.error(validationMessage.getMessage());
-    }
-    */
-
-    @Override
+    /**
+     * Executes an ENA submission for a submittable using Unirest
+     */
     public boolean executeSRASubmission(String submissionXML, String submittableXML) throws Exception {
-        final Path submissionPath = Files.createTempFile("submission", ".xml");
-        final File submissionFile = submissionPath.toFile();
-        Files.write(submissionPath, submissionXML.getBytes(StandardCharsets.UTF_8));
-        submissionFile.deleteOnExit();
-
-        final Path studyPath = Files.createTempFile("study", ".xml");
-        final File studyFile = studyPath.toFile();
-        Files.write(studyPath, submittableXML.getBytes(StandardCharsets.UTF_8));
-        studyFile.deleteOnExit();
-
+        final InputStream submissionXMLInputStream = IOUtils.toInputStream(submissionXML, Charset.forName("UTF-8"));
+        final InputStream submittableInputStream = IOUtils.toInputStream(submittableXML, Charset.forName("UTF-8"));
 
         final HttpResponse<String> stringHttpResponse = Unirest.post(submissionUrl).basicAuth(loginName, password)
-                .field("SUBMISSION", submissionFile)
-                .field(getSchema().toUpperCase(), studyFile).asString();
+                .field("SUBMISSION", submissionXMLInputStream,"submission.xml")
+                .field(getSchema().toUpperCase(), submittableInputStream,"submittable.xml").asString();
         logger.info(stringHttpResponse.getBody());
         final RECEIPTDocument receiptDocument = RECEIPTDocument.Factory.parse(stringHttpResponse.getBody());
         receipt = receiptDocument.getRECEIPT();
@@ -100,10 +86,15 @@ public abstract class AbstractSRALoaderService<T extends ENASubmittable> impleme
             accession = iDs[0].getAccession();
         }
 
+        submissionXMLInputStream.close();
+        submittableInputStream.close();
         return receipt.getSuccess();
     }
 
     @Override
+    /**
+     * Executes an ENA for an ENA submittable
+     */
     public boolean executeSRASubmission(ENASubmittable enaSubmittable, String submissionAlias, boolean validateOnly) throws Exception {
         final String submissionXML = createSubmissionXML(enaSubmittable, enaSubmittable.getId().toString(), validateOnly);
         Document document = documentBuilder.newDocument();
