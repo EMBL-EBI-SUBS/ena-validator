@@ -41,7 +41,7 @@ public class StudySRALoaderTest extends AbstractSRALoaderTest{
     public void executeSubmittableSRALoader() throws Exception {
         String alias = UUID.randomUUID().toString();
         final ENAStudy enaStudy = getENAStudy(alias, getTeam());
-        sraLoader.executeSRASubmission(enaStudy,alias,false);
+        sraLoader.executeSRASubmission(enaStudy,false);
         String accession = enaStudy.getAccession();
         assertThat(accession,startsWith("ERP"));
     }

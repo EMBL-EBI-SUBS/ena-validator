@@ -43,7 +43,7 @@ public class SampleSRALoaderTest extends AbstractSRALoaderTest {
         enaSample.setTeam(getTeam());
         enaSample.setTaxonId(9606l);
         enaSample.setId(UUID.randomUUID().toString());
-        sraLoader.executeSRASubmission(enaSample,alias,false);
+        sraLoader.executeSRASubmission(enaSample,false);
         String accession = enaSample.getAccession();
         assertThat(accession,startsWith("ERS"));
     }
