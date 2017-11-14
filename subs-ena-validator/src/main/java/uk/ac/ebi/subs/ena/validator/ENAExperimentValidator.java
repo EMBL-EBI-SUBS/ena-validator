@@ -6,8 +6,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.ena.processor.ENAExperimentProcessor;
 import uk.ac.ebi.subs.ena.processor.ENAProcessorContainerService;
@@ -68,7 +66,6 @@ public class ENAExperimentValidator implements ENAValidator {
      */
     @RabbitListener(queues = ENA_ASSAY_VALIDATION)
     public void validateAssay(AssayValidationMessageEnvelope validationEnvelope) {
-        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         final Assay assay = validationEnvelope.getEntityToValidate();
         final List<SingleValidationResult> singleValidationResultCollection = executeSubmittableValidation(assay, experimentProcessor);
         checkForEmptySingleValidationResult(singleValidationResultCollection,assay);
