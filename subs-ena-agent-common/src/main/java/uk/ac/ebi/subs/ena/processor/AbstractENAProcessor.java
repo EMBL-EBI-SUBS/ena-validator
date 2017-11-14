@@ -74,6 +74,7 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
                 enaSubmittable.getId());
 
         Collection<SingleValidationResult> singleValidationResultCollection = new ArrayList<>();
+        // At the moment this is disabled as we need to validate the everything in submission envelope at once
         //singleValidationResultCollection.addAll(convertValidationMessages(enaSubmittable.getId().toString(), null));
         return singleValidationResultCollection;
     }
@@ -101,12 +102,12 @@ public abstract class AbstractENAProcessor<T extends ENASubmittable> implements 
      * @param {@link Collection} of
      * @return {@link Collection} of {@link SingleValidationResult}
      */
-    Collection<SingleValidationResult> convertMessages (String entityUUID, String[] errorMessages, SingleValidationResultStatus singleValidationResultStatus) {
+    Collection<SingleValidationResult> convertMessages (String entityUUID, String[] messages, SingleValidationResultStatus singleValidationResultStatus) {
         Collection<SingleValidationResult> singleValidationResultCollection = new ArrayList<>();
 
-        for (String errorMessage : errorMessages) {
+        for (String message : messages) {
             SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,entityUUID);
-            singleValidationResult.setMessage(errorMessage);
+            singleValidationResult.setMessage(message);
             singleValidationResult.setValidationStatus(singleValidationResultStatus);
         }
 
