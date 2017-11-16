@@ -1,171 +1,166 @@
+group 'uk.ac.ebi.subs'
+version '0.4.0-SNAPSHOT'
+
 buildscript {
-	ext {
-		springBootVersion = '1.5.1.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath "org.hidetake:gradle-ssh-plugin:1.1.3"
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-	}
+    repositories {
+        mavenCentral()
+
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
+        classpath 'org.hidetake:gradle-ssh-plugin:1.1.3'
+    }
 }
 
-allprojects {
-	ext.version_base = '0.4.0-SNAPSHOT'
-	version = version_base
-	group = 'uk.ac.ebi.subs.ena'
-	ext.gradle_env = findProperty('env') ? env : 'dev'
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'maven'
+apply plugin: 'org.hidetake.ssh'
+
+sourceCompatibility = 1.8
+
+ext.gradle_env = hasProperty('env') ? env : 'dev'
+
+bootRepackage {
+    mainClass = "uk.ac.ebi.subs.ena.EnaAgentApplication"
+}
+springBoot {
+    executable = true
 }
 
-subprojects {
-	apply plugin: 'java'
-	apply plugin: 'maven-publish'
-	apply plugin: 'maven'
-	apply plugin: 'org.hidetake.ssh'
-	apply plugin: 'org.springframework.boot'
+repositories {
+    mavenCentral()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+}
 
-	repositories {
-		mavenLocal()
-		maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-        maven { url "http://ena-dev:8081/artifactory/all" }
-		mavenCentral()
-	}
+dependencies {
 
-	dependencyManagement {
-		resolutionStrategy {
-			cacheChangingModulesFor 0, 'seconds'
-		}
-	}
+    compile ("uk.ac.ebi.subs:validator-common:0.7.0-SNAPSHOT") {
+        exclude group: 'org.springframework.boot', module :'spring-boot-starter-data-mongodb'
+    }
+    compile("uk.ac.ebi.subs:subs-messaging:0.4.0-SNAPSHOT")
+    compile ("uk.ac.ebi.subs:subs-data-model:0.3.0-SNAPSHOT")
+    compile ("uk.ac.ebi.subs:subs-ena-data-model:0.5.0-SNAPSHOT")
+    compile("org.springframework.boot:spring-boot-starter")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+}
 
-	configurations.all {
-		resolutionStrategy {
-			cacheChangingModulesFor 0, 'seconds'
-		}
-	}
+processTestResources {
+    filesMatching('application.yml') {
+        expand(project.properties)
+    }
+}
 
-	task wrapper(type: Wrapper) {
-		gradleVersion = '3.3'
-	}
+uploadArchives {
+    repositories {
+        mavenDeployer {
 
-	processResources {
-		filesMatching('application.yml') {
-			expand(project.properties)
-		}
-	}
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')) {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+            }
 
-	processTestResources {
-		filesMatching('application.yml') {
-			expand(project.properties)
-		}
-	}
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')) {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
 
-	ssh.settings {
-		user = 'sub_adm'
-	}
+            }
 
-	if (project.hasProperty('sshKeyFile')) {
-		ssh.settings.identity = new File(sshKeyFile)
-	}
+            pom.project {
+                packaging 'jar'
+                url 'https://github.com/EMBL-EBI-SUBS/biosamples-validator'
 
-	if (project.hasProperty('sshPassphrase')) {
-		ssh.settings.passphrase = sshPassphrase
-	}
+                scm {
+                    url 'https://github.com/EMBL-EBI-SUBS/biosamples-validator.git'
+                }
 
-	remotes {
-		dev {
-			host = 'mac-subs-001.ebi.ac.uk'
-		}
-	}
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
 
-	task printJarName {
-		doLast {
-			println "$jar.archivePath.name"
-		}
+                developers {
+                    developer {
+                        id 'subs-internal'
+                        name 'EMBL-EBI-SUBS'
+                        email 'subs-internal@ebi.ac.uk'
+                    }
+                }
+            }
+        }
+    }
+}
 
-	}
+ssh.settings {
+    user = 'sub_adm'
+}
 
-	task printJarFullPath {
-		doLast {
-			println "$jar.archivePath.absolutePath"
-		}
-	}
+if (project.hasProperty('sshKeyFile')) {
+    ssh.settings.identity = new File(sshKeyFile)
+}
 
-	remotes {
-		agent {
-			role('agent')
-			host = 'mac-subs-004'
-		}
-	}
+if (project.hasProperty('sshPassphrase')) {
+    ssh.settings.passphrase = sshPassphrase
+}
 
-	remotes {
-		validator {
-			role('validator')
-			host = 'mac-subs-006'
-		}
-	}
-
-	remotes {
-		dumper {
-			role('validator')
-			host = 'mac-subs-008'
-		}
-	}
-
-	task sourceJar(type: Jar) { from sourceSets.main.allJava }
-
-	springBoot {
-		executable = false
-	}
-
-	task printClasspath doLast {
-		configurations.compile.each { println it }
-	}
-
-
-	publishing {
-		publications {
-			mavenJava(MavenPublication) {
-				from components.java
-				artifact sourceJar { classifier "sources" }
-			}
-		}
-		repositories {
-			maven {
-				credentials {
-					username artifactoryUsername
-					password artifactoryPassword
-				}
-				url "http://ena-dev:8081/artifactory/libs-snapshot-local"
-			}
-		}
-	}
-
-	task deployJar(type: SshTask, dependsOn: 'assemble') {
-		doLast {
-			File jarDeployDir = new File("/data/$gradle_env/$project.name/jar")
-			ssh.run {
-				session(remotes.role(gradle_env)) {
-					execute "/homes/sub_adm/create_dirs.sh $gradle_env $project.name", ignoreError: false
-					println "Uploading jar $jar.archivePath.name to $jarDeployDir area on $remote"
-					put(jar.archivePath.absolutePath, jarDeployDir.absolutePath)
-					println "creating symbolic link to $jar.archiveName"
-					def result = execute "ln -s -f $jarDeployDir/$jar.archiveName $jarDeployDir/$jar.baseName" + ".jar", ignoreError: true
-					println result
-					println "updating permissions of $jarDeployDir/$jar.archiveName"
-					execute "chmod u+x $jarDeployDir/*", ignoreError: false
-				}
-			}
-		}
-		ssh.settings {
-			knownHosts = allowAnyHosts
-		}
-	}
+task printJarName {
+    doLast {
+        println "$jar.archivePath.name"
+    }
 
 }
 
+task printJarFullPath {
+    doLast {
+        println "$jar.archivePath.absolutePath"
+    }
+}
 
+def devDeployHostName = hasProperty(project.name + "DevDeployTarget") ? getProperty(project.name + "DevDeployTarget") : 'localhost'
+def testDeployHostName = hasProperty(project.name + "TestDeployTarget") ? getProperty(project.name + "TestDeployTarget") : 'localhost'
+def prodDeployHostName = hasProperty(project.name + "ProdDeployTarget") ? getProperty(project.name + "ProdDeployTarget") : 'localhost'
 
+remotes {
+    submission_dev {
+        role('dev')
+        host = devDeployHostName
+    }
+    submission_test {
+        role('test')
+        host = testDeployHostName
+    }
+    submission_prod {
+        role('prod')
+        host = prodDeployHostName
+    }
+}
 
+task deployJar(type: SshTask, dependsOn: 'assemble') {
+    doLast {
+        File jarDeployDir = new File("/data/$gradle_env/$project.name/jar")
+        sshRun(jarDeployDir)
+    }
+    ssh.settings {
+        knownHosts = allowAnyHosts
+    }
+}
 
-
+private Object sshRun(File jarDeployDir) {
+    ssh.run {
+        session(remotes.role(gradle_env)) {
+            execute "/homes/sub_adm/create_dirs.sh $gradle_env $project.name", ignoreError: false
+            println "Uploading jar $jar.archivePath.name to $jarDeployDir area on $remote"
+            put(jar.archivePath.absolutePath, jarDeployDir.absolutePath)
+            println "creating symbolic link to $jar.archiveName"
+            def result = execute "ln -s -f $jarDeployDir/$jar.archiveName $jarDeployDir/$jar.baseName" + ".jar", ignoreError: true
+            println result
+            println "updating permissions of $jarDeployDir/$jar.archiveName"
+            execute "chmod u+x $jarDeployDir/*", ignoreError: false
+        }
+    }
+}
