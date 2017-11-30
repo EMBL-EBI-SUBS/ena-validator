@@ -77,34 +77,8 @@ public class ENAStudyValidator implements ENAValidator {
     public void validateStudy(StudyValidationMessageEnvelope validationEnvelope) {
         final Study study = validationEnvelope.getEntityToValidate();
         final List<SingleValidationResult> singleValidationResultCollection = executeSubmittableValidation(study,enaStudyProcessor );
-        checkReleaseDate(study,singleValidationResultCollection);
         checkForEmptySingleValidationResult(singleValidationResultCollection,study);
         publishValidationMessage(study,singleValidationResultCollection,validationEnvelope.getValidationResultUUID(),validationEnvelope.getValidationResultVersion());
     }
 
-    void checkReleaseDate(Study study, List<SingleValidationResult> singleValidationResultCollection) {
-        checkReleaseDate(study,singleValidationResultCollection,RELEASE_DATE_INTERVAL_DAYS);
-    }
-
-    void checkReleaseDate(Study study, List<SingleValidationResult> singleValidationResultCollection, int intevalDays) {
-        if (study.getReleaseDate() != null) {
-            final Instant instant = Instant.now();
-            final long releaseDateInMillis = Date.from(study.getReleaseDate().atStartOfDay(ZoneId.systemDefault()).toInstant()).toInstant().toEpochMilli();
-            if ( releaseDateInMillis > instant.toEpochMilli()) {
-                final long daysBetween = DAYS.between(LocalDate.now(), study.getReleaseDate());
-                if (daysBetween >= intevalDays) {
-                    SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, study.getId());
-                    singleValidationResult.setValidationStatus(SingleValidationResultStatus.Error);
-                    singleValidationResult.setMessage(String.format("Release date %s must not exceed two years from the present date", study.getReleaseDate()));
-                    singleValidationResultCollection.add(singleValidationResult);
-                }
-            }
-        } else {
-            SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena,study.getId());
-            singleValidationResult.setValidationStatus(SingleValidationResultStatus.Error);
-            singleValidationResult.setMessage("A release date for a study must be provided");
-            singleValidationResultCollection.add(singleValidationResult);
-        }
-
-    }
 }
