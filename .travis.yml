@@ -14,5 +14,6 @@ cache:
   - $HOME/.m2
   - $HOME/.gradle/caches/
   - $HOME/.gradle/wrapper/
-after_success:
-- test $TRAVIS_BRANCH = "dev" && ./gradlew uploadArchives
+before_install:
+- openssl aes-256-cbc -K $encrypted_d4dd2230ebfa_key -iv $encrypted_d4dd2230ebfa_iv
+  -in gradle.properties.enc -out gradle.properties -d

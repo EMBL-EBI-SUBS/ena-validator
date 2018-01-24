@@ -1,5 +1,5 @@
 group 'uk.ac.ebi.subs'
-version '0.4.0-SNAPSHOT'
+version '1.0.1-SNAPSHOT'
 
 buildscript {
     repositories {
@@ -35,13 +35,7 @@ repositories {
 }
 
 dependencies {
-
-    compile ("uk.ac.ebi.subs:validator-common:0.7.0-SNAPSHOT") {
-        exclude group: 'org.springframework.boot', module :'spring-boot-starter-data-mongodb'
-    }
-    compile("uk.ac.ebi.subs:subs-messaging:0.4.0-SNAPSHOT")
-    compile ("uk.ac.ebi.subs:subs-data-model:0.3.0-SNAPSHOT")
-    compile ("uk.ac.ebi.subs:subs-ena-data-model:0.5.0-SNAPSHOT")
+    compile ("uk.ac.ebi.subs:subs-ena-core-service:1.0.1-SNAPSHOT")
     compile("org.springframework.boot:spring-boot-starter")
     testCompile("org.springframework.boot:spring-boot-starter-test")
 }
@@ -142,7 +136,8 @@ remotes {
 
 task deployJar(type: SshTask, dependsOn: 'assemble') {
     doLast {
-        File jarDeployDir = new File("/data/$gradle_env/$project.name/jar")
+        def uploadJarFileName = project.name + "-"  + project.version + "." + System.currentTimeMillis() + ".jar"
+        File jarDeployDir = new File("/data/$gradle_env/$project.name/jar",uploadJarFileName)
         sshRun(jarDeployDir)
     }
     ssh.settings {
@@ -150,14 +145,16 @@ task deployJar(type: SshTask, dependsOn: 'assemble') {
     }
 }
 
-private Object sshRun(File jarDeployDir) {
+private Object sshRun(File jarDeployFile) {
+    def uploadJarFileName = name + "-"  + version + "." + System.currentTimeMillis() + ".jar"
+    File jarDeployDir = jarDeployFile.getParentFile()
     ssh.run {
         session(remotes.role(gradle_env)) {
             execute "/homes/sub_adm/create_dirs.sh $gradle_env $project.name", ignoreError: false
-            println "Uploading jar $jar.archivePath.name to $jarDeployDir area on $remote"
-            put(jar.archivePath.absolutePath, jarDeployDir.absolutePath)
+            println "Uploading jar $jar.archivePath.name to $jarDeployDir/$uploadJarFileName  area on $remote"
+            put(jar.archivePath.absolutePath, jarDeployFile.absolutePath)
             println "creating symbolic link to $jar.archiveName"
-            def result = execute "ln -s -f $jarDeployDir/$jar.archiveName $jarDeployDir/$jar.baseName" + ".jar", ignoreError: true
+            def result = execute "ln -s -f $jarDeployFile.absolutePath $jarDeployDir/$jar.baseName" + ".jar", ignoreError: true
             println result
             println "updating permissions of $jarDeployDir/$jar.archiveName"
             execute "chmod u+x $jarDeployDir/*", ignoreError: false
