@@ -1,5 +1,6 @@
 package uk.ac.ebi.subs.ena.validator;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -11,14 +12,16 @@ import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
 import uk.ac.ebi.subs.ena.config.RabbitMQDependentTest;
 import uk.ac.ebi.subs.ena.helper.TestHelper;
-import uk.ac.ebi.subs.ena.processor.ENAStudyProcessor;
+import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
+import uk.ac.ebi.subs.validator.data.StudyValidationMessageEnvelope;
+import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -27,14 +30,20 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
-@Category(RabbitMQDependentTest.class)
 public class ENAStudyValidatorTest {
 
     @Autowired
     ENAStudyValidator enaAgentStudyValidator;
 
     @Autowired
-    ENAStudyProcessor enaStudyProcessor;
+    ENAStudyValidator enaStudyValidator;
+
+    SubmissionEnvelope submissionEnvelope;
+
+    @Before
+    public void setUp() {
+        submissionEnvelope = new SubmissionEnvelope();
+    }
 
     private static final String CENTER_NAME = "test-team";
     private final String SUBMITTABLE_TYPE = Study.class.getSimpleName();
@@ -43,8 +52,10 @@ public class ENAStudyValidatorTest {
     public void testExecuteSubmittableValidation () {
         final Team team = TestHelper.getTeam("my-team");
         final Study study = TestHelper.getStudy(UUID.randomUUID().toString(), team, "study_abstract","Whole Genome Sequencing");
-        final List<SingleValidationResult> singleValidationResults = enaAgentStudyValidator.executeSubmittableValidation(study, enaStudyProcessor);
-        assertTrue("singleValidationResult",singleValidationResults.isEmpty());
+        submissionEnvelope.getStudies().add(study);
+        final List<SingleValidationResult> singleValidationResultList = enaStudyValidator.validate(submissionEnvelope,study);
+        final SingleValidationResult singleValidationResult = singleValidationResultList.get(0);
+        assertThat(singleValidationResult.getValidationStatus(), is(SingleValidationResultStatus.Pass));
     }
 
 }
