@@ -3,16 +3,21 @@ package uk.ac.ebi.subs.ena.validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
-import uk.ac.ebi.subs.data.submittable.ENASubmittable;
+import org.springframework.stereotype.Service;
+import uk.ac.ebi.subs.data.Submission;
+import uk.ac.ebi.subs.data.submittable.BaseSubmittable;
 import uk.ac.ebi.subs.data.submittable.Submittable;
-import uk.ac.ebi.subs.ena.processor.ENAAgentProcessor;
+import uk.ac.ebi.subs.ena.processor.ENAProcessor;
 import uk.ac.ebi.subs.messaging.Exchanges;
+import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.SingleValidationResultsEnvelope;
+import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
 import uk.ac.ebi.subs.validator.data.structures.ValidationAuthor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static uk.ac.ebi.subs.ena.config.EnaValidatorRoutingKeys.EVENT_VALIDATION_ERROR;
@@ -21,51 +26,54 @@ import static uk.ac.ebi.subs.ena.config.EnaValidatorRoutingKeys.EVENT_VALIDATION
 /**
  * Created by karoly on 14/06/2017.
  */
-public interface ENAValidator {
+@Service
+public abstract class ENAValidator<T extends BaseSubmittable> {
 
     Logger logger = LoggerFactory.getLogger(ENAValidator.class);
+    ENAProcessor enaProcessor;
+    RabbitMessagingTemplate rabbitMessagingTemplate;
 
-    void setRabbitMessagingTemplate(RabbitMessagingTemplate rabbitMessagingTemplate);
-    RabbitMessagingTemplate getRabbitMessagingTemplate();
-
-    default List<SingleValidationResult> executeSubmittableValidation(Submittable submittable,
-                                                                       ENAAgentProcessor eNAAgentProcessor) {
-        List<SingleValidationResult> singleValidationResultCollection = new ArrayList<>();
-
-        try {
-            ENASubmittable eNASubmittable= eNAAgentProcessor.convertFromSubmittableToENASubmittable(submittable,singleValidationResultCollection);
-            // TODO Temporary until we can figure out how to share the same transaction for the entire submission during validation
-            //singleValidationResultCollection.addAll(eNAAgentProcessor.validateEntity(eNASubmittable));
-        } catch (InstantiationException | IllegalAccessException e) {
-            logger.error("An exception occured: {}", e.getMessage());
-            SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, submittable.getId());
-            singleValidationResult.setMessage(e.getMessage());
-            singleValidationResult.setValidationStatus(SingleValidationResultStatus.Error);
-            singleValidationResultCollection.add(singleValidationResult);
-        }
-
-        return singleValidationResultCollection;
+    public ENAValidator(ENAProcessor enaProcessor, RabbitMessagingTemplate rabbitMessagingTemplate) {
+        this.enaProcessor = enaProcessor;
+        this.rabbitMessagingTemplate = rabbitMessagingTemplate;
     }
 
-    default void publishValidationMessage(Submittable submittable, List<SingleValidationResult> singleValidationResultCollection,
-                                          String validationResultUuid, int validationResultVersion) {
+    protected List<SingleValidationResult> validate (SubmissionEnvelope submissionEnvelope, T entityToValidate) {
+        Submission submission = new Submission();
+        submission.setTeam(submission.getTeam());
+        submission.setId(entityToValidate.getAlias());
+        submissionEnvelope.setSubmission(submission);
+        List<SingleValidationResult> singleValidationResultList = new ArrayList<>();
+        logger.info("Validating " + entityToValidate);
+        singleValidationResultList = enaProcessor.process(submissionEnvelope);
+        if (singleValidationResultList.isEmpty()) {
+            return Collections.singletonList(createEmptySingleValidationResult(entityToValidate));
+        } else {
+            return singleValidationResultList;
+        }
+
+    }
+
+    void publishValidationMessage(Submittable submittable, List<SingleValidationResult> singleValidationResultCollection,
+                                  String validationResultUuid, int validationResultVersion) {
 
         SingleValidationResultsEnvelope singleValidationResultsEnvelope = new SingleValidationResultsEnvelope(
                 singleValidationResultCollection, validationResultVersion, validationResultUuid, ValidationAuthor.Ena
         );
 
         if (!hasValidationError(singleValidationResultCollection)) {
-            getRabbitMessagingTemplate().convertAndSend(Exchanges.SUBMISSIONS, EVENT_VALIDATION_SUCCESS, singleValidationResultsEnvelope);
+            rabbitMessagingTemplate.convertAndSend(Exchanges.SUBMISSIONS, EVENT_VALIDATION_SUCCESS, singleValidationResultsEnvelope);
 
             logger.info("Validation successful for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
         } else {
-            getRabbitMessagingTemplate().convertAndSend(Exchanges.SUBMISSIONS, EVENT_VALIDATION_ERROR, singleValidationResultsEnvelope);
+            rabbitMessagingTemplate.convertAndSend(Exchanges.SUBMISSIONS, EVENT_VALIDATION_ERROR, singleValidationResultsEnvelope);
 
             logger.info("Validation erred for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
         }
+
     }
 
-    default boolean hasValidationError(List<SingleValidationResult> validationResults) {
+    boolean hasValidationError(List<SingleValidationResult> validationResults) {
         SingleValidationResult errorValidationResult = validationResults.stream().filter(
                 validationResult -> validationResult.getValidationStatus() == SingleValidationResultStatus.Error)
                 .findAny()
@@ -74,13 +82,14 @@ public interface ENAValidator {
         return errorValidationResult != null;
     }
 
-    default void checkForEmptySingleValidationResult (List<SingleValidationResult> singleValidationResultList, Submittable submittable) {
+    void checkForEmptySingleValidationResult (List<SingleValidationResult> singleValidationResultList, Submittable submittable) {
         if (singleValidationResultList.isEmpty()) singleValidationResultList.add(createEmptySingleValidationResult(submittable));
     }
 
-    default SingleValidationResult createEmptySingleValidationResult (Submittable submittable) {
+    SingleValidationResult createEmptySingleValidationResult (Submittable submittable) {
         SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, submittable.getId());
         singleValidationResult.setValidationStatus(SingleValidationResultStatus.Pass);
         return singleValidationResult;
     }
+
 }
