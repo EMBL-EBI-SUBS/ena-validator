@@ -39,24 +39,23 @@ public abstract class ENAValidator<T extends BaseSubmittable> {
     }
 
     protected List<SingleValidationResult> validate (SubmissionEnvelope submissionEnvelope, T entityToValidate) {
-        Submission submission = new Submission();
-        submission.setTeam(submission.getTeam());
-        submission.setId(entityToValidate.getAlias());
-        submissionEnvelope.setSubmission(submission);
-        List<SingleValidationResult> singleValidationResultList = new ArrayList<>();
         logger.info("Validating " + entityToValidate);
-        singleValidationResultList = enaProcessor.process(submissionEnvelope);
+        List<SingleValidationResult> singleValidationResultList = enaProcessor.process(submissionEnvelope);
         if (singleValidationResultList.isEmpty()) {
             return Collections.singletonList(createEmptySingleValidationResult(entityToValidate));
         } else {
             return singleValidationResultList;
         }
+    }
 
+    Submission createSubmission(String submissionId) {
+        Submission submission = new Submission();
+        submission.setId(submissionId);
+        return submission;
     }
 
     void publishValidationMessage(Submittable submittable, List<SingleValidationResult> singleValidationResultCollection,
                                   String validationResultUuid, int validationResultVersion) {
-
         SingleValidationResultsEnvelope singleValidationResultsEnvelope = new SingleValidationResultsEnvelope(
                 singleValidationResultCollection, validationResultVersion, validationResultUuid, ValidationAuthor.Ena
         );

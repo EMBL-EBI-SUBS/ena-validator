@@ -37,6 +37,9 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
     public void validateAssayData(AssayDataValidationMessageEnvelope validationEnvelope) {
         final AssayData assayData = validationEnvelope.getEntityToValidate();
         SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope();
+
+        submissionEnvelope.setSubmission(createSubmission(validationEnvelope.getSubmissionId()));
+
         submissionEnvelope.getAssayData().add(assayData);
         if (validationEnvelope.getAssay() != null && validationEnvelope.getSubmissionId().equals(validationEnvelope.getAssay().getSubmissionId())) {
             submissionEnvelope.getAssays().add(validationEnvelope.getAssay().getBaseSubmittable());

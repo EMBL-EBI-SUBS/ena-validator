@@ -41,6 +41,9 @@ public class ENASampleValidator extends ENAValidator<Sample> {
     public void validateSample(SampleValidationMessageEnvelope validationEnvelope) {
         final Sample sample = validationEnvelope.getEntityToValidate();
         SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope();
+
+        submissionEnvelope.setSubmission(createSubmission(validationEnvelope.getSubmissionId()));
+
         submissionEnvelope.getSamples().add(sample);
         final List<Sample> supportingSampleList = validationEnvelope.getSampleList().stream().
                 filter(s -> validationEnvelope.getSubmissionId().equals(s.getSubmissionId())).

@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
@@ -28,29 +29,28 @@ import static org.junit.Assert.assertTrue;
  *
  * Created by karoly on 09/06/2017.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
 public class ENAStudyValidatorTest {
-
-    @Autowired
-    ENAStudyValidator enaAgentStudyValidator;
 
     @Autowired
     ENAStudyValidator enaStudyValidator;
 
     SubmissionEnvelope submissionEnvelope;
 
+    private static final String SUBMISSION_ID = "12ab34cd-1234-5678-9999-aabbccddeeff";
+
     @Before
     public void setUp() {
         submissionEnvelope = new SubmissionEnvelope();
+        submissionEnvelope.setSubmission(enaStudyValidator.createSubmission(SUBMISSION_ID));
     }
 
     private static final String CENTER_NAME = "test-team";
-    private final String SUBMITTABLE_TYPE = Study.class.getSimpleName();
 
     @Test
     public void testExecuteSubmittableValidation () {
-        final Team team = TestHelper.getTeam("my-team");
+        final Team team = TestHelper.getTeam(CENTER_NAME);
         final Study study = TestHelper.getStudy(UUID.randomUUID().toString(), team, "study_abstract","Whole Genome Sequencing");
         submissionEnvelope.getStudies().add(study);
         final List<SingleValidationResult> singleValidationResultList = enaStudyValidator.validate(submissionEnvelope,study);

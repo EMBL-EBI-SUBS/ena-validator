@@ -35,6 +35,9 @@ public class ENAStudyValidator extends ENAValidator<Study> {
     public void validateStudy(StudyValidationMessageEnvelope validationEnvelope) {
         final Study study = validationEnvelope.getEntityToValidate();
         SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope();
+
+        submissionEnvelope.setSubmission(createSubmission(validationEnvelope.getSubmissionId()));
+
         submissionEnvelope.getStudies().add(study);
         final List<SingleValidationResult> singleValidationResultList = validate(submissionEnvelope, study);
         publishValidationMessage(validationEnvelope.getEntityToValidate(),
