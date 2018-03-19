@@ -26,10 +26,10 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
     }
 
     /**
-     * Do a validation for the sample submitted in the {@link StudyValidationMessageEnvelope}.
+     * Do a validation for the assay data submitted in the {@link AssayDataValidationMessageEnvelope}.
      * It produces a message according to the validation outcome.
      *
-     * @param validationEnvelope {@link StudyValidationMessageEnvelope} that contains the sample to validate
+     * @param validationEnvelope {@link AssayDataValidationMessageEnvelope} that contains the assay data to validate
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
@@ -41,7 +41,7 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
         if (validationEnvelope.getAssay() != null && validationEnvelope.getSubmissionId().equals(validationEnvelope.getAssay().getSubmissionId())) {
             submissionEnvelope.getAssays().add(validationEnvelope.getAssay().getBaseSubmittable());
         }
-        final List<SingleValidationResult> singleValidationResultList = validate(submissionEnvelope,assayData);
+        final List<SingleValidationResult> singleValidationResultList = validate(submissionEnvelope, assayData);
         publishValidationMessage(validationEnvelope.getEntityToValidate(),
                 singleValidationResultList,
                 validationEnvelope.getValidationResultUUID(),

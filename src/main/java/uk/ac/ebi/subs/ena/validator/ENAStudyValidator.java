@@ -24,10 +24,10 @@ public class ENAStudyValidator extends ENAValidator<Study> {
     }
 
     /**
-     * Do a validation for the sample submitted in the {@link StudyValidationMessageEnvelope}.
+     * Do a validation for the study submitted in the {@link StudyValidationMessageEnvelope}.
      * It produces a message according to the validation outcome.
      *
-     * @param validationEnvelope {@link StudyValidationMessageEnvelope} that contains the sample to validate
+     * @param validationEnvelope {@link StudyValidationMessageEnvelope} that contains the study to validate
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
@@ -36,7 +36,7 @@ public class ENAStudyValidator extends ENAValidator<Study> {
         final Study study = validationEnvelope.getEntityToValidate();
         SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope();
         submissionEnvelope.getStudies().add(study);
-        final List<SingleValidationResult> singleValidationResultList = validate(submissionEnvelope,study);
+        final List<SingleValidationResult> singleValidationResultList = validate(submissionEnvelope, study);
         publishValidationMessage(validationEnvelope.getEntityToValidate(),
                 singleValidationResultList,
                 validationEnvelope.getValidationResultUUID(),

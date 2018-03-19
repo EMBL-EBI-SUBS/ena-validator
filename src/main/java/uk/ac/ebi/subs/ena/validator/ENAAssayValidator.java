@@ -26,15 +26,15 @@ public class ENAAssayValidator extends ENAValidator<Assay> {
     }
 
     /**
-     * Do a validation for the sample submitted in the {@link StudyValidationMessageEnvelope}.
+     * Do a validation for the assay submitted in the {@link AssayValidationMessageEnvelope}.
      * It produces a message according to the validation outcome.
      *
-     * @param validationEnvelope {@link StudyValidationMessageEnvelope} that contains the sample to validate
+     * @param validationEnvelope {@link AssayValidationMessageEnvelope} that contains the assay to validate
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
     @RabbitListener(queues = ENA_ASSAY_VALIDATION)
-    public void validateSample(AssayValidationMessageEnvelope validationEnvelope) {
+    public void validateAssay(AssayValidationMessageEnvelope validationEnvelope) {
         final Assay assay = validationEnvelope.getEntityToValidate();
         SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope();
         submissionEnvelope.getAssays().add(assay);
@@ -46,7 +46,7 @@ public class ENAAssayValidator extends ENAValidator<Assay> {
                 map(s -> s.getBaseSubmittable()).
                 collect(Collectors.toList());
         submissionEnvelope.getSamples().addAll(supportingSampleList);
-        final List<SingleValidationResult> singleValidationResultList = validate(submissionEnvelope,assay);
+        final List<SingleValidationResult> singleValidationResultList = validate(submissionEnvelope, assay);
         publishValidationMessage(validationEnvelope.getEntityToValidate(),
                 singleValidationResultList,
                 validationEnvelope.getValidationResultUUID(),
