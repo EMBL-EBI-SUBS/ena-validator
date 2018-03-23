@@ -3,13 +3,13 @@ package uk.ac.ebi.subs.ena.validator;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.subs.data.Submission;
 import uk.ac.ebi.subs.data.submittable.AssayData;
-import uk.ac.ebi.subs.data.submittable.Sample;
 import uk.ac.ebi.subs.ena.processor.ENAProcessor;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
-import uk.ac.ebi.subs.validator.data.*;
+import uk.ac.ebi.subs.validator.data.AssayDataValidationMessageEnvelope;
+import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,10 +44,31 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
         if (validationEnvelope.getAssay() != null && validationEnvelope.getSubmissionId().equals(validationEnvelope.getAssay().getSubmissionId())) {
             submissionEnvelope.getAssays().add(validationEnvelope.getAssay().getBaseSubmittable());
         }
-        final List<SingleValidationResult> singleValidationResultList = validate(submissionEnvelope, assayData);
+        List<SingleValidationResult> singleValidationResultList = validate(submissionEnvelope, assayData);
+
+        singleValidationResultList = filterFileExistenceError(singleValidationResultList, assayData);
+
         publishValidationMessage(validationEnvelope.getEntityToValidate(),
                 singleValidationResultList,
                 validationEnvelope.getValidationResultUUID(),
                 validationEnvelope.getValidationResultVersion());
+    }
+
+    List<SingleValidationResult> filterFileExistenceError(List<SingleValidationResult> singleValidationResultList,
+                                                          AssayData submittable) {
+        List<SingleValidationResult> filtererErrorList = singleValidationResultList.stream().filter(
+                singleValidationResult -> {
+                    String message = singleValidationResult.getMessage();
+
+                    return !(message.startsWith("In run")
+                            && message.contains("in the upload area"));
+                }
+        ).collect(Collectors.toList());
+
+        if (filtererErrorList.size() == 0) {
+            filtererErrorList = Collections.singletonList(createEmptySingleValidationResult(submittable));
+        }
+
+        return filtererErrorList;
     }
 }
