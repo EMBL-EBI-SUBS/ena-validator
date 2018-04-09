@@ -3,11 +3,13 @@ package uk.ac.ebi.subs.ena.validator;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.stereotype.Service;
+import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.data.submittable.AssayData;
 import uk.ac.ebi.subs.ena.processor.ENAProcessor;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 import uk.ac.ebi.subs.validator.data.AssayDataValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
+import uk.ac.ebi.subs.validator.model.Submittable;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,9 +43,18 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
         submissionEnvelope.setSubmission(createSubmission(validationEnvelope.getSubmissionId()));
 
         submissionEnvelope.getAssayData().add(assayData);
-        if (validationEnvelope.getAssay() != null && validationEnvelope.getSubmissionId().equals(validationEnvelope.getAssay().getSubmissionId())) {
-            submissionEnvelope.getAssays().add(validationEnvelope.getAssay().getBaseSubmittable());
+
+        boolean haveAssays = (validationEnvelope.getAssays() != null &&
+                !validationEnvelope.getAssays().isEmpty());
+
+        if (haveAssays) {
+            Submittable<Assay> wrappedAssay = validationEnvelope.getAssays().iterator().next();
+
+            if (validationEnvelope.getSubmissionId().equals( wrappedAssay.getSubmissionId())){
+                submissionEnvelope.getAssays().add(wrappedAssay.getBaseSubmittable());
+            }
         }
+
         List<SingleValidationResult> singleValidationResultList = validate(submissionEnvelope, assayData);
 
         singleValidationResultList = filterFileExistenceError(singleValidationResultList, assayData);
