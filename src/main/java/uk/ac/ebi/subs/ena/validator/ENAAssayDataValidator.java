@@ -5,6 +5,8 @@ import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.data.submittable.AssayData;
+import uk.ac.ebi.subs.ena.errors.EnaDataErrorMessage;
+import uk.ac.ebi.subs.ena.errors.EnaReferenceErrorMessage;
 import uk.ac.ebi.subs.ena.processor.ENAProcessor;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 import uk.ac.ebi.subs.validator.data.AssayDataValidationMessageEnvelope;
@@ -81,5 +83,19 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
         }
 
         return filtererErrorList;
+    }
+
+    @Override
+    boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, AssayData entityToValidate) {
+        return false; //TODO
+    }
+
+    @Override
+    boolean isErrorRelevant(EnaDataErrorMessage enaDataErrorMessage, AssayData entityToValidate) {
+        return  (
+                enaDataErrorMessage.getEnaEntityType().equals("run") &&
+                enaDataErrorMessage.getAlias().equals(entityToValidate.getAlias()) &&
+                enaDataErrorMessage.getTeamName().equals(entityToValidate.getTeam().getName())
+        );
     }
 }

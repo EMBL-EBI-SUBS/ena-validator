@@ -3,8 +3,15 @@ package uk.ac.ebi.subs.ena.validator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
+import org.springframework.amqp.utils.test.TestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.submittable.Assay;
@@ -13,15 +20,24 @@ import uk.ac.ebi.subs.data.submittable.Sample;
 import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
 import uk.ac.ebi.subs.ena.helper.TestHelper;
+import uk.ac.ebi.subs.messaging.Exchanges;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
+import uk.ac.ebi.subs.validator.data.AssayDataValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
+import uk.ac.ebi.subs.validator.data.SingleValidationResultsEnvelope;
 import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
+import uk.ac.ebi.subs.validator.data.structures.ValidationAuthor;
+import uk.ac.ebi.subs.validator.model.Submittable;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static uk.ac.ebi.subs.ena.config.EnaValidatorRoutingKeys.EVENT_VALIDATION_SUCCESS;
 
 /**
  *
@@ -33,6 +49,9 @@ public class ENAAssayDataValidatorTest {
 
     @Autowired
     ENAAssayDataValidator enaAssayDataValidator;
+
+    @MockBean
+    RabbitMessagingTemplate rabbitMessagingTemplate;
 
     SubmissionEnvelope submissionEnvelope;
 
@@ -75,6 +94,73 @@ public class ENAAssayDataValidatorTest {
 
         final SingleValidationResult singleValidationResultAfterFilter = singleValidationResultList.get(0);
         assertThat(singleValidationResultAfterFilter.getValidationStatus(), is(SingleValidationResultStatus.Pass));
+    }
+
+    @Test
+    public void test_validation_with_data(){
+        AssayDataValidationMessageEnvelope envelope = createAssayDataValidationMessageEnvelope();
+
+        enaAssayDataValidator.validateAssayData(envelope);
+
+        SingleValidationResultsEnvelope expectedEnvelope = new SingleValidationResultsEnvelope(
+                Collections.emptyList(),
+                envelope.getValidationResultVersion(),
+                envelope.getValidationResultUUID(),
+                ValidationAuthor.Ena
+        );
+
+        ArgumentCaptor<SingleValidationResultsEnvelope> envelopeArgumentCaptor = ArgumentCaptor.forClass(SingleValidationResultsEnvelope.class);
+
+        Mockito.verify(rabbitMessagingTemplate)
+                .convertAndSend(
+                        Mockito.eq(Exchanges.SUBMISSIONS),
+                        Mockito.anyString(),
+                        envelopeArgumentCaptor.capture()
+                );
+
+        SingleValidationResultsEnvelope actualEnvelope = envelopeArgumentCaptor.getValue();
+
+        assertEquals(
+                expectedEnvelope.getSingleValidationResults(),
+                actualEnvelope.getSingleValidationResults()
+        );
+
+        assertEquals(
+                expectedEnvelope.getValidationResultUUID(),
+                actualEnvelope.getValidationResultUUID()
+        );
+
+        assertEquals(
+                expectedEnvelope.getValidationResultVersion(),
+                actualEnvelope.getValidationResultVersion()
+        );
+
+        assertEquals(
+                expectedEnvelope.getValidationAuthor(),
+                actualEnvelope.getValidationAuthor()
+        );
+
+    }
+
+    private AssayDataValidationMessageEnvelope createAssayDataValidationMessageEnvelope() {
+        final Team team = TestHelper.getTeam(CENTER_NAME);
+        final String assayDataAlias = UUID.randomUUID().toString();
+        final String assayAlias = UUID.randomUUID().toString();
+        final String submissionId = UUID.randomUUID().toString();
+
+        AssayData assayData = TestHelper.getAssayData(assayDataAlias,team,assayDataAlias);
+        Assay assay = TestHelper.getAssay(assayAlias,team,"sample","study");
+        Submittable<Assay> wrappedAssay = new Submittable<>(assay,submissionId);
+
+        AssayDataValidationMessageEnvelope envelope = new AssayDataValidationMessageEnvelope();
+        envelope.setEntityToValidate(assayData);
+        envelope.getAssays().add(wrappedAssay);
+
+        envelope.setSubmissionId(submissionId);
+        envelope.setValidationResultUUID(UUID.randomUUID().toString());
+        envelope.setValidationResultVersion(42);
+
+        return  envelope;
     }
 
 }

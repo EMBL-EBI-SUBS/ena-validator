@@ -3,9 +3,10 @@ package uk.ac.ebi.subs.ena.validator;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.subs.data.Submission;
 import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.data.submittable.Sample;
+import uk.ac.ebi.subs.ena.errors.EnaDataErrorMessage;
+import uk.ac.ebi.subs.ena.errors.EnaReferenceErrorMessage;
 import uk.ac.ebi.subs.ena.processor.ENAProcessor;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 import uk.ac.ebi.subs.validator.data.*;
@@ -23,6 +24,16 @@ public class ENAAssayValidator extends ENAValidator<Assay> {
 
     public ENAAssayValidator(ENAProcessor enaProcessor, RabbitMessagingTemplate rabbitMessagingTemplate) {
         super(enaProcessor, rabbitMessagingTemplate);
+    }
+
+    @Override
+    boolean isErrorRelevant(EnaDataErrorMessage enaDataErrorMessage, Assay entityToValidate) {
+        return false; //TODO
+    }
+
+    @Override
+    boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, Assay entityToValidate) {
+        return false; //TODO
     }
 
     /**
