@@ -28,7 +28,7 @@ public class ENAAssayValidator extends ENAValidator<Assay> {
 
     @Override
     boolean isErrorRelevant(EnaDataErrorMessage enaDataErrorMessage, Assay entityToValidate) {
-        return false; //TODO
+        return enaDataErrorMessage.getEnaEntityType().equals("experiment");
     }
 
     @Override

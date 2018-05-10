@@ -13,9 +13,7 @@ import uk.ac.ebi.subs.validator.data.AssayDataValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.model.Submittable;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static uk.ac.ebi.subs.ena.config.EnaValidatorQueues.ENA_ASSAYDATA_VALIDATION;
 
@@ -52,14 +50,12 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
         if (haveAssays) {
             Submittable<Assay> wrappedAssay = validationEnvelope.getAssays().iterator().next();
 
-            if (validationEnvelope.getSubmissionId().equals( wrappedAssay.getSubmissionId())){
+            if (validationEnvelope.getSubmissionId().equals(wrappedAssay.getSubmissionId())) {
                 submissionEnvelope.getAssays().add(wrappedAssay.getBaseSubmittable());
             }
         }
 
         List<SingleValidationResult> singleValidationResultList = validate(submissionEnvelope, assayData);
-
-        singleValidationResultList = filterFileExistenceError(singleValidationResultList, assayData);
 
         publishValidationMessage(validationEnvelope.getEntityToValidate(),
                 singleValidationResultList,
@@ -67,23 +63,6 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
                 validationEnvelope.getValidationResultVersion());
     }
 
-    List<SingleValidationResult> filterFileExistenceError(List<SingleValidationResult> singleValidationResultList,
-                                                          AssayData submittable) {
-        List<SingleValidationResult> filtererErrorList = singleValidationResultList.stream().filter(
-                singleValidationResult -> {
-                    String message = singleValidationResult.getMessage();
-
-                    return !(message.startsWith("In run")
-                            && message.contains("in the upload area"));
-                }
-        ).collect(Collectors.toList());
-
-        if (filtererErrorList.size() == 0) {
-            filtererErrorList = Collections.singletonList(createEmptySingleValidationResult(submittable));
-        }
-
-        return filtererErrorList;
-    }
 
     @Override
     boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, AssayData entityToValidate) {
@@ -92,10 +71,14 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
 
     @Override
     boolean isErrorRelevant(EnaDataErrorMessage enaDataErrorMessage, AssayData entityToValidate) {
-        return  (
-                enaDataErrorMessage.getEnaEntityType().equals("run") &&
-                enaDataErrorMessage.getAlias().equals(entityToValidate.getAlias()) &&
-                enaDataErrorMessage.getTeamName().equals(entityToValidate.getTeam().getName())
-        );
+        boolean entityTypeMatches = enaDataErrorMessage.getEnaEntityType().equals("run");
+        boolean entityAliasMatches = enaDataErrorMessage.getAlias().equals(entityToValidate.getAlias());
+        boolean entityTeamMatches = enaDataErrorMessage.getTeamName().equals(entityToValidate.getTeam().getName());
+        boolean errorMessageIsNotAboutMissingFile = !enaDataErrorMessage.getMessage().contains("in the upload area");
+
+        return entityTypeMatches &&
+                entityAliasMatches &&
+                entityTeamMatches &&
+                errorMessageIsNotAboutMissingFile;
     }
 }

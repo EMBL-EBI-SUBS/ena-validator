@@ -28,12 +28,12 @@ public class ENASampleValidator extends ENAValidator<Sample> {
 
     @Override
     boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, Sample entityToValidate) {
-        return false; //TODO
+        return true; //errors are always relevant, there's only one thing in the submission
     }
 
     @Override
     boolean isErrorRelevant(EnaDataErrorMessage enaDataErrorMessage, Sample entityToValidate) {
-        return false;//TODO
+        return true; //errors are always relevant, there's only one thing in the submission
     }
 
     /**

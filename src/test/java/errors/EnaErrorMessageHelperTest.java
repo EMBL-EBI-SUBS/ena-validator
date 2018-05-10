@@ -10,9 +10,6 @@ import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 
 public class EnaErrorMessageHelperTest {
 
-//    "Failed to validate run xml, error: Expected element 'EXPERIMENT_REF' instead of 'DATA_BLOCK' here in element RUN";
-  //          "Failed to validate run xml, error: Expected element 'EXPERIMENT_REF' before the end of the content in element RUN"
-
     private static final String EXPERIMENT_DATA_ERROR = "In experiment, alias:\"13afaffd-4664-486e-a4eb-ee663a149754@USI-test-team\", accession:\"\". Missing study reference from experiment";
     private static final String EXPERIMENT_REFERENCE_ERROR = "In reference:\"SAMPLE_DESCRIPTOR\", reference alias:\"sample@USI-test-team\", reference accession:\"\". Failed to find referenced sample, alias sample@USI-test-team.";
     private static final String NULL_SAMPLE_IN_EXPERIMENT_ERROR = "Sample in experiment is null";

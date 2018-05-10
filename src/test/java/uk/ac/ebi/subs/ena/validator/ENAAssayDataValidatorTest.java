@@ -1,5 +1,6 @@
 package uk.ac.ebi.subs.ena.validator;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.ac.ebi.subs.data.component.AssayRef;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.data.submittable.AssayData;
@@ -57,6 +59,8 @@ public class ENAAssayDataValidatorTest {
 
     private static final String SUBMISSION_ID = "12ab34cd-1234-5678-9999-aabbccddeeff";
 
+    private ArgumentCaptor<SingleValidationResultsEnvelope> envelopeArgumentCaptor = ArgumentCaptor.forClass(SingleValidationResultsEnvelope.class);
+
     @Before
     public void setUp() {
         submissionEnvelope = new SubmissionEnvelope();
@@ -87,17 +91,13 @@ public class ENAAssayDataValidatorTest {
 
         List<SingleValidationResult> singleValidationResultList =
                 enaAssayDataValidator.validate(submissionEnvelope, assayData);
-        final SingleValidationResult singleValidationResultBeforeFilter = singleValidationResultList.get(0);
-        assertThat(singleValidationResultBeforeFilter.getValidationStatus(), is(SingleValidationResultStatus.Error));
-
-        singleValidationResultList = enaAssayDataValidator.filterFileExistenceError(singleValidationResultList, assayData);
 
         final SingleValidationResult singleValidationResultAfterFilter = singleValidationResultList.get(0);
         assertThat(singleValidationResultAfterFilter.getValidationStatus(), is(SingleValidationResultStatus.Pass));
     }
 
     @Test
-    public void test_validation_with_data(){
+    public void test_validation_with_good_data(){
         AssayDataValidationMessageEnvelope envelope = createAssayDataValidationMessageEnvelope();
 
         enaAssayDataValidator.validateAssayData(envelope);
@@ -108,8 +108,6 @@ public class ENAAssayDataValidatorTest {
                 envelope.getValidationResultUUID(),
                 ValidationAuthor.Ena
         );
-
-        ArgumentCaptor<SingleValidationResultsEnvelope> envelopeArgumentCaptor = ArgumentCaptor.forClass(SingleValidationResultsEnvelope.class);
 
         Mockito.verify(rabbitMessagingTemplate)
                 .convertAndSend(
@@ -140,6 +138,29 @@ public class ENAAssayDataValidatorTest {
                 actualEnvelope.getValidationAuthor()
         );
 
+    }
+
+    @Test
+    public void test_validation_with_no_file_ref(){
+        AssayDataValidationMessageEnvelope envelope = createAssayDataValidationMessageEnvelope();
+
+        envelope.getEntityToValidate().setFiles(Collections.emptyList());
+
+
+        enaAssayDataValidator.validateAssayData(envelope);
+
+        Mockito.verify(rabbitMessagingTemplate)
+                .convertAndSend(
+                        Mockito.eq(Exchanges.SUBMISSIONS),
+                        Mockito.anyString(),
+                        envelopeArgumentCaptor.capture()
+                );
+
+        SingleValidationResultsEnvelope actualEnvelope = envelopeArgumentCaptor.getValue();
+
+        Assert.assertTrue(
+                actualEnvelope.getSingleValidationResults().size() > 0
+        );
     }
 
     private AssayDataValidationMessageEnvelope createAssayDataValidationMessageEnvelope() {

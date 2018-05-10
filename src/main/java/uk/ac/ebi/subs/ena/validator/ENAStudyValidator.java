@@ -27,14 +27,13 @@ public class ENAStudyValidator extends ENAValidator<Study> {
 
     @Override
     boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, Study entityToValidate) {
-        return false; //TODO
+        return true; //errors are always relevant, there's only one thing in the submission
     }
 
     @Override
     boolean isErrorRelevant(EnaDataErrorMessage enaDataErrorMessage, Study entityToValidate) {
-        return false; //TODO
+        return true; //errors are always relevant, there's only one thing in the submission
     }
-
     /**
      * Do a validation for the study submitted in the {@link StudyValidationMessageEnvelope}.
      * It produces a message according to the validation outcome.

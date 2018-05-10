@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.subs.data.Submission;
 import uk.ac.ebi.subs.data.submittable.BaseSubmittable;
+import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.errors.EnaDataErrorMessage;
 import uk.ac.ebi.subs.ena.errors.EnaErrorMessageHelper;
@@ -90,7 +91,6 @@ public abstract class ENAValidator<T extends BaseSubmittable> {
 
     abstract boolean isErrorRelevant(EnaDataErrorMessage enaDataErrorMessage, T entityToValidate);
     abstract boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, T entityToValidate);
-
 
     Submission createSubmission(String submissionId) {
         Submission submission = new Submission();
