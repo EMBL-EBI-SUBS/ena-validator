@@ -77,6 +77,9 @@ public abstract class ENAValidator<T extends BaseSubmittable> {
                 }
 
             }
+            else { // default to keeping error messages if they don't match the patterns we understand
+                passedMessages.add(validationResult);
+            }
 
 
         }

@@ -39,7 +39,7 @@ public class EnaErrorMessageHelper {
     }
 
     private final Pattern referenceErrorRegex = Pattern.compile(
-            "^In reference:\"(.*)\", reference alias:\"(.+)@USI-(.*)\" reference accession:\"(.*)\". (.*)"
+            "^In reference:\"(.*)\", reference alias:\"(.+)@USI-(.*)\", reference accession:\"(.*)\". (.*)"
     );
 
     public boolean isReferenceError(SingleValidationResult validationResult){
