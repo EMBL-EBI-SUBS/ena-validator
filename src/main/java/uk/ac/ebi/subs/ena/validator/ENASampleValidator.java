@@ -36,6 +36,11 @@ public class ENASampleValidator extends ENAValidator<Sample> {
         return true; //errors are always relevant, there's only one thing in the submission
     }
 
+    @Override
+    boolean isErrorRelevant(String message, Sample entityToValidate) {
+        return true; //errors are always relevant, there's only one thing in the submission
+    }
+
     /**
      * Do a validation for the sample submitted in the {@link SampleValidationMessageEnvelope}.
      * It produces a message according to the validation outcome.

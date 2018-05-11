@@ -66,7 +66,11 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
 
     @Override
     boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, AssayData entityToValidate) {
-        return false; //TODO
+        if (enaReferenceErrorMessage.getReferenceLocator().equals("SAMPLE_DESCRIPTOR") ){
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -80,5 +84,14 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
                 entityAliasMatches &&
                 entityTeamMatches &&
                 errorMessageIsNotAboutMissingFile;
+    }
+
+    @Override
+    boolean isErrorRelevant(String message, AssayData entityToValidate) {
+        if (message.equals("Sample in experiment is null")) {
+            return false;
+        }
+
+        return true;
     }
 }

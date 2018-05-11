@@ -33,7 +33,12 @@ public class ENAAssayValidator extends ENAValidator<Assay> {
 
     @Override
     boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, Assay entityToValidate) {
-        return false; //TODO
+        return true; //TODO
+    }
+
+    @Override
+    boolean isErrorRelevant(String message, Assay entityToValidate) {
+        return true; //TODO
     }
 
     /**

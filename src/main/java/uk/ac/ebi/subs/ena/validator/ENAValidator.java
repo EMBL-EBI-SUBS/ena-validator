@@ -6,7 +6,6 @@ import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.subs.data.Submission;
 import uk.ac.ebi.subs.data.submittable.BaseSubmittable;
-import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.data.submittable.Submittable;
 import uk.ac.ebi.subs.ena.errors.EnaDataErrorMessage;
 import uk.ac.ebi.subs.ena.errors.EnaErrorMessageHelper;
@@ -63,22 +62,16 @@ public abstract class ENAValidator<T extends BaseSubmittable> {
 
         for (SingleValidationResult validationResult : rawValidationResults) {
 
-            if (enaErrorMessageHelper.isDataError(validationResult)){
-                EnaDataErrorMessage enaDataErrorMessage = enaErrorMessageHelper.parseDataError(validationResult);
-
-                if (isErrorRelevant(enaDataErrorMessage,entityToValidate)){
+            // handle well structured error messages, then less well structured
+            if (enaErrorMessageHelper.isDataError(validationResult)) {
+                if (isDataErrorRelevant(validationResult, entityToValidate)) {
                     passedMessages.add(validationResult);
                 }
-            }
-            else if (enaErrorMessageHelper.isReferenceError(validationResult)){
-                EnaReferenceErrorMessage enaReferenceErrorMessage = enaErrorMessageHelper.parseReferenceError(validationResult);
-
-                if (isErrorRelevant(enaReferenceErrorMessage,entityToValidate)){
+            } else if (enaErrorMessageHelper.isReferenceError(validationResult)) {
+                if (isReferenceErrorRelevant(validationResult, entityToValidate)) {
                     passedMessages.add(validationResult);
                 }
-
-            }
-            else { // default to keeping error messages if they don't match the patterns we understand
+            } else if (isErrorRelevant(validationResult.getMessage(), entityToValidate)) {
                 passedMessages.add(validationResult);
             }
 
@@ -89,8 +82,23 @@ public abstract class ENAValidator<T extends BaseSubmittable> {
         return passedMessages;
     }
 
+    private boolean isDataErrorRelevant(SingleValidationResult validationResult, T entityToValidate) {
+        EnaDataErrorMessage enaDataErrorMessage = enaErrorMessageHelper.parseDataError(validationResult);
+
+        return isErrorRelevant(enaDataErrorMessage, entityToValidate);
+    }
+
+    private boolean isReferenceErrorRelevant(SingleValidationResult validationResult, T entityToValidate) {
+        EnaReferenceErrorMessage enaReferenceErrorMessage = enaErrorMessageHelper.parseReferenceError(validationResult);
+
+        return isErrorRelevant(enaReferenceErrorMessage, entityToValidate);
+    }
+
     abstract boolean isErrorRelevant(EnaDataErrorMessage enaDataErrorMessage, T entityToValidate);
+
     abstract boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, T entityToValidate);
+
+    abstract boolean isErrorRelevant(String message, T entityToValidate);
 
     Submission createSubmission(String submissionId) {
         Submission submission = new Submission();
