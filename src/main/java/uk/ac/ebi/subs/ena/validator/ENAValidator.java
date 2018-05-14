@@ -50,6 +50,11 @@ public abstract class ENAValidator<T extends BaseSubmittable> {
         if (filteredValidationResults.isEmpty()) {
             return Collections.singletonList(createEmptySingleValidationResult(entityToValidate));
         } else {
+
+            for (SingleValidationResult result : filteredValidationResults) {
+                result.setEntityUuid(entityToValidate.getId());
+            }
+
             return filteredValidationResults;
         }
     }

@@ -2,31 +2,30 @@ package uk.ac.ebi.subs.ena.validator;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
-import uk.ac.ebi.subs.ena.config.RabbitMQDependentTest;
 import uk.ac.ebi.subs.ena.helper.TestHelper;
-import uk.ac.ebi.subs.processing.SubmissionEnvelope;
-import uk.ac.ebi.subs.validator.data.SingleValidationResult;
+import uk.ac.ebi.subs.messaging.Exchanges;
+import uk.ac.ebi.subs.validator.data.SingleValidationResultsEnvelope;
 import uk.ac.ebi.subs.validator.data.StudyValidationMessageEnvelope;
-import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
 
-import java.util.List;
 import java.util.UUID;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.assertEnvelopesEqual;
+import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.errorResult;
+import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.expectedEnvelope;
+import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.passResult;
 
 /**
- *
  * Created by karoly on 09/06/2017.
  */
 @RunWith(SpringRunner.class)
@@ -36,26 +35,112 @@ public class ENAStudyValidatorTest {
     @Autowired
     ENAStudyValidator enaStudyValidator;
 
-    SubmissionEnvelope submissionEnvelope;
+    @MockBean
+    RabbitMessagingTemplate rabbitMessagingTemplate;
 
-    private static final String SUBMISSION_ID = "12ab34cd-1234-5678-9999-aabbccddeeff";
+    private ArgumentCaptor<SingleValidationResultsEnvelope> envelopeArgumentCaptor;
 
     @Before
     public void setUp() {
-        submissionEnvelope = new SubmissionEnvelope();
-        submissionEnvelope.setSubmission(enaStudyValidator.createSubmission(SUBMISSION_ID));
+        envelopeArgumentCaptor = ArgumentCaptor.forClass(SingleValidationResultsEnvelope.class);
     }
 
     private static final String CENTER_NAME = "test-team";
 
     @Test
-    public void testExecuteSubmittableValidation () {
-        final Team team = TestHelper.getTeam(CENTER_NAME);
-        final Study study = TestHelper.getStudy(UUID.randomUUID().toString(), team, "study_abstract","Whole Genome Sequencing");
-        submissionEnvelope.getStudies().add(study);
-        final List<SingleValidationResult> singleValidationResultList = enaStudyValidator.validate(submissionEnvelope,study);
-        final SingleValidationResult singleValidationResult = singleValidationResultList.get(0);
-        assertThat(singleValidationResult.getValidationStatus(), is(SingleValidationResultStatus.Pass));
+    public void validate_good_study() {
+        StudyValidationMessageEnvelope studyValidationMessageEnvelope = createStudyValidationMessageEnvelope();
+
+        enaStudyValidator.validateStudy(studyValidationMessageEnvelope);
+
+        SingleValidationResultsEnvelope expectedEnvelope = expectedEnvelope(
+                studyValidationMessageEnvelope,
+                passResult(studyValidationMessageEnvelope)
+        );
+
+        Mockito.verify(rabbitMessagingTemplate)
+                .convertAndSend(
+                        Mockito.eq(Exchanges.SUBMISSIONS),
+                        Mockito.anyString(),
+                        envelopeArgumentCaptor.capture()
+                );
+
+        SingleValidationResultsEnvelope actualEnvelope = envelopeArgumentCaptor.getValue();
+
+        assertEnvelopesEqual(expectedEnvelope, actualEnvelope);
+    }
+
+    @Test
+    public void validate_study_no_study_abstract() {
+        StudyValidationMessageEnvelope studyValidationMessageEnvelope = createStudyValidationMessageEnvelope();
+        Study study = studyValidationMessageEnvelope.getEntityToValidate();
+
+        study.getAttributes().remove("study_abstract");
+
+
+        enaStudyValidator.validateStudy(studyValidationMessageEnvelope);
+
+        SingleValidationResultsEnvelope expectedEnvelope = expectedEnvelope(
+                studyValidationMessageEnvelope,
+                errorResult(studyValidationMessageEnvelope, "Value for attribute study_abstract is required.")
+        );
+
+        Mockito.verify(rabbitMessagingTemplate)
+                .convertAndSend(
+                        Mockito.eq(Exchanges.SUBMISSIONS),
+                        Mockito.anyString(),
+                        envelopeArgumentCaptor.capture()
+                );
+
+        SingleValidationResultsEnvelope actualEnvelope = envelopeArgumentCaptor.getValue();
+
+        assertEnvelopesEqual(expectedEnvelope, actualEnvelope);
+    }
+
+    @Test
+    public void validate_study_no_study_type() {
+        StudyValidationMessageEnvelope studyValidationMessageEnvelope = createStudyValidationMessageEnvelope();
+        Study study = studyValidationMessageEnvelope.getEntityToValidate();
+
+        study.getAttributes().remove("study_type");
+
+
+        enaStudyValidator.validateStudy(studyValidationMessageEnvelope);
+
+        SingleValidationResultsEnvelope expectedEnvelope = expectedEnvelope(
+                studyValidationMessageEnvelope,
+                errorResult(studyValidationMessageEnvelope, "Value for attribute study_type is required.")
+        );
+
+        Mockito.verify(rabbitMessagingTemplate)
+                .convertAndSend(
+                        Mockito.eq(Exchanges.SUBMISSIONS),
+                        Mockito.anyString(),
+                        envelopeArgumentCaptor.capture()
+                );
+
+        SingleValidationResultsEnvelope actualEnvelope = envelopeArgumentCaptor.getValue();
+
+        assertEnvelopesEqual(expectedEnvelope, actualEnvelope);
+    }
+
+
+    private StudyValidationMessageEnvelope createStudyValidationMessageEnvelope() {
+        Team team = TestHelper.getTeam(CENTER_NAME);
+        String studyAlias = UUID.randomUUID().toString();
+        String submissionId = UUID.randomUUID().toString();
+
+        Study study = TestHelper.getStudy(studyAlias, team, "study_abstract", "Whole Genome Sequencing");
+
+
+        StudyValidationMessageEnvelope envelope = new StudyValidationMessageEnvelope();
+        envelope.setEntityToValidate(study);
+
+        envelope.setSubmissionId(submissionId);
+        envelope.setValidationResultUUID(UUID.randomUUID().toString());
+        envelope.setValidationResultVersion(42);
+
+        return envelope;
     }
 
 }

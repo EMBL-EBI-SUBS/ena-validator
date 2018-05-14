@@ -1,6 +1,5 @@
 package uk.ac.ebi.subs.ena.validator;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,17 +23,18 @@ import uk.ac.ebi.subs.validator.data.AssayDataValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.SingleValidationResultsEnvelope;
 import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
-import uk.ac.ebi.subs.validator.data.structures.ValidationAuthor;
 import uk.ac.ebi.subs.validator.model.Submittable;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.assertEnvelopesEqual;
+import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.errorResult;
+import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.expectedEnvelope;
+import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.passResult;
 
 /**
  * Created by karoly on 09/06/2017.
@@ -147,7 +147,7 @@ public class ENAAssayDataValidatorTest {
 
         SingleValidationResultsEnvelope actualEnvelope = envelopeArgumentCaptor.getValue();
 
-        assertEnvelopesEqual(expectedEnvelope,actualEnvelope);
+        assertEnvelopesEqual(expectedEnvelope, actualEnvelope);
     }
 
     @Test
@@ -182,7 +182,7 @@ public class ENAAssayDataValidatorTest {
 
         SingleValidationResultsEnvelope actualEnvelope = envelopeArgumentCaptor.getValue();
 
-        assertEnvelopesEqual(expectedEnvelope,actualEnvelope);
+        assertEnvelopesEqual(expectedEnvelope, actualEnvelope);
     }
 
     private AssayDataValidationMessageEnvelope createAssayDataValidationMessageEnvelope() {
@@ -206,58 +206,4 @@ public class ENAAssayDataValidatorTest {
         return envelope;
     }
 
-
-    private SingleValidationResult passResult(AssayDataValidationMessageEnvelope envelope) {
-        SingleValidationResult result = new SingleValidationResult(
-                ValidationAuthor.Ena,
-                envelope.getEntityToValidate().getId()
-        );
-
-        result.setValidationStatus(SingleValidationResultStatus.Pass);
-        return result;
-    }
-
-    private SingleValidationResult errorResult(AssayDataValidationMessageEnvelope envelope, String message) {
-        SingleValidationResult result = new SingleValidationResult(
-                ValidationAuthor.Ena,
-                null
-        );
-
-        result.setValidationStatus(SingleValidationResultStatus.Error);
-
-        result.setMessage(message);
-
-        return result;
-    }
-
-    private SingleValidationResultsEnvelope expectedEnvelope(AssayDataValidationMessageEnvelope envelope, SingleValidationResult... expectedResults) {
-        return new SingleValidationResultsEnvelope(
-                Arrays.asList(expectedResults),
-                envelope.getValidationResultVersion(),
-                envelope.getValidationResultUUID(),
-                ValidationAuthor.Ena
-        );
-    }
-
-    private void assertEnvelopesEqual(SingleValidationResultsEnvelope expectedEnvelope, SingleValidationResultsEnvelope actualEnvelope) {
-        assertEquals(
-                expectedEnvelope.getSingleValidationResults(),
-                actualEnvelope.getSingleValidationResults()
-        );
-
-        assertEquals(
-                expectedEnvelope.getValidationResultUUID(),
-                actualEnvelope.getValidationResultUUID()
-        );
-
-        assertEquals(
-                expectedEnvelope.getValidationResultVersion(),
-                actualEnvelope.getValidationResultVersion()
-        );
-
-        assertEquals(
-                expectedEnvelope.getValidationAuthor(),
-                actualEnvelope.getValidationAuthor()
-        );
-    }
 }
