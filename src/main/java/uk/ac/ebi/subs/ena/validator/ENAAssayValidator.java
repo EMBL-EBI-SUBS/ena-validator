@@ -33,11 +33,18 @@ public class ENAAssayValidator extends ENAValidator<Assay> {
 
     @Override
     boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, Assay entityToValidate) {
+        if (enaReferenceErrorMessage.getReferenceLocator().equals("SAMPLE_DESCRIPTOR")){
+            return false;
+        }
         return true; //TODO
     }
 
     @Override
     boolean isErrorRelevant(String message, Assay entityToValidate) {
+        if (message.equals("Sample in experiment is null")){
+            return false;
+        }
+
         return true; //TODO
     }
 
