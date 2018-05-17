@@ -7,12 +7,14 @@ import org.springframework.stereotype.Service;
 import uk.ac.ebi.subs.data.Submission;
 import uk.ac.ebi.subs.data.submittable.BaseSubmittable;
 import uk.ac.ebi.subs.data.submittable.Submittable;
+import uk.ac.ebi.subs.ena.errors.EnaDataErrorMessage;
+import uk.ac.ebi.subs.ena.errors.EnaErrorMessageHelper;
+import uk.ac.ebi.subs.ena.errors.EnaReferenceErrorMessage;
 import uk.ac.ebi.subs.ena.processor.ENAProcessor;
 import uk.ac.ebi.subs.messaging.Exchanges;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.SingleValidationResultsEnvelope;
-import uk.ac.ebi.subs.validator.data.ValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.structures.SingleValidationResultStatus;
 import uk.ac.ebi.subs.validator.data.structures.ValidationAuthor;
 
@@ -33,20 +35,75 @@ public abstract class ENAValidator<T extends BaseSubmittable> {
     ENAProcessor enaProcessor;
     RabbitMessagingTemplate rabbitMessagingTemplate;
 
+    EnaErrorMessageHelper enaErrorMessageHelper = new EnaErrorMessageHelper();
+
     public ENAValidator(ENAProcessor enaProcessor, RabbitMessagingTemplate rabbitMessagingTemplate) {
         this.enaProcessor = enaProcessor;
         this.rabbitMessagingTemplate = rabbitMessagingTemplate;
     }
 
-    protected List<SingleValidationResult> validate (SubmissionEnvelope submissionEnvelope, T entityToValidate) {
+    protected List<SingleValidationResult> validate(SubmissionEnvelope submissionEnvelope, T entityToValidate) {
         logger.info("Validating " + entityToValidate);
-        List<SingleValidationResult> singleValidationResultList = enaProcessor.process(submissionEnvelope);
-        if (singleValidationResultList.isEmpty()) {
+        List<SingleValidationResult> rawResults = enaProcessor.process(submissionEnvelope);
+
+        List<SingleValidationResult> filteredValidationResults = filterValidationResults(rawResults, entityToValidate);
+        if (filteredValidationResults.isEmpty()) {
             return Collections.singletonList(createEmptySingleValidationResult(entityToValidate));
         } else {
-            return singleValidationResultList;
+
+            for (SingleValidationResult result : filteredValidationResults) {
+                result.setEntityUuid(entityToValidate.getId());
+            }
+
+            return filteredValidationResults;
         }
     }
+
+    /*
+
+     */
+    private List<SingleValidationResult> filterValidationResults(List<SingleValidationResult> rawValidationResults, T entityToValidate) {
+        List<SingleValidationResult> passedMessages = new ArrayList<>();
+
+        for (SingleValidationResult validationResult : rawValidationResults) {
+
+            // handle well structured error messages, then less well structured
+            if (enaErrorMessageHelper.isDataError(validationResult)) {
+                if (isDataErrorRelevant(validationResult, entityToValidate)) {
+                    passedMessages.add(validationResult);
+                }
+            } else if (enaErrorMessageHelper.isReferenceError(validationResult)) {
+                if (isReferenceErrorRelevant(validationResult, entityToValidate)) {
+                    passedMessages.add(validationResult);
+                }
+            } else if (isErrorRelevant(validationResult.getMessage(), entityToValidate)) {
+                passedMessages.add(validationResult);
+            }
+
+
+        }
+
+
+        return passedMessages;
+    }
+
+    private boolean isDataErrorRelevant(SingleValidationResult validationResult, T entityToValidate) {
+        EnaDataErrorMessage enaDataErrorMessage = enaErrorMessageHelper.parseDataError(validationResult);
+
+        return isErrorRelevant(enaDataErrorMessage, entityToValidate);
+    }
+
+    private boolean isReferenceErrorRelevant(SingleValidationResult validationResult, T entityToValidate) {
+        EnaReferenceErrorMessage enaReferenceErrorMessage = enaErrorMessageHelper.parseReferenceError(validationResult);
+
+        return isErrorRelevant(enaReferenceErrorMessage, entityToValidate);
+    }
+
+    abstract boolean isErrorRelevant(EnaDataErrorMessage enaDataErrorMessage, T entityToValidate);
+
+    abstract boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, T entityToValidate);
+
+    abstract boolean isErrorRelevant(String message, T entityToValidate);
 
     Submission createSubmission(String submissionId) {
         Submission submission = new Submission();
@@ -81,11 +138,12 @@ public abstract class ENAValidator<T extends BaseSubmittable> {
         return errorValidationResult != null;
     }
 
-    void checkForEmptySingleValidationResult (List<SingleValidationResult> singleValidationResultList, Submittable submittable) {
-        if (singleValidationResultList.isEmpty()) singleValidationResultList.add(createEmptySingleValidationResult(submittable));
+    void checkForEmptySingleValidationResult(List<SingleValidationResult> singleValidationResultList, Submittable submittable) {
+        if (singleValidationResultList.isEmpty())
+            singleValidationResultList.add(createEmptySingleValidationResult(submittable));
     }
 
-    SingleValidationResult createEmptySingleValidationResult (Submittable submittable) {
+    SingleValidationResult createEmptySingleValidationResult(Submittable submittable) {
         SingleValidationResult singleValidationResult = new SingleValidationResult(ValidationAuthor.Ena, submittable.getId());
         singleValidationResult.setValidationStatus(SingleValidationResultStatus.Pass);
         return singleValidationResult;

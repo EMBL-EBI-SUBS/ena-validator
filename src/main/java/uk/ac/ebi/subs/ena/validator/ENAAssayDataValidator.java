@@ -5,15 +5,15 @@ import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.data.submittable.AssayData;
+import uk.ac.ebi.subs.ena.errors.EnaDataErrorMessage;
+import uk.ac.ebi.subs.ena.errors.EnaReferenceErrorMessage;
 import uk.ac.ebi.subs.ena.processor.ENAProcessor;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 import uk.ac.ebi.subs.validator.data.AssayDataValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.model.Submittable;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static uk.ac.ebi.subs.ena.config.EnaValidatorQueues.ENA_ASSAYDATA_VALIDATION;
 
@@ -50,14 +50,12 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
         if (haveAssays) {
             Submittable<Assay> wrappedAssay = validationEnvelope.getAssays().iterator().next();
 
-            if (validationEnvelope.getSubmissionId().equals( wrappedAssay.getSubmissionId())){
+            if (validationEnvelope.getSubmissionId().equals(wrappedAssay.getSubmissionId())) {
                 submissionEnvelope.getAssays().add(wrappedAssay.getBaseSubmittable());
             }
         }
 
         List<SingleValidationResult> singleValidationResultList = validate(submissionEnvelope, assayData);
-
-        singleValidationResultList = filterFileExistenceError(singleValidationResultList, assayData);
 
         publishValidationMessage(validationEnvelope.getEntityToValidate(),
                 singleValidationResultList,
@@ -65,21 +63,35 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
                 validationEnvelope.getValidationResultVersion());
     }
 
-    List<SingleValidationResult> filterFileExistenceError(List<SingleValidationResult> singleValidationResultList,
-                                                          AssayData submittable) {
-        List<SingleValidationResult> filtererErrorList = singleValidationResultList.stream().filter(
-                singleValidationResult -> {
-                    String message = singleValidationResult.getMessage();
 
-                    return !(message.startsWith("In run")
-                            && message.contains("in the upload area"));
-                }
-        ).collect(Collectors.toList());
-
-        if (filtererErrorList.size() == 0) {
-            filtererErrorList = Collections.singletonList(createEmptySingleValidationResult(submittable));
+    @Override
+    boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, AssayData entityToValidate) {
+        if (enaReferenceErrorMessage.getReferenceLocator().equals("SAMPLE_DESCRIPTOR") ){
+            return false;
         }
 
-        return filtererErrorList;
+        return true;
+    }
+
+    @Override
+    boolean isErrorRelevant(EnaDataErrorMessage enaDataErrorMessage, AssayData entityToValidate) {
+        boolean entityTypeMatches = enaDataErrorMessage.getEnaEntityType().equals("run");
+        boolean entityAliasMatches = enaDataErrorMessage.getAlias().equals(entityToValidate.getAlias());
+        boolean entityTeamMatches = enaDataErrorMessage.getTeamName().equals(entityToValidate.getTeam().getName());
+        boolean errorMessageIsNotAboutMissingFile = !enaDataErrorMessage.getMessage().contains("in the upload area");
+
+        return entityTypeMatches &&
+                entityAliasMatches &&
+                entityTeamMatches &&
+                errorMessageIsNotAboutMissingFile;
+    }
+
+    @Override
+    boolean isErrorRelevant(String message, AssayData entityToValidate) {
+        if (message.equals("Sample in experiment is null")) {
+            return false;
+        }
+
+        return true;
     }
 }
