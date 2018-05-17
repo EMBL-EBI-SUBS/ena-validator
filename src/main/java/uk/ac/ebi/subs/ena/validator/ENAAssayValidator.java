@@ -36,7 +36,7 @@ public class ENAAssayValidator extends ENAValidator<Assay> {
         if (enaReferenceErrorMessage.getReferenceLocator().equals("SAMPLE_DESCRIPTOR")){
             return false;
         }
-        return true; //TODO
+        return true;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class ENAAssayValidator extends ENAValidator<Assay> {
             return false;
         }
 
-        return true; //TODO
+        return true;
     }
 
     /**
