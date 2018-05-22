@@ -4,6 +4,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.subs.data.submittable.Study;
+import uk.ac.ebi.subs.ena.errors.EnaDataErrorMessage;
+import uk.ac.ebi.subs.ena.errors.EnaReferenceErrorMessage;
 import uk.ac.ebi.subs.ena.processor.ENAProcessor;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
@@ -21,6 +23,21 @@ public class ENAStudyValidator extends ENAValidator<Study> {
 
     public ENAStudyValidator(ENAProcessor enaProcessor, RabbitMessagingTemplate rabbitMessagingTemplate) {
         super(enaProcessor, rabbitMessagingTemplate);
+    }
+
+    @Override
+    boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, Study entityToValidate) {
+        return true; //errors are always relevant, there's only one thing in the submission
+    }
+
+    @Override
+    boolean isErrorRelevant(EnaDataErrorMessage enaDataErrorMessage, Study entityToValidate) {
+        return true; //errors are always relevant, there's only one thing in the submission
+    }
+
+    @Override
+    boolean isErrorRelevant(String message, Study entityToValidate) {
+        return true; //errors are always relevant, there's only one thing in the submission
     }
 
     /**
