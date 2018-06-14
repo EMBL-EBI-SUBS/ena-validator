@@ -23,7 +23,10 @@ import uk.ac.ebi.subs.validator.model.Submittable;
 
 import java.util.UUID;
 
-import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.*;
+import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.assertEnvelopesEqual;
+import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.errorResult;
+import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.expectedEnvelope;
+import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.passResult;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
@@ -127,11 +130,10 @@ public class ENAAssayValidatorTest {
     private AssayValidationMessageEnvelope createAssayValidationMessageEnvelope() {
         Team team = TestHelper.getTeam(CENTER_NAME);
         String assayAlias = UUID.randomUUID().toString();
-        String sampleAlias = UUID.randomUUID().toString();
         String studyAlias = UUID.randomUUID().toString();
         String submissionId = UUID.randomUUID().toString();
 
-        Assay assay = TestHelper.getAssay(assayAlias, team, sampleAlias, studyAlias);
+        Assay assay = TestHelper.getAssay(assayAlias, team, TestAccessions.BIOSAMPLE_ACCESSION, studyAlias);
         Study study = TestHelper.getStudy(studyAlias, team, "study_abstract", "Whole Genome Sequencing");
 
         AssayValidationMessageEnvelope envelope = new AssayValidationMessageEnvelope();
