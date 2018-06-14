@@ -68,12 +68,11 @@ public class ENAAssayDataValidatorTest {
     public void testExecuteSubmittableValidation() {
         final Team team = TestHelper.getTeam(CENTER_NAME);
         final String alias = UUID.randomUUID().toString();
-        final String submissionId = UUID.randomUUID().toString();
 
         final Study study = TestHelper.getStudy(
                 alias, team, "study_abstract", "Whole Genome Sequencing");
         final Sample sample = TestHelper.getSample(alias, team);
-        final Assay assay = TestHelper.getAssay(alias, team, alias, alias);
+        final Assay assay = TestHelper.getAssay(alias, team, TestAccessions.BIOSAMPLE_ACCESSION, alias);
         final AssayData assayData = TestHelper.getAssayData(alias, team, alias);
 
         final String filename = "missing_file_while_validation.fastq.gz";
@@ -192,7 +191,7 @@ public class ENAAssayDataValidatorTest {
         final String submissionId = UUID.randomUUID().toString();
 
         AssayData assayData = TestHelper.getAssayData(assayDataAlias, team, assayDataAlias);
-        Assay assay = TestHelper.getAssay(assayAlias, team, "sample", "study");
+        Assay assay = TestHelper.getAssay(assayAlias, team, TestAccessions.BIOSAMPLE_ACCESSION, "study");
         Submittable<Assay> wrappedAssay = new Submittable<>(assay, submissionId);
 
         AssayDataValidationMessageEnvelope envelope = new AssayDataValidationMessageEnvelope();
