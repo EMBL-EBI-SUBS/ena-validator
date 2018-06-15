@@ -50,6 +50,8 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
         if (haveAssays) {
             Submittable<Assay> wrappedAssay = validationEnvelope.getAssays().iterator().next();
 
+            SampleAccessionAdjuster.fixSampleAccession(wrappedAssay.getBaseSubmittable());
+
             if (validationEnvelope.getSubmissionId().equals(wrappedAssay.getSubmissionId())) {
                 submissionEnvelope.getAssays().add(wrappedAssay.getBaseSubmittable());
             }
@@ -91,6 +93,7 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
         if (message.equals("Sample in experiment is null")) {
             return false;
         }
+
 
         return true;
     }

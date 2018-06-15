@@ -132,8 +132,11 @@ public class ENAAssayValidatorTest {
         String assayAlias = UUID.randomUUID().toString();
         String studyAlias = UUID.randomUUID().toString();
         String submissionId = UUID.randomUUID().toString();
+        String sampleAlias = UUID.randomUUID().toString();
 
-        Assay assay = TestHelper.getAssay(assayAlias, team, TestAccessions.BIOSAMPLE_ACCESSION, studyAlias);
+        Assay assay = TestHelper.getAssay(assayAlias, team, null, studyAlias);
+        assay.getSampleUses().get(0).getSampleRef().setAlias(sampleAlias);
+
         Study study = TestHelper.getStudy(studyAlias, team, "study_abstract", "Whole Genome Sequencing");
 
         AssayValidationMessageEnvelope envelope = new AssayValidationMessageEnvelope();
