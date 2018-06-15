@@ -188,10 +188,13 @@ public class ENAAssayDataValidatorTest {
         final Team team = TestHelper.getTeam(CENTER_NAME);
         final String assayDataAlias = UUID.randomUUID().toString();
         final String assayAlias = UUID.randomUUID().toString();
+        final String sampleAlias = UUID.randomUUID().toString();
         final String submissionId = UUID.randomUUID().toString();
 
         AssayData assayData = TestHelper.getAssayData(assayDataAlias, team, assayDataAlias);
-        Assay assay = TestHelper.getAssay(assayAlias, team, TestAccessions.BIOSAMPLE_ACCESSION, "study");
+        Assay assay = TestHelper.getAssay(assayAlias, team, null, "study");
+        assay.getSampleUses().get(0).getSampleRef().setAlias(sampleAlias);
+
         Submittable<Assay> wrappedAssay = new Submittable<>(assay, submissionId);
 
         AssayDataValidationMessageEnvelope envelope = new AssayDataValidationMessageEnvelope();
