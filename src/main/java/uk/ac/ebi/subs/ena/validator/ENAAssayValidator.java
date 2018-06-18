@@ -3,6 +3,7 @@ package uk.ac.ebi.subs.ena.validator;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.stereotype.Service;
+import uk.ac.ebi.subs.data.component.SampleUse;
 import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.data.submittable.Sample;
 import uk.ac.ebi.subs.ena.errors.EnaDataErrorMessage;
@@ -11,6 +12,7 @@ import uk.ac.ebi.subs.ena.processor.ENAProcessor;
 import uk.ac.ebi.subs.processing.SubmissionEnvelope;
 import uk.ac.ebi.subs.validator.data.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,6 +62,9 @@ public class ENAAssayValidator extends ENAValidator<Assay> {
     public void validateAssay(AssayValidationMessageEnvelope validationEnvelope) {
         final Assay assay = validationEnvelope.getEntityToValidate();
         SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope();
+
+
+        SampleAccessionAdjuster.fixSampleAccession(assay);
 
         submissionEnvelope.setSubmission(createSubmission(validationEnvelope.getSubmissionId()));
 
