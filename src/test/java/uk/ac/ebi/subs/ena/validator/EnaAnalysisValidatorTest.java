@@ -12,20 +12,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.submittable.Analysis;
-import uk.ac.ebi.subs.data.submittable.Assay;
 import uk.ac.ebi.subs.data.submittable.Sample;
 import uk.ac.ebi.subs.data.submittable.Study;
 import uk.ac.ebi.subs.ena.EnaAgentApplication;
 import uk.ac.ebi.subs.ena.helper.TestHelper;
 import uk.ac.ebi.subs.messaging.Exchanges;
 import uk.ac.ebi.subs.validator.data.AnalysisValidationEnvelope;
-import uk.ac.ebi.subs.validator.data.AssayDataValidationMessageEnvelope;
-import uk.ac.ebi.subs.validator.data.AssayValidationMessageEnvelope;
 import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.data.SingleValidationResultsEnvelope;
 import uk.ac.ebi.subs.validator.model.Submittable;
 
-import java.util.Collections;
 import java.util.UUID;
 
 import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.assertEnvelopesEqual;
@@ -53,7 +49,7 @@ public class EnaAnalysisValidatorTest {
     private static final String CENTER_NAME = "test-team";
 
     @Test
-    public void test_good_analysis(){
+    public void test_good_analysis() {
         AnalysisValidationEnvelope envelope = createAnalysisEnvelope();
 
         enaAnalysisValidator.validateAnalysis(envelope);
@@ -79,12 +75,12 @@ public class EnaAnalysisValidatorTest {
     public void test_validation_with_no_study_ref() {
         AnalysisValidationEnvelope envelope = createAnalysisEnvelope();
 
-        envelope.getEntityToValidate().setStudyRefs(Collections.emptyList()); // break the study
+        envelope.getEntityToValidate().getStudyRefs().clear();
 
         SingleValidationResult missingStudyRef = errorResult(
                 envelope,
-                "In analysis, alias:\""+envelope.getEntityToValidate().getAlias()
-                        +"@USI-test-team\", accession:\"\". Invalid number of study references: 0. Supported study references for SEQUENCE_VARIATION analysis type are: 1"
+                "In analysis, alias:\"" + envelope.getEntityToValidate().getAlias()
+                        + "@USI-test-team\", accession:\"\". Invalid number of study references: 0. Supported study references for SEQUENCE_VARIATION analysis type are: 1"
         );
 
         SingleValidationResultsEnvelope expectedEnvelope = expectedEnvelope(
@@ -117,13 +113,13 @@ public class EnaAnalysisValidatorTest {
         analysis.getSampleRefs().get(0).setAlias(sampleAlias);
 
         Study study = TestHelper.getStudy(studyAlias, team, "study_abstract", "Whole Genome Sequencing");
-        Sample sample = TestHelper.getSample(sampleAlias,team);
+        Sample sample = TestHelper.getSample(sampleAlias, team);
 
         AnalysisValidationEnvelope envelope = new AnalysisValidationEnvelope();
         envelope.setEntityToValidate(analysis);
 
-        envelope.getStudies().add(new Submittable<Study>(study,submissionId));
-        envelope.getSamples().add(new Submittable<Sample>(sample,submissionId));
+        envelope.getStudies().add(new Submittable<Study>(study, submissionId));
+        envelope.getSamples().add(new Submittable<Sample>(sample, submissionId));
         envelope.setSubmissionId(submissionId);
         envelope.setValidationResultUUID(UUID.randomUUID().toString());
         envelope.setValidationResultVersion(7);
