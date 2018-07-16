@@ -129,12 +129,12 @@ public class EnaValidatorQueueConfiguration {
     }
 
     /**
-     * Create a {@link Binding} between the validation exchange and ENA assay data validation queue
+     * Create a {@link Binding} between the validation exchange and ENA analysis data validation queue
      * using the routing key of created assay data related to ENA.
      *
-     * @param enaAnalysisQueue {@link Queue} for validating ENA sequence variation related assay data
+     * @param enaAnalysisQueue {@link Queue} for validating ENA analysis data
      * @param submissionExchange {@link TopicExchange} for validation
-     * @return a {@link Binding} between the validation exchange and ENA assay data validation queue
+     * @return a {@link Binding} between the validation exchange and ENA analysis data validation queue
      * using the routing key of created assay data related to ENA.
      */
     @Bean
