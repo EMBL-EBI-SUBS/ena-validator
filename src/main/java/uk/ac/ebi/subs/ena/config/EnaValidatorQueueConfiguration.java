@@ -122,4 +122,24 @@ public class EnaValidatorQueueConfiguration {
         return BindingBuilder.bind(enaAssayDataQueue).to(submissionExchange)
                 .with(EVENT_ENA_ASSAYDATA_VALIDATION);
     }
+
+    @Bean
+    Queue enaAnalysisQueue() {
+        return Queues.buildQueueWithDlx(ENA_ANALYSIS_VALIDATION);
+    }
+
+    /**
+     * Create a {@link Binding} between the validation exchange and ENA analysis data validation queue
+     * using the routing key of created assay data related to ENA.
+     *
+     * @param enaAnalysisQueue {@link Queue} for validating ENA analysis data
+     * @param submissionExchange {@link TopicExchange} for validation
+     * @return a {@link Binding} between the validation exchange and ENA analysis data validation queue
+     * using the routing key of created assay data related to ENA.
+     */
+    @Bean
+    Binding validationForCreatedENAAnalysisBinding(Queue enaAnalysisQueue, TopicExchange submissionExchange) {
+        return BindingBuilder.bind(enaAnalysisQueue).to(submissionExchange)
+                .with(EVENT_ENA_ANALYSIS_VALIDATION);
+    }
 }
