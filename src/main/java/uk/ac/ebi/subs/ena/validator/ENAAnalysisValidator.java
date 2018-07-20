@@ -16,7 +16,9 @@ import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import uk.ac.ebi.subs.validator.model.Submittable;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static uk.ac.ebi.subs.ena.config.EnaValidatorQueues.ENA_ANALYSIS_VALIDATION;
@@ -24,8 +26,14 @@ import static uk.ac.ebi.subs.ena.config.EnaValidatorQueues.ENA_ANALYSIS_VALIDATI
 @Service
 public class ENAAnalysisValidator extends ENAValidator<Analysis> {
 
+    private final Set<String> messagesToIgnore = new HashSet<>();
+
     public ENAAnalysisValidator(ENAProcessor enaProcessor, RabbitMessagingTemplate rabbitMessagingTemplate) {
         super(enaProcessor, rabbitMessagingTemplate);
+
+        messagesToIgnore.add("Failed to validate analysis xml, error: Expected attribute: checksum_method in element FILE");
+        messagesToIgnore.add("Sample in experiment is null");
+        messagesToIgnore.add("Failed to validate analysis xml, error: Expected attribute: checksum in element FILE");
     }
 
     /**
@@ -108,10 +116,6 @@ public class ENAAnalysisValidator extends ENAValidator<Analysis> {
 
     @Override
     boolean isErrorRelevant(String message, Analysis entityToValidate) {
-        if (message.equals("Sample in experiment is null")) {
-            return false;
-        }
-
-        return true;
+        return  !(messagesToIgnore.contains(message));
     }
 }
