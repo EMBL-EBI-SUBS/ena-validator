@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.ac.ebi.subs.data.component.File;
 import uk.ac.ebi.subs.data.component.Team;
 import uk.ac.ebi.subs.data.submittable.Analysis;
 import uk.ac.ebi.subs.data.submittable.Sample;
@@ -117,6 +118,11 @@ public class EnaAnalysisValidatorTest {
 
         AnalysisValidationEnvelope envelope = new AnalysisValidationEnvelope();
         envelope.setEntityToValidate(analysis);
+
+        File vcfFile = new File();
+        vcfFile.setName("test.vcf.gz");
+        vcfFile.setType("vcf");
+        analysis.getFiles().add(vcfFile);
 
         envelope.getStudies().add(new Submittable<Study>(study, submissionId));
         envelope.getSamples().add(new Submittable<Sample>(sample, submissionId));
