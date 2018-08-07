@@ -1,5 +1,5 @@
 group 'uk.ac.ebi.subs'
-version '2.3.1-SNAPSHOT'
+version '2.3.2-SNAPSHOT'
 
 buildscript {
     repositories {
@@ -34,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    compile ("uk.ac.ebi.subs:subs-ena-core-service:2.4.1-SNAPSHOT")
+    compile ("uk.ac.ebi.subs:subs-ena-core-service:2.4.2-SNAPSHOT")
     compile("org.springframework.boot:spring-boot-starter")
     testCompile("org.springframework.boot:spring-boot-starter-test")
 }
