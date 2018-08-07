@@ -172,7 +172,7 @@ public class ENAAssayDataValidatorTest {
 
         enaAssayDataValidator.validateAssayData(envelope);
 
-        Mockito.verify(rabbitMessagingTemplate, Mockito.atLeastOnce())
+        Mockito.verify(rabbitMessagingTemplate)
                 .convertAndSend(
                         Mockito.eq(Exchanges.SUBMISSIONS),
                         Mockito.anyString(),
