@@ -5,6 +5,9 @@ import uk.ac.ebi.subs.validator.data.SingleValidationResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * It is a helper class to check the error type (data or reference related error).
+ */
 public class EnaErrorMessageHelper {
     private final Pattern dataErrorRegex = Pattern.compile(
             "^In (\\w+), alias:\"(.+)@USI-(.*)\", accession:\"(.*)\". (.*)"

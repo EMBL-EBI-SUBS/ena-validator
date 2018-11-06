@@ -2,6 +2,9 @@ package uk.ac.ebi.subs.ena.errors;
 
 import java.util.Objects;
 
+/**
+ * This class represents an error message data object dealing with ENA related reference errors.
+ */
 public class EnaReferenceErrorMessage {
 
     private final String referenceLocator;

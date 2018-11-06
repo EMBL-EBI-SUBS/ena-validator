@@ -18,7 +18,9 @@ import java.util.List;
 import static uk.ac.ebi.subs.ena.config.EnaValidatorQueues.ENA_ASSAYDATA_VALIDATION;
 
 /**
- * This class responsible to do the ENA related validations.
+ * This listener listens on the {@code ENA_ASSAYDATA_VALIDATION} RabbitMQ queue,
+ * executes validation of the published assay data object
+ * and send the validation outcome to the validation service.
  */
 @Service
 public class ENAAssayDataValidator extends ENAValidator<AssayData> {
@@ -68,11 +70,7 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
 
     @Override
     boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, AssayData entityToValidate) {
-        if (enaReferenceErrorMessage.getReferenceLocator().equals("SAMPLE_DESCRIPTOR") ){
-            return false;
-        }
-
-        return true;
+        return !enaReferenceErrorMessage.getReferenceLocator().equals("SAMPLE_DESCRIPTOR");
     }
 
     @Override
@@ -93,7 +91,6 @@ public class ENAAssayDataValidator extends ENAValidator<AssayData> {
         if (message.equals("Sample in experiment is null")) {
             return false;
         }
-
 
         return true;
     }

@@ -19,7 +19,9 @@ import java.util.stream.Collectors;
 import static uk.ac.ebi.subs.ena.config.EnaValidatorQueues.ENA_ASSAY_VALIDATION;
 
 /**
- * This class responsible to do the ENA related validations.
+ * This listener listens on the {@code ENA_ASSAY_VALIDATION} RabbitMQ queue,
+ * executes validation of the published assay §object
+ * and send the validation outcome to the validation service.
  */
 @Service
 public class ENAAssayValidator extends ENAValidator<Assay> {
@@ -35,19 +37,12 @@ public class ENAAssayValidator extends ENAValidator<Assay> {
 
     @Override
     boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, Assay entityToValidate) {
-        if (enaReferenceErrorMessage.getReferenceLocator().equals("SAMPLE_DESCRIPTOR")){
-            return false;
-        }
-        return true;
+        return !enaReferenceErrorMessage.getReferenceLocator().equals("SAMPLE_DESCRIPTOR");
     }
 
     @Override
     boolean isErrorRelevant(String message, Assay entityToValidate) {
-        if (message.equals("Sample in experiment is null")){
-            return false;
-        }
-
-        return true;
+        return !message.equals("Sample in experiment is null");
     }
 
     /**
@@ -62,7 +57,6 @@ public class ENAAssayValidator extends ENAValidator<Assay> {
     public void validateAssay(AssayValidationMessageEnvelope validationEnvelope) {
         final Assay assay = validationEnvelope.getEntityToValidate();
         SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope();
-
 
         SampleAccessionAdjuster.fixSampleAccession(assay);
 
@@ -83,5 +77,4 @@ public class ENAAssayValidator extends ENAValidator<Assay> {
                 validationEnvelope.getValidationResultUUID(),
                 validationEnvelope.getValidationResultVersion());
     }
-
 }
