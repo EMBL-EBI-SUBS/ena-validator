@@ -26,6 +26,10 @@ import static uk.ac.ebi.subs.ena.config.EnaValidatorRoutingKeys.EVENT_VALIDATION
 import static uk.ac.ebi.subs.ena.config.EnaValidatorRoutingKeys.EVENT_VALIDATION_SUCCESS;
 
 /**
+ * This is the base class for ENA related validation.
+ * Validation for submittable objects (like sample, study, assay, assay data, analysis)
+ * are extending this base validator to add their specific validation code.
+ *
  * Created by karoly on 14/06/2017.
  */
 @Service
@@ -59,9 +63,6 @@ public abstract class ENAValidator<T extends BaseSubmittable> {
         }
     }
 
-    /*
-
-     */
     private List<SingleValidationResult> filterValidationResults(List<SingleValidationResult> rawValidationResults, T entityToValidate) {
         List<SingleValidationResult> passedMessages = new ArrayList<>();
 
@@ -79,10 +80,7 @@ public abstract class ENAValidator<T extends BaseSubmittable> {
             } else if (isErrorRelevant(validationResult.getMessage(), entityToValidate)) {
                 passedMessages.add(validationResult);
             }
-
-
         }
-
 
         return passedMessages;
     }
@@ -126,7 +124,6 @@ public abstract class ENAValidator<T extends BaseSubmittable> {
 
             logger.info("Validation erred for {} entity with id: {}", submittable.getClass().getSimpleName(), submittable.getId());
         }
-
     }
 
     boolean hasValidationError(List<SingleValidationResult> validationResults) {
@@ -136,11 +133,6 @@ public abstract class ENAValidator<T extends BaseSubmittable> {
                 .orElse(null);
 
         return errorValidationResult != null;
-    }
-
-    void checkForEmptySingleValidationResult(List<SingleValidationResult> singleValidationResultList, Submittable submittable) {
-        if (singleValidationResultList.isEmpty())
-            singleValidationResultList.add(createEmptySingleValidationResult(submittable));
     }
 
     SingleValidationResult createEmptySingleValidationResult(Submittable submittable) {

@@ -2,6 +2,9 @@ package uk.ac.ebi.subs.ena.errors;
 
 import java.util.Objects;
 
+/**
+ * This class represents an error message coming from the ENA archive.
+ */
 public class EnaDataErrorMessage {
 
     private final String enaEntityType;

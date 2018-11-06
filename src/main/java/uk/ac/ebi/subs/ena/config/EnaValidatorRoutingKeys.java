@@ -1,5 +1,8 @@
 package uk.ac.ebi.subs.ena.config;
 
+/**
+ * Validator routing key names related to ENA validation.
+ */
 public class EnaValidatorRoutingKeys {
 
     public static final String EVENT_VALIDATION_SUCCESS = "validation.success";

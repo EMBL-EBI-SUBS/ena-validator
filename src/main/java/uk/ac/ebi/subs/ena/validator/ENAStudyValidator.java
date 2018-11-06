@@ -16,7 +16,9 @@ import java.util.List;
 import static uk.ac.ebi.subs.ena.config.EnaValidatorQueues.ENA_STUDY_VALIDATION;
 
 /**
- * This class responsible to do the ENA related validations.
+ * This listener listens on the {@code ENA_STUDY_VALIDATION} RabbitMQ queue,
+ * executes validation of the published study §object
+ * and send the validation outcome to the validation service.
  */
 @Service
 public class ENAStudyValidator extends ENAValidator<Study> {
@@ -62,5 +64,4 @@ public class ENAStudyValidator extends ENAValidator<Study> {
                 validationEnvelope.getValidationResultUUID(),
                 validationEnvelope.getValidationResultVersion());
     }
-
 }
