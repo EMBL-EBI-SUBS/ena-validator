@@ -1,5 +1,8 @@
 package uk.ac.ebi.subs.ena.config;
 
+/**
+ * Validator queue names related to ENA validation.
+ */
 public class EnaValidatorQueues {
 
     public static final String ENA_STUDY_VALIDATION = "ena-study-validation";

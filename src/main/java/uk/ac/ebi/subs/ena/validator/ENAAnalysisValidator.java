@@ -23,6 +23,11 @@ import java.util.stream.Collectors;
 
 import static uk.ac.ebi.subs.ena.config.EnaValidatorQueues.ENA_ANALYSIS_VALIDATION;
 
+/**
+ * This listener listens on the {@code ENA_ANALYSIS_VALIDATION} RabbitMQ queue,
+ * executes validation of the published analysis object
+ * and send the validation outcome to the validation service.
+ */
 @Service
 public class ENAAnalysisValidator extends ENAValidator<Analysis> {
 
@@ -91,14 +96,9 @@ public class ENAAnalysisValidator extends ENAValidator<Analysis> {
                 .addAll(samples);
     }
 
-
     @Override
     boolean isErrorRelevant(EnaReferenceErrorMessage enaReferenceErrorMessage, Analysis entityToValidate) {
-        if (enaReferenceErrorMessage.getReferenceLocator().equals("SAMPLE_DESCRIPTOR")) {
-            return false;
-        }
-
-        return true;
+        return !enaReferenceErrorMessage.getReferenceLocator().equals("SAMPLE_DESCRIPTOR");
     }
 
     @Override

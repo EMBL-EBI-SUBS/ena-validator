@@ -82,7 +82,8 @@ public class ENAAssayValidatorTest {
         SingleValidationResultsEnvelope expectedEnvelope = expectedEnvelope(
                 assayValidationMessageEnvelope,
                 errorResult(assayValidationMessageEnvelope,
-                        "In experiment, alias:\""+assay.getAlias()+"@USI-test-team\", accession:\"\". Missing study reference from experiment"
+                        "In experiment, alias:\""+assay.getAlias()+"@USI-test-team\", accession:\"\", In reference:\"STUDY_REF\", reference alias:\"\", reference accession:\"\"."
+                        + " Failed to find referenced study, accession \"\"."
                         )
         );
 

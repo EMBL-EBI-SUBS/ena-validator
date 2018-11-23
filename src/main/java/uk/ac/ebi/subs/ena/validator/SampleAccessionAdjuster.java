@@ -21,7 +21,7 @@ public class SampleAccessionAdjuster {
                     .map(sampleUse -> sampleUse.getSampleRef())
                     .filter(sampleRef -> !sampleRef.isAccessioned())
                     .filter(sampleRef -> sampleRef.getAlias() != null)
-                    .forEach(sampleRef -> sampleRef.setAccession("SAMEA4452027"));
+                    .forEach(sampleRef -> sampleRef.setAccession("SAMEA1034365"));
         }
     }
 }
