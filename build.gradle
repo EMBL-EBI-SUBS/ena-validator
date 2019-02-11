@@ -1,5 +1,5 @@
 group 'uk.ac.ebi.subs'
-version '2.4.3-SNAPSHOT'
+version '2.4.4-SNAPSHOT'
 
 buildscript {
     repositories {
@@ -36,6 +36,9 @@ repositories {
 dependencies {
     compile ("uk.ac.ebi.subs:subs-ena-core-service:2.5.1-SNAPSHOT")
     compile("org.springframework.boot:spring-boot-starter")
+
+    compile("de.siegmar:logback-gelf:1.1.0")
+    
     testCompile("org.springframework.boot:spring-boot-starter-test"){
         exclude group: "com.vaadin.external.google", module:"android-json"
     }
