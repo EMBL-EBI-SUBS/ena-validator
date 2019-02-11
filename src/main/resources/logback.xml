@@ -1,0 +1,46 @@
+<configuration>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %d %p [%c] - &lt;%m&gt;%n
+            </pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+    </appender>
+
+    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/ena-validator.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/ena-validator-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>40</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d %p [%c] - &lt;%m&gt;%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="GELF" class="de.siegmar.logbackgelf.GelfUdpAppender">
+        <graylogHost>${GRAYLOG_HOST}</graylogHost>
+        <graylogPort>${GRAYLOG_PORT}</graylogPort>
+        <layout class="de.siegmar.logbackgelf.GelfLayout">
+            <staticField>application:${SPRING_APP}</staticField>
+            <staticField>project:USI</staticField>
+            <staticField>environment:${SPRING_PROFILE}</staticField>
+        </layout>
+    </appender>
+
+    <logger name="log4j.logger.org.springframework.security" level="INFO"/>
+    <logger name="org.springframework.security" level="INFO"/>
+
+    <root>
+        <level value="INFO" />
+        <appender-ref ref="stdout" />
+        <appender-ref ref="ROLLING" />
+        <appender-ref ref="GELF"/>
+    </root>
+
+</configuration>
