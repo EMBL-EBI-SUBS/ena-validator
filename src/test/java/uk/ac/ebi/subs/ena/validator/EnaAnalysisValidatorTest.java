@@ -1,6 +1,7 @@
 package uk.ac.ebi.subs.ena.validator;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -32,6 +33,7 @@ import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.passResult;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
+@Ignore // SUBS-1663
 public class EnaAnalysisValidatorTest {
 
     @Autowired
