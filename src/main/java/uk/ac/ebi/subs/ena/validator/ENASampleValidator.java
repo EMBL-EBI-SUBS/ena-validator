@@ -54,6 +54,10 @@ public class ENASampleValidator extends ENAValidator<Sample> {
     @RabbitListener(queues = ENA_SAMPLE_VALIDATION)
     public void validateSample(SampleValidationMessageEnvelope validationEnvelope) {
         final Sample sample = validationEnvelope.getEntityToValidate();
+
+        // we don't want to send BioSamples accession ID to ENA, its format is not compatible with ENA.
+        sample.setAccession(null);
+
         SubmissionEnvelope submissionEnvelope = new SubmissionEnvelope();
 
         submissionEnvelope.setSubmission(createSubmission(validationEnvelope.getSubmissionId()));
