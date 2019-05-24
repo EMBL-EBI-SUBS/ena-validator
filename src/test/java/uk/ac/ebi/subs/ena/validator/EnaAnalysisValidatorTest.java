@@ -33,6 +33,7 @@ import static uk.ac.ebi.subs.ena.validator.ValidationResultUtil.passResult;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {EnaAgentApplication.class})
+@Ignore // SUBS-1663
 public class EnaAnalysisValidatorTest {
 
     @Autowired
