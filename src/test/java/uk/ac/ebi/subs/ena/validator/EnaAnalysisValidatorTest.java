@@ -52,6 +52,7 @@ public class EnaAnalysisValidatorTest {
     private static final String CENTER_NAME = "test-team";
 
     @Test
+    @Ignore
     public void test_good_analysis() {
         AnalysisValidationEnvelope envelope = createAnalysisEnvelope();
 
@@ -75,6 +76,7 @@ public class EnaAnalysisValidatorTest {
     }
 
     @Test
+    @Ignore
     public void test_validation_with_no_study_ref() {
         AnalysisValidationEnvelope envelope = createAnalysisEnvelope();
 
@@ -126,8 +128,8 @@ public class EnaAnalysisValidatorTest {
         vcfFile.setType("vcf");
         analysis.getFiles().add(vcfFile);
 
-        envelope.getStudies().add(new Submittable<Study>(study, submissionId));
-        envelope.getSamples().add(new Submittable<Sample>(sample, submissionId));
+        envelope.getStudies().add(new Submittable<>(study, submissionId));
+        envelope.getSamples().add(new Submittable<>(sample, submissionId));
         envelope.setSubmissionId(submissionId);
         envelope.setValidationResultUUID(UUID.randomUUID().toString());
         envelope.setValidationResultVersion(7);
