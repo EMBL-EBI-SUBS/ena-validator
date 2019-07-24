@@ -38,9 +38,6 @@ usi:
         - metabolomicsStudies
 
 spring:
-  boot:
-    admin:
-      url: http://localhost:9000
   application:
     name: ena-validator
 
