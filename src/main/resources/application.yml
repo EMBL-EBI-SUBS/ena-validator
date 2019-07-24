@@ -1,0 +1,11 @@
+server:
+  port: 0
+
+ena:
+  processor_list: ENAStudyProcessor,ENAExperimentProcessor
+  login_name: ${enaLoginName}
+  password: ${enaPassword}
+  submission:
+    url: https://www-test.ebi.ac.uk/ena/submit/drop-box/submit
+  action_services: StudyActionService,SampleActionService,AssayActionService,AssayDataActionService,ValidationActionService,SequenceVariationAnalysisActionService
+

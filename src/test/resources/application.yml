@@ -1,0 +1,7 @@
+ena:
+  login_name: ${enaLoginName}
+  password: ${enaPassword}
+  processor_list: ENAStudyProcessor,ENASampleProcessor,ENAExperimentProcessor
+  submission:
+    url: https://www-test.ebi.ac.uk/ena/submit/drop-box/submit
+  action_services: StudyActionService,SampleActionService,AssayActionService,AssayDataActionService,ValidationActionService,SequenceVariationAnalysisActionService
