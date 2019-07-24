@@ -1,9 +1,9 @@
 server:
   port: 0
-
 spring:
-  main:
-    web-environment: true
+  boot:
+    admin:
+      url: http://localhost:9000
 
 ena:
   processor_list: ENAStudyProcessor,ENAExperimentProcessor
