@@ -1,6 +1,10 @@
 server:
   port: 0
 
+spring:
+  main:
+    web-environment: true
+
 ena:
   processor_list: ENAStudyProcessor,ENAExperimentProcessor
   login_name: ${enaLoginName}
@@ -8,4 +12,3 @@ ena:
   submission:
     url: https://www-test.ebi.ac.uk/ena/submit/drop-box/submit
   action_services: StudyActionService,SampleActionService,AssayActionService,AssayDataActionService,ValidationActionService,SequenceVariationAnalysisActionService
-
