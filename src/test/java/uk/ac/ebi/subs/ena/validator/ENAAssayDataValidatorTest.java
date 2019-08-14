@@ -117,14 +117,6 @@ public class ENAAssayDataValidatorTest {
 
         envelope.getEntityToValidate().setFiles(Collections.emptyList()); // break the file
 
-        SingleValidationResult missingFileGroup = errorResult(
-                envelope,
-                "In run, alias:\"" +
-                        envelope.getEntityToValidate().getAlias() +
-                        "@USI-test-team\", accession:\"\". Invalid group of files: . Supported file grouping(s) are: [ at least 1 \"CompleteGenomics_native\" files],[1 \"OxfordNanopore_native\" file],[ at least 1 \"PacBio_HDF5\" files],[1 \"bam\" file],[1 \"cram\" file],[1..2 \"fastq\" files],[1 \"sff\" file],[1 \"srf\" file]."
-
-        );
-
         SingleValidationResult missingFileElement = errorResult(
                 envelope,
                 "Failed to validate run xml, error: Expected element 'FILE' before the end of the content in element FILES"
@@ -132,7 +124,7 @@ public class ENAAssayDataValidatorTest {
 
         SingleValidationResultsEnvelope expectedEnvelope = expectedEnvelope(
                 envelope,
-                missingFileElement, missingFileGroup
+                missingFileElement
         );
 
         enaAssayDataValidator.validateAssayData(envelope);
