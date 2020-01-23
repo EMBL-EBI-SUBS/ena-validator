@@ -35,7 +35,7 @@ repositories {
 }
 
 dependencies {
-    compile ("uk.ac.ebi.subs:subs-ena-core-service:2.6.1-SNAPSHOT")
+    compile ("uk.ac.ebi.subs:subs-ena-core-service:2.6.2-SNAPSHOT")
     
     compile("org.springframework.boot:spring-boot-starter")
     compile 'de.codecentric:spring-boot-admin-starter-client:1.5.7'
