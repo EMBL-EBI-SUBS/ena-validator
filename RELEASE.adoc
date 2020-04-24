@@ -1,0 +1,17 @@
+= [.ebi-color]#Release notes#
+:toc: auto
+
+This pages contains links to release notes for DSP's ENA Validator.
+
+[[section]]
+== v2.7.0 Release notes
+
+Bug fixes:
+--------------
+1. [Subs 1826] Fix centre name mapping. There was a typo in the centre name mapping.
+--------------
+
+Platform upgrades:
+--------------
+1. DSP's ENA Validator now runs on Java 11 (Open JDK 11).
+--------------
