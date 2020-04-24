@@ -4,6 +4,14 @@
 This pages contains links to release notes for DSP's ENA Validator.
 
 [[section]]
+== v2.8.0 Release notes
+
+Bug fixes:
+--------------
+1. [Subs 1825] Study and Sample release date information is now passed along to the archive.
+--------------
+
+[[section]]
 == v2.7.0 Release notes
 
 Bug fixes:
