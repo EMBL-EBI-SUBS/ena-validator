@@ -105,24 +105,21 @@ remotes {
 task deployJar(type: SshTask, dependsOn: 'assemble') {
     doLast {
         def uploadJarFileName = project.name + "-"  + project.version + "." + System.currentTimeMillis() + ".jar"
-        File jarDeployDir = new File("/data/$gradle_env/$project.name/jar",uploadJarFileName)
-        sshRun(jarDeployDir)
+        sshRun("/data/$gradle_env/$project.name/jar", uploadJarFileName)
     }
     ssh.settings {
         knownHosts = allowAnyHosts
     }
 }
 
-private Object sshRun(File jarDeployFile) {
-    def uploadJarFileName = name + "-"  + version + "." + System.currentTimeMillis() + ".jar"
-    File jarDeployDir = jarDeployFile.getParentFile()
+private Object sshRun(String jarDeployDir, String uploadJarFileName) {
     ssh.run {
         session(remotes.role(gradle_env)) {
             execute "/homes/sub_adm/create_dirs.sh $gradle_env $project.name", ignoreError: false
-            println "Uploading jar $jar.archivePath.name to $jarDeployDir/$uploadJarFileName  area on $remote"
-            put(jar.archivePath.absolutePath, jarDeployFile.absolutePath)
+            println "Uploading jar $jar.archivePath.name to $jarDeployDir/$uploadJarFileName area on $remote"
+            put(jar.archivePath.absolutePath, "$jarDeployDir/$uploadJarFileName")
             println "creating symbolic link to $jar.archiveName"
-            def result = execute "ln -s -f $jarDeployFile.absolutePath $jarDeployDir/$jar.baseName" + ".jar", ignoreError: true
+            def result = execute "ln -s -f $jarDeployDir/$uploadJarFileName $jarDeployDir/$jar.baseName" + ".jar", ignoreError: true
             println result
             println "updating permissions of $jarDeployDir/$jar.archiveName"
             execute "chmod u+x $jarDeployDir/*", ignoreError: false
