@@ -14,6 +14,8 @@ import java.util.UUID;
  */
 public final class ValidatorTestUtil {
 
+    private static final String ILLUMINA_GENOME_ANALYZER_INSTRUMENT_MODEL = "Illumina Genome Analyzer";
+
     public static Sample createSample() {
         String alias = getAlias();
         final Team team = getTeam("test-team");
@@ -29,7 +31,8 @@ public final class ValidatorTestUtil {
     public static Assay createAssay(String assayAlias, String centerName, String sampleAlias, String studyAlias) {
         String alias = getAlias();
         final Team team = getTeam(centerName);
-        Assay assay = TestHelper.getAssay(assayAlias, team, sampleAlias, studyAlias);
+        Assay assay = TestHelper.getAssay(
+                assayAlias, team, sampleAlias, studyAlias, ILLUMINA_GENOME_ANALYZER_INSTRUMENT_MODEL);
         assay.setId(UUID.randomUUID().toString());
         return assay;
     }

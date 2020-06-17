@@ -53,6 +53,8 @@ public class ENAAssayDataValidatorTest {
 
     private static final String SUBMISSION_ID = "12ab34cd-1234-5678-9999-aabbccddeeff";
 
+    private static final String ILLUMINA_GENOME_ANALYZER_INSTRUMENT_MODEL = "Illumina Genome Analyzer";
+
     private ArgumentCaptor<SingleValidationResultsEnvelope> envelopeArgumentCaptor;
 
     @Before
@@ -72,7 +74,8 @@ public class ENAAssayDataValidatorTest {
         final Study study = TestHelper.getStudy(
                 alias, team, "study_abstract", "Whole Genome Sequencing");
         final Sample sample = TestHelper.getSample(alias, team);
-        final Assay assay = TestHelper.getAssay(alias, team, TestAccessions.BIOSAMPLE_ACCESSION, alias);
+        final Assay assay = TestHelper.getAssay(
+                alias, team, TestAccessions.BIOSAMPLE_ACCESSION, alias, ILLUMINA_GENOME_ANALYZER_INSTRUMENT_MODEL);
         final AssayData assayData = TestHelper.getAssayData(alias, team, alias);
 
         final String filename = "missing_file_while_validation.fastq.gz";
@@ -184,7 +187,8 @@ public class ENAAssayDataValidatorTest {
         final String submissionId = UUID.randomUUID().toString();
 
         AssayData assayData = TestHelper.getAssayData(assayDataAlias, team, assayDataAlias);
-        Assay assay = TestHelper.getAssay(assayAlias, team, null, "study");
+        Assay assay = TestHelper.getAssay(
+                assayAlias, team, null, "study", ILLUMINA_GENOME_ANALYZER_INSTRUMENT_MODEL);
         assay.getSampleUses().get(0).getSampleRef().setAlias(sampleAlias);
 
         Submittable<Assay> wrappedAssay = new Submittable<>(assay, submissionId);
