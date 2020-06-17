@@ -38,6 +38,8 @@ public class ENAAssayValidatorTest {
     @MockBean
     RabbitMessagingTemplate rabbitMessagingTemplate;
 
+    private static final String ILLUMINA_GENOME_ANALYZER_INSTRUMENT_MODEL = "Illumina Genome Analyzer";
+
     private ArgumentCaptor<SingleValidationResultsEnvelope> envelopeArgumentCaptor;
 
     @Before
@@ -135,7 +137,8 @@ public class ENAAssayValidatorTest {
         String submissionId = UUID.randomUUID().toString();
         String sampleAlias = UUID.randomUUID().toString();
 
-        Assay assay = TestHelper.getAssay(assayAlias, team, null, studyAlias);
+        Assay assay = TestHelper.getAssay(
+                assayAlias, team, null, studyAlias, ILLUMINA_GENOME_ANALYZER_INSTRUMENT_MODEL);
         assay.getSampleUses().get(0).getSampleRef().setAlias(sampleAlias);
 
         Study study = TestHelper.getStudy(studyAlias, team, "study_abstract", "Whole Genome Sequencing");
