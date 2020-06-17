@@ -22,7 +22,7 @@ repositories {
 }
 
 group 'uk.ac.ebi.subs'
-version '2.8.2-SNAPSHOT'
+version '2.10.1-SNAPSHOT'
 
 mainClassName = "uk.ac.ebi.subs.ena.EnaAgentApplication"
 
@@ -39,7 +39,7 @@ springBoot {
 }
 
 dependencies {
-    compile ("uk.ac.ebi.subs:subs-ena-core-service:2.8.2-SNAPSHOT")
+    compile ("uk.ac.ebi.subs:subs-ena-core-service:2.10.1-SNAPSHOT")
     
     compile("org.springframework.boot:spring-boot-starter")
     compile("org.springframework.boot:spring-boot-starter-amqp")
