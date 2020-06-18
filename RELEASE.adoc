@@ -4,6 +4,14 @@
 This pages contains links to release notes for DSP's ENA Validator.
 
 [[section]]
+== v2.10.1 Release notes
+
+Bug fixes:
+--------------
+1. [RT-425531] Experiment's instrument configuration has been updated according to this ENA web page: https://ena-docs.readthedocs.io/en/latest/submit/reads/webin-cli.html#instrument.
+--------------
+
+[[section]]
 == v2.8.0 Release notes
 
 Bug fixes:
