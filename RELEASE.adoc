@@ -4,6 +4,14 @@
 This pages contains links to release notes for DSP's ENA Validator.
 
 [[section]]
+== v2.10.2 Release notes
+
+Bug fixes:
+--------------
+1. [SUB-1946] Fixed handling entities with attributes that has null value.
+--------------
+
+[[section]]
 == v2.10.1 Release notes
 
 Bug fixes:
